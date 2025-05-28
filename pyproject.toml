@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling", "black", "lxml", "requests", "pytest", "ruff"]
+requires = ["hatchling", "black", "lxml", "pytest", "ruff"]
 build-backend = "hatchling.build"
 
 [project]
@@ -23,12 +23,13 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: Implementation :: CPython"
 ]
 dependencies = []
 
 [project.optional-dependencies]
-build = ["lxml", "requests"]
+build = ["lxml"]
 
 [project.urls]
 Homepage = "https://github.com/grking/python-wayland"

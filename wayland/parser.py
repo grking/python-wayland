@@ -30,9 +30,7 @@ import shutil
 import subprocess
 import tempfile
 from copy import deepcopy
-from typing import Dict, List, Optional
 
-import requests
 from lxml import etree
 
 from wayland.log import log
@@ -82,10 +80,10 @@ class WaylandParser:
 
     def _run(
         self,
-        cmd: List[str],
+        cmd: list[str],
         *,
-        cwd: Optional[str] = None,
-        env: Optional[Dict[str, str]] = None,
+        cwd: str | None = None,
+        env: dict[str, str] | None = None,
         check=True,
         stream_output=False,
     ):
@@ -98,7 +96,7 @@ class WaylandParser:
 
         log.info(" ".join(cmd))
 
-        result = subprocess.run(
+        return subprocess.run(
             cmd,
             cwd=cwd,
             env=env or os.environ.copy(),
@@ -107,15 +105,17 @@ class WaylandParser:
             stderr=stderr,
             text=True,
         )
-        return result
 
     def clone_git_repo(
         self,
         repo_url: str,
-        dest_dir: str = "/tmp/",
+        dest_dir: str | None = None,
         *,
         delete_existing=False,
     ) -> bool:
+        if dest_dir is None:
+            dest_dir = tempfile.gettempdir()
+
         repo_name = os.path.basename(repo_url)
         if repo_name.endswith(".git"):
             repo_name = repo_name[:-4]
@@ -172,7 +172,7 @@ class WaylandParser:
 
     def _scan_directories_for_xml_files(
         self,
-        directories_to_scan: List[str],
+        directories_to_scan: list[str],
         effective_ignore_set: set[str],
         source_name_for_logging: str = "specified directories",
     ) -> list[str]:
@@ -202,14 +202,14 @@ class WaylandParser:
 
     def get_local_files(
         self,
-        search_directories: Optional[List[str]] = None,
-        ignore_filenames: Optional[List[str]] = None,
+        search_directories: list[str] | None = None,
+        ignore_filenames: list[str] | None = None,
     ) -> list[str]:
         found_files_accumulator: list[str] = []
         global_ignore_set = set(ignore_filenames or [])
         if global_ignore_set:
             log.debug(
-                f"Global ignore list active for this call: {', '.join(sorted(list(global_ignore_set)))}"
+                f"Global ignore list active for this call: {', '.join(sorted(global_ignore_set))}"
             )
 
         dirs_actually_scanned_log: list[str] = []
@@ -243,11 +243,11 @@ class WaylandParser:
                 )
                 if source_specific_ignores:
                     log.debug(
-                        f"Source-specific ignores for {source_name}: {', '.join(sorted(list(source_specific_ignores)))}"
+                        f"Source-specific ignores for {source_name}: {', '.join(sorted(source_specific_ignores))}"
                     )
                 if current_effective_ignore_set:
                     log.debug(
-                        f"Effective ignores for {source_name}: {', '.join(sorted(list(current_effective_ignore_set)))}"
+                        f"Effective ignores for {source_name}: {', '.join(sorted(current_effective_ignore_set))}"
                     )
 
                 actual_search_paths_for_source = [
@@ -270,10 +270,10 @@ class WaylandParser:
                     f"{len(found_files_accumulator)} total files found so far after processing {source_name}."
                 )
 
-        unique_found_files = sorted(list(set(found_files_accumulator)))
+        unique_found_files = sorted(set(found_files_accumulator))
 
         if dirs_actually_scanned_log:
-            unique_scanned_dirs = sorted(list(set(dirs_actually_scanned_log)))
+            unique_scanned_dirs = sorted(set(dirs_actually_scanned_log))
             log.info(
                 f"Found {len(unique_found_files)} unique XML protocol files after scanning: {', '.join(unique_scanned_dirs)} (all ignore filters applied)."
             )
@@ -371,44 +371,44 @@ class WaylandParser:
                 f"Registering new interface '{interface_name}' v{current_version} from {current_path}."
             )
             return True
-        else:
-            stored_info = self.unique_interfaces_source[interface_name]
-            stored_version = stored_info["version"]  # type: ignore
-            stored_path = stored_info["path"]  # type: ignore
 
-            if current_version > stored_version:
-                log.info(
-                    f"Replacing older version {stored_version} of interface '{interface_name}' (from {stored_path}) "
-                    f"with newer version {current_version} (from {current_path})."
-                )
-                self.unique_interfaces_source[interface_name] = {
-                    "version": current_version,
-                    "path": current_path,
+        stored_info = self.unique_interfaces_source[interface_name]
+        stored_version = stored_info["version"]  # type: ignore
+        stored_path = stored_info["path"]  # type: ignore
+
+        if current_version > stored_version:
+            log.info(
+                f"Replacing older version {stored_version} of interface '{interface_name}' (from {stored_path}) "
+                f"with newer version {current_version} (from {current_path})."
+            )
+            self.unique_interfaces_source[interface_name] = {
+                "version": current_version,
+                "path": current_path,
+            }
+            if (
+                interface_name in self.interfaces
+            ):  # Clear out old data for this interface
+                self.interfaces[interface_name] = {
+                    "events": [],
+                    "requests": [],
+                    "enums": [],
                 }
-                if (
-                    interface_name in self.interfaces
-                ):  # Clear out old data for this interface
-                    self.interfaces[interface_name] = {
-                        "events": [],
-                        "requests": [],
-                        "enums": [],
-                    }
-                return True
-            elif current_version < stored_version:
-                log.info(
-                    f"Ignoring older version {current_version} of interface '{interface_name}' (from {current_path}). "
-                    f"Already loaded version {stored_version} (from {stored_path})."
-                )
-                return False
-            else:  # current_version == stored_version
-                log.warning(
-                    f"Ignoring duplicate interface definition for '{interface_name}' version {current_version}:\n"
-                    f"  Attempted to load from: {current_path}\n"
-                    f"  Already defined in:    {stored_path}"
-                )
-                return False
+            return True
+        if current_version < stored_version:
+            log.info(
+                f"Ignoring older version {current_version} of interface '{interface_name}' (from {current_path}). "
+                f"Already loaded version {stored_version} (from {stored_path})."
+            )
+            return False
+        # current_version == stored_version
+        log.warning(
+            f"Ignoring duplicate interface definition for '{interface_name}' version {current_version}:\n"
+            f"  Attempted to load from: {current_path}\n"
+            f"  Already defined in:    {stored_path}"
+        )
+        return False
 
-    def _get_xml_root(self, path: str) -> Optional[etree._Element]:
+    def _get_xml_root(self, path: str) -> etree._Element | None:
         """Loads and parses an XML file from a path or URL, returning the root element."""
         if not path.strip():
             log.warning("Empty path provided to _get_xml_root.")
@@ -417,7 +417,7 @@ class WaylandParser:
         xml_parser = etree.XMLParser(remove_blank_text=True)
 
         # Determine if it's a URL or local file path and set definition_uri
-        if path.startswith("http://") or path.startswith("https://"):
+        if path.startswith(("http://", "https://")):
             self.definition_uri = path  # For http, definition_uri remains the URL
             current_file_path_for_logging = path
         else:
@@ -425,28 +425,17 @@ class WaylandParser:
             current_file_path_for_logging = self.definition_uri
 
         try:
-            if self.definition_uri.startswith("http"):
-                response = requests.get(self.definition_uri, timeout=20)
-                response.raise_for_status()
-                xml_content = response.content
-                return etree.fromstring(xml_content, parser=xml_parser)
-            else:
-                if not os.path.exists(self.definition_uri):
-                    log.error(f"Protocol file not found: {self.definition_uri}")
-                    return None
-                tree = etree.parse(self.definition_uri, parser=xml_parser)
-                return tree.getroot()
-        except requests.RequestException as e:
-            log.error(
-                f"Failed to fetch protocol from {current_file_path_for_logging}: {e}"
-            )
-            return None
+            if not os.path.exists(self.definition_uri):
+                log.error(f"Protocol file not found: {self.definition_uri}")
+                return None
+            tree = etree.parse(self.definition_uri, parser=xml_parser)
+            return tree.getroot()
         except etree.XMLSyntaxError as e:
             log.error(f"Failed to parse XML from {current_file_path_for_logging}: {e}")
             return None
-        except Exception as e:
+        except OSError as e:
             log.error(
-                f"An unexpected error occurred while processing {current_file_path_for_logging}: {e}"
+                f"An OS error occurred while processing {current_file_path_for_logging}: {e}"
             )
             return None
 

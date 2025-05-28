@@ -4,7 +4,7 @@
 
 A Python implementation of the Wayland protocol, from scratch, with no external dependencies, including no dependencies on any Wayland libraries.
 
-This seeks to be a Python implementation of libwayland-client. 
+This seeks to be a Python implementation of libwayland-client.
 
 ## Features
 
@@ -54,7 +54,7 @@ class wl_output.transform(Enum):
 
 ## Making Wayland Requests
 
-Requests are made in the standard manner, with the exception that `new_id` arguments should be omitted. There is no need to pass an integer ID for the object you want to create, that is handled automatically for you. An instance of the object created is simply returned by the request. 
+Requests are made in the standard manner, with the exception that `new_id` arguments should be omitted. There is no need to pass an integer ID for the object you want to create, that is handled automatically for you. An instance of the object created is simply returned by the request.
 
 So the request signature is _not_ this:
 
@@ -146,6 +146,14 @@ Example output:
 ## Protocol Level Debugging
 
 Set the environment variable `WAYLAND_DEBUG=1`
+
+## Development of python-wayland
+
+For developing `python-wayland` itself, rather than using it the following are handy:
+
+* Run tests with `hatch test`
+* Run lint check with `hatch fmt`
+* Build the wheel with `hatch build`
 
 ## Thanks
 

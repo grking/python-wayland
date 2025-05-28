@@ -1,5 +1,9 @@
 ### Changelog
 
+### v0.7.1 (28th May 2025)
+- Remove dependency on requests library.
+- Lint fixes for unit tests.
+
 ### v0.7.0 (28th May 2025)
 - Include Wayland unstable protocols definitions.
 - Include Hyprland protocol extensions.
