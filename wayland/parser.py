@@ -38,6 +38,26 @@ from lxml import etree
 from wayland.log import log
 
 
+# Sources of Wayland protocol definitions.
+PROTOCOL_SOURCES = [
+    {
+        "name": "Wayland Main Protocol",
+        "url": "https://gitlab.freedesktop.org/wayland/wayland.git",
+        "dirs": ["protocol"]
+     },
+     {
+         "name": "Official Wayland Protocol Definitions",
+         "url": "https://gitlab.freedesktop.org/wayland/wayland-protocols.git",
+         "dirs": ["staging", "stable", "unstable"]
+     },
+     {
+         "name": "Hyprland Wayland Extensions",
+         "url": "https://github.com/hyprwm/hyprland-protocols",
+         "dirs": ["protocols"]
+     }
+]
+
+
 class WaylandParser:
     def __init__(self):
         self.interfaces: dict[str, dict] = {}
@@ -131,28 +151,20 @@ class WaylandParser:
         return target_dir
 
     def get_remote_uris(self) -> list[str]:
-        wayland_repo = "https://gitlab.freedesktop.org/wayland/wayland.git"
-        wayland_protocols_repo = "https://gitlab.freedesktop.org/wayland/wayland-protocols.git"
-        paths = ["staging", "stable", "unstable"]
-
         temp_dir = tempfile.gettempdir()
+        search_paths = []
 
-        # Clone the wayland repo to get the main protocol definition
-        # TODO support --force
-        local_wayland_dir = self.clone_git_repo(wayland_repo, temp_dir, delete_existing=False)
-        if not local_wayland_dir:
-            raise Exception("Unable to clone the wayland git repository")
+        # Grab all the sources
+        for source in PROTOCOL_SOURCES:
+            log.info(f"Processing {source['name']}")
+            local_dir = self.clone_git_repo(source["url"], temp_dir, delete_existing=False)
+            if not local_dir:
+                raise Exception(f"Unable to clone the {source['name']} repository")
+            search_paths.extend([os.path.join(local_dir, x) for x in source['dirs']])
 
-        # Clone the wayland protocol repo
-        # TODO support --force
-        local_dir = self.clone_git_repo(wayland_protocols_repo, temp_dir, delete_existing=False)
-        if not local_dir:
-            raise Exception("Unable to clone the wayland protocol git repository")
-
-        search_paths = [os.path.join(local_dir, x) for x in paths]
-        search_paths.append(os.path.join(local_wayland_dir, "protocol"))
+        # Search for all the files
         repo_files = self.get_local_files(search_paths)
-        log.info(f"Found files {repo_files} in {search_paths}")
+        log.debug(f"Found files {repo_files} in {search_paths}")
         return repo_files
 
     def get_local_files(self, search_path=None) -> list[str]:

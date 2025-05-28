@@ -1,7 +1,9 @@
 ### Changelog
 
 ### v0.7.0 (28th May 2025)
-- Update the library to the latest Wayland protocol definitions.
+- Update to latest Wayland protocol definitions.
+- Include Wayland unstable protocols definitions.
+- Include Hyprland protocol definitions.
 - Improve the Wayland protocol parser.
 - Use git to fetch Wayland protocol definitions rather than GitLab API.
 
