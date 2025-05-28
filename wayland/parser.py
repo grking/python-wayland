@@ -54,6 +54,11 @@ REMOTE_PROTOCOL_SOURCES = [
         "url": "https://github.com/hyprwm/hyprland-protocols",
         "dirs": ["protocols"],
     },
+    {
+        "name": "wlroots Protocol Extensions",
+        "url": "https://gitlab.freedesktop.org/wlroots/wlr-protocols",
+        "dirs": ["unstable"],
+    },
 ]
 
 
