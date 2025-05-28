@@ -26,7 +26,11 @@ from __future__ import annotations
 import json
 import keyword
 import os
+import shutil
+import subprocess
+import tempfile
 from copy import deepcopy
+from typing import Dict, List, Optional
 
 import requests
 from lxml import etree
@@ -39,43 +43,119 @@ class WaylandParser:
         self.interfaces: dict[str, dict] = {}
         self.unique_interfaces: list = []
         self.protocol_name: str = ""
+        self.definition_uri: str = ""
+
+    def _run(
+        self,
+        cmd: List[str],
+        *,
+        cwd: Optional[str] = None,
+        env: Optional[Dict[str, str]] = None,
+        check=True,
+        stream_output=False,
+    ):
+        """
+        Run a subprocess with common options.
+
+        Args:
+            cmd: Command to run as a list of strings
+            cwd: Working directory
+            env: Environment variables
+            check: Whether to check the return code
+            stream_output: Whether to stream output to terminal in real-time
+
+        Returns:
+            CompletedProcess instance
+
+        Raises:
+            subprocess.CalledProcessError: If the process returns non-zero exit status and check=True
+        """
+        # Set stdout/stderr based on stream_output parameter
+        if stream_output:
+            stdout = None  # Use parent process's stdout
+            stderr = None  # Use parent process's stderr
+        else:
+            stdout = subprocess.PIPE
+            stderr = subprocess.PIPE
+
+        log.info(" ".join(cmd))
+
+        result = subprocess.run(
+            cmd,
+            cwd=cwd,
+            env=env or os.environ.copy(),
+            check=check,
+            stdout=stdout,
+            stderr=stderr,
+            text=True,
+        )
+        return result
+
+    def clone_git_repo(
+        self, repo_url: str, dest_dir: str = "/tmp/", *, delete_existing=False,
+    ) -> bool:
+        """
+        Clone or update a repository.
+
+        Args:
+            repo_url: URL of the repository to clone
+
+        Returns:
+            str: The absolute path of the local repository. Or None on error
+        """
+        # Extract repo name from URL
+        repo_name = os.path.basename(repo_url)
+        if repo_name.endswith(".git"):
+            repo_name = repo_name[:-4]
+
+        # Calculate target directory
+        target_dir = os.path.join(dest_dir, repo_name)
+
+        # Start with status message
+        log.info(f"Cloning {repo_name} into {target_dir}")
+
+        if os.path.isdir(target_dir):
+            if delete_existing:
+                log.info("Removing existing repo")
+                shutil.rmtree(target_dir)
+            # Update existing repository
+            log.info("Updating exist repo")
+            self._run(
+                ["git", "pull", "--quiet"], cwd=target_dir
+            )
+            return target_dir
+
+        # Clone new repository
+        self._run(["git", "clone", repo_url, target_dir])
+
+        return target_dir
 
     def get_remote_uris(self) -> list[str]:
-        base_url = "https://gitlab.freedesktop.org/api/v4/projects/wayland%2Fwayland-protocols/repository/"
+        wayland_protocols_repo = "https://gitlab.freedesktop.org/wayland/wayland-protocols.git"
         paths = ["staging", "stable", "unstable"]
-        xml_uris = []
 
-        for path in paths:
-            log.info(f"Searching for {path} Wayland protocol definitions")
-            page = 1
-            while True:
-                params = {
-                    "per_page": 100,
-                    "page": page,
-                    "path": path,
-                    "recursive": True,
-                }
-                response = requests.get(f"{base_url}/tree", params=params, timeout=30)
-                response.raise_for_status()
+        # Clone the wayland protocol repo
+        temp_dir = tempfile.gettempdir()
+        # TODO support --force
+        local_dir = self.clone_git_repo(wayland_protocols_repo, temp_dir, delete_existing=False)
+        if not local_dir:
+            raise Exception("Unable to clone the wayland git repository")
 
-                if not response.json():
-                    break
+        search_paths = [os.path.join(local_dir, x) for x in paths]
+        repo_files = self.get_local_files(search_paths)
+        log.info(f"Found files {repo_files} in {search_paths}")
+        return repo_files
 
-                xml_uris.extend(
-                    f"{base_url}/blobs/{x['id']}/raw"
-                    for x in response.json()
-                    if x["path"].endswith(".xml")
-                )
-                page += 1
+    def get_local_files(self, search_path=None) -> list[str]:
+        if not search_path:
+            protocol_dirs = ["/usr/share/wayland", "/usr/share/wayland-protocols"]
+        else:
+            if isinstance(search_path, str):
+                protocol_dirs = [search_path]
+            else:
+                protocol_dirs = search_path
 
-        xml_uris.insert(
-            0,
-            "https://gitlab.freedesktop.org/wayland/wayland/-/raw/main/protocol/wayland.xml",
-        )
-        return xml_uris
-
-    def get_local_files(self) -> list[str]:
-        protocol_dirs = ["/usr/share/wayland", "/usr/share/wayland-protocols"]
+        log.info(f"Loading wayland protocol definitions from {', '.join(protocol_dirs)}")
         return [
             os.path.join(root, file)
             for directory in protocol_dirs
@@ -133,6 +213,7 @@ class WaylandParser:
     def parse(self, path: str):
         if not path.strip():
             return
+        self.definition_uri = path
 
         if path.startswith("http"):
             response = requests.get(path, timeout=20)
@@ -174,7 +255,7 @@ class WaylandParser:
         for node in tree.xpath(xpath):
             interface_name = node.getparent().attrib["name"]
             if interface_name in self.unique_interfaces:
-                log.warning(f"Ignoring duplicate interface {interface_name}")
+                log.warning(f"Ignoring duplicate interface {interface_name}\n   in {self.definition_uri}")
                 return []
             if interface_name not in interfaces:
                 interfaces.append(interface_name)
