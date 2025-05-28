@@ -37,39 +37,34 @@ from lxml import etree
 
 from wayland.log import log
 
-
 REMOTE_PROTOCOL_SOURCES = [
     {
         "name": "Wayland Main Protocol",
         "url": "https://gitlab.freedesktop.org/wayland/wayland.git",
-        "dirs": ["protocol"]
-     },
-     {
-         "name": "Official Wayland Protocol Definitions",
-         "url": "https://gitlab.freedesktop.org/wayland/wayland-protocols.git",
-         "dirs": ["stable", "staging", "unstable"],
-         "ignore": ["linux-dmabuf-unstable-v1.xml"]
-     },
-     {
-         "name": "Hyprland Wayland Extensions",
-         "url": "https://github.com/hyprwm/hyprland-protocols",
-         "dirs": ["protocols"]
-     }
+        "dirs": ["protocol"],
+    },
+    {
+        "name": "Official Wayland Protocol Definitions",
+        "url": "https://gitlab.freedesktop.org/wayland/wayland-protocols.git",
+        "dirs": ["stable", "staging", "unstable"],
+        "ignore": ["linux-dmabuf-unstable-v1.xml"],
+    },
+    {
+        "name": "Hyprland Wayland Extensions",
+        "url": "https://github.com/hyprwm/hyprland-protocols",
+        "dirs": ["protocols"],
+    },
 ]
 
 
 LOCAL_PROTOCOL_SOURCES = [
+    {"name": "Wayland Main Protocol", "url": "/usr/share/wayland", "dirs": ["./"]},
     {
-        "name": "Wayland Main Protocol",
-        "url": "/usr/share/wayland",
-        "dirs": ["./"]
-     },
-     {
-         "name": "Official Wayland Protocol Definitions",
-         "url": "/usr/share/wayland-protocols",
-         "dirs": ["./"],
-         "ignore": ["linux-dmabuf-unstable-v1.xml"]
-     }
+        "name": "Official Wayland Protocol Definitions",
+        "url": "/usr/share/wayland-protocols",
+        "dirs": ["./"],
+        "ignore": ["linux-dmabuf-unstable-v1.xml"],
+    },
 ]
 
 
@@ -110,7 +105,11 @@ class WaylandParser:
         return result
 
     def clone_git_repo(
-        self, repo_url: str, dest_dir: str = "/tmp/", *, delete_existing=False,
+        self,
+        repo_url: str,
+        dest_dir: str = "/tmp/",
+        *,
+        delete_existing=False,
     ) -> bool:
         repo_name = os.path.basename(repo_url)
         if repo_name.endswith(".git"):
@@ -125,9 +124,7 @@ class WaylandParser:
                 log.info("Removing existing repo")
                 shutil.rmtree(target_dir)
             log.info("Updating exist repo")
-            self._run(
-                ["git", "pull", "--quiet"], cwd=target_dir
-            )
+            self._run(["git", "pull", "--quiet"], cwd=target_dir)
             return target_dir
 
         self._run(["git", "clone", repo_url, target_dir])
@@ -140,20 +137,28 @@ class WaylandParser:
 
         for source in REMOTE_PROTOCOL_SOURCES:
             log.info(f"Processing protocol source: {source['name']}")
-            local_dir = self.clone_git_repo(source["url"], temp_dir, delete_existing=False)
+            local_dir = self.clone_git_repo(
+                source["url"], temp_dir, delete_existing=False
+            )
             if not local_dir:
                 # Consider whether to raise an exception or just log a warning and continue
-                log.error(f"Unable to clone the {source['name']} repository from {source['url']}. Skipping this source.")
+                log.error(
+                    f"Unable to clone the {source['name']} repository from {source['url']}. Skipping this source."
+                )
                 continue
 
-            source_search_dirs = [os.path.join(local_dir, d) for d in source['dirs']]
+            source_search_dirs = [os.path.join(local_dir, d) for d in source["dirs"]]
             ignore_list = source.get("ignore", [])
 
-            log.debug(f"Scanning directories for {source['name']}: {source_search_dirs}")
+            log.debug(
+                f"Scanning directories for {source['name']}: {source_search_dirs}"
+            )
             if ignore_list:
                 log.debug(f"Ignoring files for {source['name']}: {ignore_list}")
 
-            files_from_source = self.get_local_files(search_directories=source_search_dirs, ignore_filenames=ignore_list)
+            files_from_source = self.get_local_files(
+                search_directories=source_search_dirs, ignore_filenames=ignore_list
+            )
             all_repo_files.extend(files_from_source)
             log.debug(f"Found {len(files_from_source)} files from {source['name']}.")
 
@@ -164,7 +169,7 @@ class WaylandParser:
         self,
         directories_to_scan: List[str],
         effective_ignore_set: set[str],
-        source_name_for_logging: str = "specified directories"
+        source_name_for_logging: str = "specified directories",
     ) -> list[str]:
         """
         Scans a list of directories for .xml files, applying an ignore set.
@@ -173,7 +178,9 @@ class WaylandParser:
         found_files: list[str] = []
         for directory in directories_to_scan:
             if not os.path.isdir(directory):
-                log.warning(f"Search directory for {source_name_for_logging} not found or not a directory, skipping: {directory}")
+                log.warning(
+                    f"Search directory for {source_name_for_logging} not found or not a directory, skipping: {directory}"
+                )
                 continue
             for root, _, files in os.walk(directory):
                 for file_name in files:
@@ -181,26 +188,38 @@ class WaylandParser:
                         full_file_path = os.path.join(root, file_name)
                         base_filename = os.path.basename(file_name)
                         if base_filename in effective_ignore_set:
-                            log.debug(f"Ignoring file '{base_filename}' from {source_name_for_logging} due to effective ignore list: {full_file_path}")
+                            log.debug(
+                                f"Ignoring file '{base_filename}' from {source_name_for_logging} due to effective ignore list: {full_file_path}"
+                            )
                             continue
                         found_files.append(full_file_path)
         return found_files
 
-    def get_local_files(self, search_directories: Optional[List[str]] = None, ignore_filenames: Optional[List[str]] = None) -> list[str]:
+    def get_local_files(
+        self,
+        search_directories: Optional[List[str]] = None,
+        ignore_filenames: Optional[List[str]] = None,
+    ) -> list[str]:
         found_files_accumulator: list[str] = []
         global_ignore_set = set(ignore_filenames or [])
         if global_ignore_set:
-            log.debug(f"Global ignore list active for this call: {', '.join(sorted(list(global_ignore_set)))}")
+            log.debug(
+                f"Global ignore list active for this call: {', '.join(sorted(list(global_ignore_set)))}"
+            )
 
         dirs_actually_scanned_log: list[str] = []
 
         if search_directories is not None:
-            log.info(f"Scanning for XML protocol files in specified directories: {', '.join(search_directories)}")
+            log.info(
+                f"Scanning for XML protocol files in specified directories: {', '.join(search_directories)}"
+            )
             # When search_directories are provided, only the global_ignore_set applies directly.
             # The caller (e.g., get_remote_uris) is responsible for passing the correct ignore_filenames.
             dirs_actually_scanned_log.extend(search_directories)
             found_files_accumulator.extend(
-                self._scan_directories_for_xml_files(search_directories, global_ignore_set)
+                self._scan_directories_for_xml_files(
+                    search_directories, global_ignore_set
+                )
             )
         else:
             log.info("No search directories provided, using LOCAL_PROTOCOL_SOURCES.")
@@ -210,36 +229,53 @@ class WaylandParser:
                 source_relative_dirs = source_config.get("dirs", ["./"])
 
                 source_specific_ignores = set(source_config.get("ignore", []))
-                current_effective_ignore_set = global_ignore_set.union(source_specific_ignores)
+                current_effective_ignore_set = global_ignore_set.union(
+                    source_specific_ignores
+                )
 
-                log.info(f"Processing local protocol source: {source_name} from base path '{base_path}'")
+                log.info(
+                    f"Processing local protocol source: {source_name} from base path '{base_path}'"
+                )
                 if source_specific_ignores:
-                    log.debug(f"Source-specific ignores for {source_name}: {', '.join(sorted(list(source_specific_ignores)))}")
+                    log.debug(
+                        f"Source-specific ignores for {source_name}: {', '.join(sorted(list(source_specific_ignores)))}"
+                    )
                 if current_effective_ignore_set:
-                    log.debug(f"Effective ignores for {source_name}: {', '.join(sorted(list(current_effective_ignore_set)))}")
+                    log.debug(
+                        f"Effective ignores for {source_name}: {', '.join(sorted(list(current_effective_ignore_set)))}"
+                    )
 
                 actual_search_paths_for_source = [
-                    os.path.normpath(os.path.join(base_path, rel_dir)) for rel_dir in source_relative_dirs
+                    os.path.normpath(os.path.join(base_path, rel_dir))
+                    for rel_dir in source_relative_dirs
                 ]
-                log.debug(f"Scanning directories for {source_name}: {', '.join(actual_search_paths_for_source)}")
+                log.debug(
+                    f"Scanning directories for {source_name}: {', '.join(actual_search_paths_for_source)}"
+                )
                 dirs_actually_scanned_log.extend(actual_search_paths_for_source)
 
                 found_files_accumulator.extend(
                     self._scan_directories_for_xml_files(
                         actual_search_paths_for_source,
                         current_effective_ignore_set,
-                        source_name_for_logging=source_name
+                        source_name_for_logging=source_name,
                     )
                 )
-                log.debug(f"{len(found_files_accumulator)} total files found so far after processing {source_name}.")
+                log.debug(
+                    f"{len(found_files_accumulator)} total files found so far after processing {source_name}."
+                )
 
         unique_found_files = sorted(list(set(found_files_accumulator)))
 
         if dirs_actually_scanned_log:
             unique_scanned_dirs = sorted(list(set(dirs_actually_scanned_log)))
-            log.info(f"Found {len(unique_found_files)} unique XML protocol files after scanning: {', '.join(unique_scanned_dirs)} (all ignore filters applied).")
+            log.info(
+                f"Found {len(unique_found_files)} unique XML protocol files after scanning: {', '.join(unique_scanned_dirs)} (all ignore filters applied)."
+            )
         else:
-            log.info("No directories were scanned (either none provided, none configured, or none found). Found 0 files.")
+            log.info(
+                "No directories were scanned (either none provided, none configured, or none found). Found 0 files."
+            )
 
         return unique_found_files
 
@@ -304,7 +340,7 @@ class WaylandParser:
         description_node = node.find("description")
         description = self.get_description(description_node)
 
-        signature_args_str = ', '.join(f'{x["name"]}: {x.get("type","")}' for x in args)
+        signature_args_str = ", ".join(f'{x["name"]}: {x.get("type","")}' for x in args)
         signature = f"{interface_name}.{object_name}({signature_args_str})"
 
         wayland_object.update(
@@ -313,7 +349,9 @@ class WaylandParser:
 
         getattr(self, f"add_{object_type}")(interface_name, wayland_object)
 
-    def _should_parse_interface(self, interface_name: str, current_version: int, current_path: str) -> bool:
+    def _should_parse_interface(
+        self, interface_name: str, current_version: int, current_path: str
+    ) -> bool:
         """
         Determines if an interface should be parsed based on its version and whether it's already known.
         Updates self.unique_interfaces_source and self.interfaces accordingly.
@@ -324,12 +362,14 @@ class WaylandParser:
                 "version": current_version,
                 "path": current_path,
             }
-            log.debug(f"Registering new interface '{interface_name}' v{current_version} from {current_path}.")
+            log.debug(
+                f"Registering new interface '{interface_name}' v{current_version} from {current_path}."
+            )
             return True
         else:
             stored_info = self.unique_interfaces_source[interface_name]
-            stored_version = stored_info["version"] # type: ignore
-            stored_path = stored_info["path"] # type: ignore
+            stored_version = stored_info["version"]  # type: ignore
+            stored_path = stored_info["path"]  # type: ignore
 
             if current_version > stored_version:
                 log.info(
@@ -340,8 +380,14 @@ class WaylandParser:
                     "version": current_version,
                     "path": current_path,
                 }
-                if interface_name in self.interfaces: # Clear out old data for this interface
-                    self.interfaces[interface_name] = {"events": [], "requests": [], "enums": []}
+                if (
+                    interface_name in self.interfaces
+                ):  # Clear out old data for this interface
+                    self.interfaces[interface_name] = {
+                        "events": [],
+                        "requests": [],
+                        "enums": [],
+                    }
                 return True
             elif current_version < stored_version:
                 log.info(
@@ -367,12 +413,11 @@ class WaylandParser:
 
         # Determine if it's a URL or local file path and set definition_uri
         if path.startswith("http://") or path.startswith("https://"):
-            self.definition_uri = path # For http, definition_uri remains the URL
+            self.definition_uri = path  # For http, definition_uri remains the URL
             current_file_path_for_logging = path
         else:
             self.definition_uri = os.path.abspath(path)
             current_file_path_for_logging = self.definition_uri
-
 
         try:
             if self.definition_uri.startswith("http"):
@@ -387,13 +432,17 @@ class WaylandParser:
                 tree = etree.parse(self.definition_uri, parser=xml_parser)
                 return tree.getroot()
         except requests.RequestException as e:
-            log.error(f"Failed to fetch protocol from {current_file_path_for_logging}: {e}")
+            log.error(
+                f"Failed to fetch protocol from {current_file_path_for_logging}: {e}"
+            )
             return None
         except etree.XMLSyntaxError as e:
             log.error(f"Failed to parse XML from {current_file_path_for_logging}: {e}")
             return None
         except Exception as e:
-            log.error(f"An unexpected error occurred while processing {current_file_path_for_logging}: {e}")
+            log.error(
+                f"An unexpected error occurred while processing {current_file_path_for_logging}: {e}"
+            )
             return None
 
     def parse(self, path: str):
@@ -408,7 +457,9 @@ class WaylandParser:
         if not self.protocol_name and protocol_name_from_xml:
             self.protocol_name = protocol_name_from_xml
         elif not protocol_name_from_xml:
-            log.warning(f"Protocol name attribute not found in root tag of {current_file_path_for_logging}")
+            log.warning(
+                f"Protocol name attribute not found in root tag of {current_file_path_for_logging}"
+            )
 
         for interface_node in tree_root.xpath("interface"):
             interface_name = interface_node.attrib["name"]
@@ -422,21 +473,33 @@ class WaylandParser:
                 )
                 current_version = 1
 
-            if not self._should_parse_interface(interface_name, current_version, current_file_path_for_logging):
+            if not self._should_parse_interface(
+                interface_name, current_version, current_file_path_for_logging
+            ):
                 continue
 
             # Ensure basic structure exists if it's the very first time or after being cleared by _should_parse_interface
-            if interface_name not in self.interfaces or not self.interfaces[interface_name].get("events"):
-                self.interfaces[interface_name] = {"events": [], "requests": [], "enums": []}
+            if interface_name not in self.interfaces or not self.interfaces[
+                interface_name
+            ].get("events"):
+                self.interfaces[interface_name] = {
+                    "events": [],
+                    "requests": [],
+                    "enums": [],
+                }
 
             self.interfaces[interface_name]["version"] = current_version
             interface_description_node = interface_node.find("description")
-            self.interfaces[interface_name]["description"] = self.get_description(interface_description_node)
+            self.interfaces[interface_name]["description"] = self.get_description(
+                interface_description_node
+            )
 
             for child_type_tag in ["request", "event", "enum"]:
                 for child_node in interface_node.findall(child_type_tag):
                     self._process_protocol_element(child_node, interface_name)
-            log.debug(f"Successfully processed interface '{interface_name}' v{current_version} from {current_file_path_for_logging}.")
+            log.debug(
+                f"Successfully processed interface '{interface_name}' v{current_version} from {current_file_path_for_logging}."
+            )
 
     @staticmethod
     def get_description(description: etree.Element) -> str:
