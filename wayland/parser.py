@@ -38,8 +38,7 @@ from lxml import etree
 from wayland.log import log
 
 
-# Sources of Wayland protocol definitions.
-PROTOCOL_SOURCES = [
+REMOTE_PROTOCOL_SOURCES = [
     {
         "name": "Wayland Main Protocol",
         "url": "https://gitlab.freedesktop.org/wayland/wayland.git",
@@ -48,7 +47,8 @@ PROTOCOL_SOURCES = [
      {
          "name": "Official Wayland Protocol Definitions",
          "url": "https://gitlab.freedesktop.org/wayland/wayland-protocols.git",
-         "dirs": ["staging", "stable", "unstable"]
+         "dirs": ["stable", "staging", "unstable"],
+         "ignore": ["linux-dmabuf-unstable-v1.xml"]
      },
      {
          "name": "Hyprland Wayland Extensions",
@@ -58,10 +58,25 @@ PROTOCOL_SOURCES = [
 ]
 
 
+LOCAL_PROTOCOL_SOURCES = [
+    {
+        "name": "Wayland Main Protocol",
+        "url": "/usr/share/wayland",
+        "dirs": ["./"]
+     },
+     {
+         "name": "Official Wayland Protocol Definitions",
+         "url": "/usr/share/wayland-protocols",
+         "dirs": ["./"],
+         "ignore": ["linux-dmabuf-unstable-v1.xml"]
+     }
+]
+
+
 class WaylandParser:
     def __init__(self):
         self.interfaces: dict[str, dict] = {}
-        self.unique_interfaces: list = []
+        self.unique_interfaces_source: dict[str, dict[str, int | str]] = {}
         self.protocol_name: str = ""
         self.definition_uri: str = ""
 
@@ -74,23 +89,6 @@ class WaylandParser:
         check=True,
         stream_output=False,
     ):
-        """
-        Run a subprocess with common options.
-
-        Args:
-            cmd: Command to run as a list of strings
-            cwd: Working directory
-            env: Environment variables
-            check: Whether to check the return code
-            stream_output: Whether to stream output to terminal in real-time
-
-        Returns:
-            CompletedProcess instance
-
-        Raises:
-            subprocess.CalledProcessError: If the process returns non-zero exit status and check=True
-        """
-        # Set stdout/stderr based on stream_output parameter
         if stream_output:
             stdout = None  # Use parent process's stdout
             stderr = None  # Use parent process's stderr
@@ -114,76 +112,136 @@ class WaylandParser:
     def clone_git_repo(
         self, repo_url: str, dest_dir: str = "/tmp/", *, delete_existing=False,
     ) -> bool:
-        """
-        Clone or update a repository.
-
-        Args:
-            repo_url: URL of the repository to clone
-
-        Returns:
-            str: The absolute path of the local repository. Or None on error
-        """
-        # Extract repo name from URL
         repo_name = os.path.basename(repo_url)
         if repo_name.endswith(".git"):
             repo_name = repo_name[:-4]
 
-        # Calculate target directory
         target_dir = os.path.join(dest_dir, repo_name)
 
-        # Start with status message
         log.info(f"Cloning {repo_name} into {target_dir}")
 
         if os.path.isdir(target_dir):
             if delete_existing:
                 log.info("Removing existing repo")
                 shutil.rmtree(target_dir)
-            # Update existing repository
             log.info("Updating exist repo")
             self._run(
                 ["git", "pull", "--quiet"], cwd=target_dir
             )
             return target_dir
 
-        # Clone new repository
         self._run(["git", "clone", repo_url, target_dir])
 
         return target_dir
 
     def get_remote_uris(self) -> list[str]:
         temp_dir = tempfile.gettempdir()
-        search_paths = []
+        all_repo_files: list[str] = []
 
-        # Grab all the sources
-        for source in PROTOCOL_SOURCES:
-            log.info(f"Processing {source['name']}")
+        for source in REMOTE_PROTOCOL_SOURCES:
+            log.info(f"Processing protocol source: {source['name']}")
             local_dir = self.clone_git_repo(source["url"], temp_dir, delete_existing=False)
             if not local_dir:
-                raise Exception(f"Unable to clone the {source['name']} repository")
-            search_paths.extend([os.path.join(local_dir, x) for x in source['dirs']])
+                # Consider whether to raise an exception or just log a warning and continue
+                log.error(f"Unable to clone the {source['name']} repository from {source['url']}. Skipping this source.")
+                continue
 
-        # Search for all the files
-        repo_files = self.get_local_files(search_paths)
-        log.debug(f"Found files {repo_files} in {search_paths}")
-        return repo_files
+            source_search_dirs = [os.path.join(local_dir, d) for d in source['dirs']]
+            ignore_list = source.get("ignore", [])
 
-    def get_local_files(self, search_path=None) -> list[str]:
-        if not search_path:
-            protocol_dirs = ["/usr/share/wayland", "/usr/share/wayland-protocols"]
+            log.debug(f"Scanning directories for {source['name']}: {source_search_dirs}")
+            if ignore_list:
+                log.debug(f"Ignoring files for {source['name']}: {ignore_list}")
+
+            files_from_source = self.get_local_files(search_directories=source_search_dirs, ignore_filenames=ignore_list)
+            all_repo_files.extend(files_from_source)
+            log.debug(f"Found {len(files_from_source)} files from {source['name']}.")
+
+        log.info(f"Total protocol files found from remote URIs: {len(all_repo_files)}")
+        return all_repo_files
+
+    def _scan_directories_for_xml_files(
+        self,
+        directories_to_scan: List[str],
+        effective_ignore_set: set[str],
+        source_name_for_logging: str = "specified directories"
+    ) -> list[str]:
+        """
+        Scans a list of directories for .xml files, applying an ignore set.
+        Helper for get_local_files.
+        """
+        found_files: list[str] = []
+        for directory in directories_to_scan:
+            if not os.path.isdir(directory):
+                log.warning(f"Search directory for {source_name_for_logging} not found or not a directory, skipping: {directory}")
+                continue
+            for root, _, files in os.walk(directory):
+                for file_name in files:
+                    if file_name.endswith(".xml"):
+                        full_file_path = os.path.join(root, file_name)
+                        base_filename = os.path.basename(file_name)
+                        if base_filename in effective_ignore_set:
+                            log.debug(f"Ignoring file '{base_filename}' from {source_name_for_logging} due to effective ignore list: {full_file_path}")
+                            continue
+                        found_files.append(full_file_path)
+        return found_files
+
+    def get_local_files(self, search_directories: Optional[List[str]] = None, ignore_filenames: Optional[List[str]] = None) -> list[str]:
+        found_files_accumulator: list[str] = []
+        global_ignore_set = set(ignore_filenames or [])
+        if global_ignore_set:
+            log.debug(f"Global ignore list active for this call: {', '.join(sorted(list(global_ignore_set)))}")
+
+        dirs_actually_scanned_log: list[str] = []
+
+        if search_directories is not None:
+            log.info(f"Scanning for XML protocol files in specified directories: {', '.join(search_directories)}")
+            # When search_directories are provided, only the global_ignore_set applies directly.
+            # The caller (e.g., get_remote_uris) is responsible for passing the correct ignore_filenames.
+            dirs_actually_scanned_log.extend(search_directories)
+            found_files_accumulator.extend(
+                self._scan_directories_for_xml_files(search_directories, global_ignore_set)
+            )
         else:
-            if isinstance(search_path, str):
-                protocol_dirs = [search_path]
-            else:
-                protocol_dirs = search_path
+            log.info("No search directories provided, using LOCAL_PROTOCOL_SOURCES.")
+            for source_config in LOCAL_PROTOCOL_SOURCES:
+                source_name = source_config["name"]
+                base_path = source_config["url"]
+                source_relative_dirs = source_config.get("dirs", ["./"])
 
-        log.info(f"Loading wayland protocol definitions from {', '.join(protocol_dirs)}")
-        return [
-            os.path.join(root, file)
-            for directory in protocol_dirs
-            for root, _, files in os.walk(directory)
-            for file in files
-            if file.endswith(".xml")
-        ]
+                source_specific_ignores = set(source_config.get("ignore", []))
+                current_effective_ignore_set = global_ignore_set.union(source_specific_ignores)
+
+                log.info(f"Processing local protocol source: {source_name} from base path '{base_path}'")
+                if source_specific_ignores:
+                    log.debug(f"Source-specific ignores for {source_name}: {', '.join(sorted(list(source_specific_ignores)))}")
+                if current_effective_ignore_set:
+                    log.debug(f"Effective ignores for {source_name}: {', '.join(sorted(list(current_effective_ignore_set)))}")
+
+                actual_search_paths_for_source = [
+                    os.path.normpath(os.path.join(base_path, rel_dir)) for rel_dir in source_relative_dirs
+                ]
+                log.debug(f"Scanning directories for {source_name}: {', '.join(actual_search_paths_for_source)}")
+                dirs_actually_scanned_log.extend(actual_search_paths_for_source)
+
+                found_files_accumulator.extend(
+                    self._scan_directories_for_xml_files(
+                        actual_search_paths_for_source,
+                        current_effective_ignore_set,
+                        source_name_for_logging=source_name
+                    )
+                )
+                log.debug(f"{len(found_files_accumulator)} total files found so far after processing {source_name}.")
+
+        unique_found_files = sorted(list(set(found_files_accumulator)))
+
+        if dirs_actually_scanned_log:
+            unique_scanned_dirs = sorted(list(set(dirs_actually_scanned_log)))
+            log.info(f"Found {len(unique_found_files)} unique XML protocol files after scanning: {', '.join(unique_scanned_dirs)} (all ignore filters applied).")
+        else:
+            log.info("No directories were scanned (either none provided, none configured, or none found). Found 0 files.")
+
+        return unique_found_files
 
     def to_json(self, *, minimise=True) -> str:
         protocols = deepcopy(self.interfaces)
@@ -239,7 +297,6 @@ class WaylandParser:
 
         wayland_object = dict(node.attrib)
 
-        # Arguments or entries
         child_tag = "arg" if object_type != "enum" else "entry"
         params = node.findall(child_tag)
         args = self.fix_arguments([dict(x.attrib) for x in params], object_type)
@@ -254,57 +311,132 @@ class WaylandParser:
             {"args": args, "description": description, "signature": signature}
         )
 
-        # This uses self.add_request, self.add_event, self.add_enum
         getattr(self, f"add_{object_type}")(interface_name, wayland_object)
 
-    def parse(self, path: str):
+    def _should_parse_interface(self, interface_name: str, current_version: int, current_path: str) -> bool:
+        """
+        Determines if an interface should be parsed based on its version and whether it's already known.
+        Updates self.unique_interfaces_source and self.interfaces accordingly.
+        Returns True if the interface should be parsed, False otherwise.
+        """
+        if interface_name not in self.unique_interfaces_source:
+            self.unique_interfaces_source[interface_name] = {
+                "version": current_version,
+                "path": current_path,
+            }
+            log.debug(f"Registering new interface '{interface_name}' v{current_version} from {current_path}.")
+            return True
+        else:
+            stored_info = self.unique_interfaces_source[interface_name]
+            stored_version = stored_info["version"] # type: ignore
+            stored_path = stored_info["path"] # type: ignore
+
+            if current_version > stored_version:
+                log.info(
+                    f"Replacing older version {stored_version} of interface '{interface_name}' (from {stored_path}) "
+                    f"with newer version {current_version} (from {current_path})."
+                )
+                self.unique_interfaces_source[interface_name] = {
+                    "version": current_version,
+                    "path": current_path,
+                }
+                if interface_name in self.interfaces: # Clear out old data for this interface
+                    self.interfaces[interface_name] = {"events": [], "requests": [], "enums": []}
+                return True
+            elif current_version < stored_version:
+                log.info(
+                    f"Ignoring older version {current_version} of interface '{interface_name}' (from {current_path}). "
+                    f"Already loaded version {stored_version} (from {stored_path})."
+                )
+                return False
+            else:  # current_version == stored_version
+                log.warning(
+                    f"Ignoring duplicate interface definition for '{interface_name}' version {current_version}:\n"
+                    f"  Attempted to load from: {current_path}\n"
+                    f"  Already defined in:    {stored_path}"
+                )
+                return False
+
+    def _get_xml_root(self, path: str) -> Optional[etree._Element]:
+        """Loads and parses an XML file from a path or URL, returning the root element."""
         if not path.strip():
-            return
-        self.definition_uri = path
+            log.warning("Empty path provided to _get_xml_root.")
+            return None
+
         xml_parser = etree.XMLParser(remove_blank_text=True)
 
-        if path.startswith("http"):
-            response = requests.get(path, timeout=20)
-            response.raise_for_status()
-            xml_content = response.content
-            tree_root = etree.fromstring(xml_content, parser=xml_parser)
+        # Determine if it's a URL or local file path and set definition_uri
+        if path.startswith("http://") or path.startswith("https://"):
+            self.definition_uri = path # For http, definition_uri remains the URL
+            current_file_path_for_logging = path
         else:
-            tree = etree.parse(path, parser=xml_parser)
-            tree_root = tree.getroot()
+            self.definition_uri = os.path.abspath(path)
+            current_file_path_for_logging = self.definition_uri
 
-        # Protocol name from the root <protocol> element
-        self.protocol_name = tree_root.attrib.get("name", "")
-        if not self.protocol_name:
-            log.warning(f"Protocol name not found in {path}")
 
-        # Iterate over <interface> elements
+        try:
+            if self.definition_uri.startswith("http"):
+                response = requests.get(self.definition_uri, timeout=20)
+                response.raise_for_status()
+                xml_content = response.content
+                return etree.fromstring(xml_content, parser=xml_parser)
+            else:
+                if not os.path.exists(self.definition_uri):
+                    log.error(f"Protocol file not found: {self.definition_uri}")
+                    return None
+                tree = etree.parse(self.definition_uri, parser=xml_parser)
+                return tree.getroot()
+        except requests.RequestException as e:
+            log.error(f"Failed to fetch protocol from {current_file_path_for_logging}: {e}")
+            return None
+        except etree.XMLSyntaxError as e:
+            log.error(f"Failed to parse XML from {current_file_path_for_logging}: {e}")
+            return None
+        except Exception as e:
+            log.error(f"An unexpected error occurred while processing {current_file_path_for_logging}: {e}")
+            return None
+
+    def parse(self, path: str):
+        tree_root = self._get_xml_root(path)
+        if tree_root is None:
+            return
+
+        # self.definition_uri is set by _get_xml_root, use it for logging and tracking
+        current_file_path_for_logging = self.definition_uri
+
+        protocol_name_from_xml = tree_root.attrib.get("name", "")
+        if not self.protocol_name and protocol_name_from_xml:
+            self.protocol_name = protocol_name_from_xml
+        elif not protocol_name_from_xml:
+            log.warning(f"Protocol name attribute not found in root tag of {current_file_path_for_logging}")
+
         for interface_node in tree_root.xpath("interface"):
             interface_name = interface_node.attrib["name"]
-
-            # Check if this interface has already been processed (e.g. from another file)
-            if interface_name in self.unique_interfaces:
+            current_version_str = interface_node.attrib.get("version", "1")
+            try:
+                current_version = int(current_version_str)
+            except ValueError:
                 log.warning(
-                    f"Ignoring duplicate interface definition for {interface_name} "
-                    f"(already processed) in {self.definition_uri}"
+                    f"Invalid version '{current_version_str}' for interface '{interface_name}' "
+                    f"in {current_file_path_for_logging}. Defaulting to version 1."
                 )
+                current_version = 1
+
+            if not self._should_parse_interface(interface_name, current_version, current_file_path_for_logging):
                 continue
 
-            # Initialize interface structure if it's new, and set/update its version and description
-            # The _add_interface_item method (called by add_request etc) will create the basic lists if needed.
-            if interface_name not in self.interfaces:
+            # Ensure basic structure exists if it's the very first time or after being cleared by _should_parse_interface
+            if interface_name not in self.interfaces or not self.interfaces[interface_name].get("events"):
                 self.interfaces[interface_name] = {"events": [], "requests": [], "enums": []}
 
-            self.interfaces[interface_name]["version"] = interface_node.attrib.get("version", "1")
+            self.interfaces[interface_name]["version"] = current_version
             interface_description_node = interface_node.find("description")
             self.interfaces[interface_name]["description"] = self.get_description(interface_description_node)
 
-            # Process requests, events, and enums for this interface
             for child_type_tag in ["request", "event", "enum"]:
                 for child_node in interface_node.findall(child_type_tag):
                     self._process_protocol_element(child_node, interface_name)
-
-            # Mark this interface as processed
-            self.unique_interfaces.append(interface_name)
+            log.debug(f"Successfully processed interface '{interface_name}' v{current_version} from {current_file_path_for_logging}.")
 
     @staticmethod
     def get_description(description: etree.Element) -> str:
