@@ -288,7 +288,7 @@ class WaylandParser:
         protocols = deepcopy(self.interfaces)
         if minimise:
             self._remove_keys(protocols, ["description", "signature", "summary"])
-        return json.dumps(protocols, indent=1)
+        return json.dumps(protocols, indent=1, sort_keys=True)
 
     @staticmethod
     def _remove_keys(obj: dict | list, keys: list[str]):
