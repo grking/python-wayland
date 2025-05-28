@@ -6,6 +6,7 @@
 - Include wlroots protocol extensions.
 - Update to latest Wayland protocol definitions.
 - Include the highest version number definition of any particular interface.
+- Auto detect if running under wayland.
 - Use git to fetch Wayland protocol definitions, not some local hack.
 - Sort the keys in the protocols.json file to make the diffs less painful.
 

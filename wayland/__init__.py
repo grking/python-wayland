@@ -45,7 +45,12 @@ def initialise(auto=None):
     return proxy
 
 
-# Auto initialise unless we are instructed not to
-if os.getenv("WAYLAND_INITIALISE", "TRUE") == "TRUE":
+# Auto initialise if we are running under wayland
+__should_init = os.getenv("WAYLAND_INITIALISE", "") == "TRUE"
+__environment = os.getenv("WAYLAND_DISPLAY", "")
+if not __environment:
+    __environment = os.getenv("XDG_SESSION_TYPE", "")
+__should_init = "wayland" in __environment.lower() or __should_init
+if __should_init:
     with contextlib.suppress(FileNotFoundError):
         initialise(True)
