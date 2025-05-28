@@ -1,5 +1,10 @@
 ### Changelog
 
+### v0.7.0 (28th May 2025)
+- Update the library to the latest Wayland protocol definitions.
+- Improve the Wayland protocol parser.
+- Use git to fetch Wayland protocol definitions rather than GitLab API.
+
 ### v0.6.0 (3rd September 2024)
 - Support Wayland enums as Python enums including bitfields.
 - Change terminology of "methods" to "requests" to match Wayland.
