@@ -131,17 +131,26 @@ class WaylandParser:
         return target_dir
 
     def get_remote_uris(self) -> list[str]:
+        wayland_repo = "https://gitlab.freedesktop.org/wayland/wayland.git"
         wayland_protocols_repo = "https://gitlab.freedesktop.org/wayland/wayland-protocols.git"
         paths = ["staging", "stable", "unstable"]
 
-        # Clone the wayland protocol repo
         temp_dir = tempfile.gettempdir()
+
+        # Clone the wayland repo to get the main protocol definition
+        # TODO support --force
+        local_wayland_dir = self.clone_git_repo(wayland_repo, temp_dir, delete_existing=False)
+        if not local_wayland_dir:
+            raise Exception("Unable to clone the wayland git repository")
+
+        # Clone the wayland protocol repo
         # TODO support --force
         local_dir = self.clone_git_repo(wayland_protocols_repo, temp_dir, delete_existing=False)
         if not local_dir:
-            raise Exception("Unable to clone the wayland git repository")
+            raise Exception("Unable to clone the wayland protocol git repository")
 
         search_paths = [os.path.join(local_dir, x) for x in paths]
+        search_paths.append(os.path.join(local_wayland_dir, "protocol"))
         repo_files = self.get_local_files(search_paths)
         log.info(f"Found files {repo_files} in {search_paths}")
         return repo_files
@@ -210,33 +219,80 @@ class WaylandParser:
     def add_event(self, interface: str, event: dict):
         self._add_interface_item(interface, "event", event)
 
+    def _process_protocol_element(self, node: etree.Element, interface_name: str):
+        """Helper function to process a request, event, or enum node."""
+        object_type = node.tag
+        object_name = node.attrib["name"]
+        log.info(f"    ({object_type}) {interface_name}.{object_name}")
+
+        wayland_object = dict(node.attrib)
+
+        # Arguments or entries
+        child_tag = "arg" if object_type != "enum" else "entry"
+        params = node.findall(child_tag)
+        args = self.fix_arguments([dict(x.attrib) for x in params], object_type)
+
+        description_node = node.find("description")
+        description = self.get_description(description_node)
+
+        signature_args_str = ', '.join(f'{x["name"]}: {x.get("type","")}' for x in args)
+        signature = f"{interface_name}.{object_name}({signature_args_str})"
+
+        wayland_object.update(
+            {"args": args, "description": description, "signature": signature}
+        )
+
+        # This uses self.add_request, self.add_event, self.add_enum
+        getattr(self, f"add_{object_type}")(interface_name, wayland_object)
+
     def parse(self, path: str):
         if not path.strip():
             return
         self.definition_uri = path
+        xml_parser = etree.XMLParser(remove_blank_text=True)
 
         if path.startswith("http"):
             response = requests.get(path, timeout=20)
             response.raise_for_status()
-            tree = etree.fromstring(response.content)
+            xml_content = response.content
+            tree_root = etree.fromstring(xml_content, parser=xml_parser)
         else:
-            tree = etree.parse(path)
+            tree = etree.parse(path, parser=xml_parser)
+            tree_root = tree.getroot()
 
-        if isinstance(tree, etree._Element):
-            self.protocol_name = tree.attrib["name"]
-        else:
-            tree.getroot().attrib.get("name")
+        # Protocol name from the root <protocol> element
+        self.protocol_name = tree_root.attrib.get("name", "")
+        if not self.protocol_name:
+            log.warning(f"Protocol name not found in {path}")
 
-        interface_names = []
-        for xpath in [
-            "/protocol/interface/request",
-            "/protocol/interface/event",
-            "/protocol/interface/enum",
-        ]:
-            interface_names.extend(self.parse_xml(tree, xpath))
+        # Iterate over <interface> elements
+        for interface_node in tree_root.xpath("interface"):
+            interface_name = interface_node.attrib["name"]
 
-        # Remember the interfaces that were parsed
-        self.unique_interfaces.extend(interface_names)
+            # Check if this interface has already been processed (e.g. from another file)
+            if interface_name in self.unique_interfaces:
+                log.warning(
+                    f"Ignoring duplicate interface definition for {interface_name} "
+                    f"(already processed) in {self.definition_uri}"
+                )
+                continue
+
+            # Initialize interface structure if it's new, and set/update its version and description
+            # The _add_interface_item method (called by add_request etc) will create the basic lists if needed.
+            if interface_name not in self.interfaces:
+                self.interfaces[interface_name] = {"events": [], "requests": [], "enums": []}
+
+            self.interfaces[interface_name]["version"] = interface_node.attrib.get("version", "1")
+            interface_description_node = interface_node.find("description")
+            self.interfaces[interface_name]["description"] = self.get_description(interface_description_node)
+
+            # Process requests, events, and enums for this interface
+            for child_type_tag in ["request", "event", "enum"]:
+                for child_node in interface_node.findall(child_type_tag):
+                    self._process_protocol_element(child_node, interface_name)
+
+            # Mark this interface as processed
+            self.unique_interfaces.append(interface_name)
 
     @staticmethod
     def get_description(description: etree.Element) -> str:
@@ -249,49 +305,6 @@ class WaylandParser:
             if line.strip()
         )
         return f"{summary}\n{text}" if text else summary
-
-    def parse_xml(self, tree: etree.ElementTree, xpath: str):
-        interfaces = []
-        for node in tree.xpath(xpath):
-            interface_name = node.getparent().attrib["name"]
-            if interface_name in self.unique_interfaces:
-                log.warning(f"Ignoring duplicate interface {interface_name}\n   in {self.definition_uri}")
-                return []
-            if interface_name not in interfaces:
-                interfaces.append(interface_name)
-            object_type = node.tag
-            object_name = node.attrib["name"]
-            log.info(f"    ({object_type}) {interface_name}.{object_name}")
-
-            wayland_object = dict(node.attrib)
-            interface = dict(node.getparent().attrib)
-
-            params = node.findall("arg" if object_type != "enum" else "entry")
-            description = self.get_description(node.find("description"))
-
-            args = self.fix_arguments([dict(x.attrib) for x in params], object_type)
-            signature = f"{interface_name}.{object_name}({', '.join(f'{x['name']}: {x.get('type','')}' for x in args)})"
-
-            wayland_object.update(
-                {"args": args, "description": description, "signature": signature}
-            )
-
-            getattr(self, f"add_{object_type}")(interface_name, wayland_object)
-
-            if (
-                interface_name not in self.interfaces
-                or "version" not in self.interfaces[interface_name]
-            ):
-                self.interfaces[interface_name].update(
-                    {
-                        "version": interface.get("version", "1"),
-                        "description": self.get_description(
-                            node.getparent().find("description")
-                        ),
-                    }
-                )
-
-        return interfaces
 
     def fix_arguments(self, original_args: list[dict], item_type: str) -> list[dict]:
         new_args = []
