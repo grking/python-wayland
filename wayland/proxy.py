@@ -36,7 +36,7 @@ from wayland.client import get_package_root
 from wayland.constants import MAX_EVENT_RESOLUTION
 from wayland.log import log
 from wayland.state import WaylandState
-
+from wayland.client import get_package_root
 
 class Proxy:
     # A single shared collection of queues for output events
