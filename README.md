@@ -2,20 +2,19 @@
 
 [![PyPI - Version](https://img.shields.io/pypi/v/python-wayland.svg)](https://pypi.org/project/python-wayland) [![Tests](https://github.com/grking/python-wayland/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/grking/python-wayland/tree/main) [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/python-wayland.svg)](https://pypi.org/project/python-wayland)
 
-A Python implementation of the Wayland protocol, from scratch, with no external dependencies, including no dependencies on any Wayland libraries.
+A Python implementation of the Wayland protocol, from scratch, with no external dependencies, not even any dependency on any Wayland libraries.
 
 This seeks to be a Python implementation of libwayland-client.
 
 ## Features
 
+* Includes support for all standard Wayland protocols and extensions from Hyprland and wlroots.
 * No external dependencies, needs no Wayland libraries, and only Python standard libraries at runtime. This is a replacement for libwayland-client, not a wrapper for it.
-* All common Wayland protocols built in.
 * Maintains the original Wayland naming conventions to ensure references such as https://wayland.app are easy to use.
-* Has the latest protocol files built in by default.
-* Supports updating protocol definitions from either the local system or latest official Wayland repositories.
-* Intellisense code completion support for methods and events.
+* Supports updating protocol definitions from either the local system or the latest official protocol repositories. Although protocols as of the `python-wayland` release date are built-in.
+* Intellisense code completion support for methods and events. (tested in vscode).
 
-## Notes
+## Naming Compatibility
 
 Wayland identifiers that collide with Python builtin keywords are renamed to end with an underscore. There are very few of these. The list of known protocols that have changes are:
 
@@ -98,10 +97,7 @@ wayland.process_messages()
 
 ## Refreshing Protocols
 
-The package is installed with the latest Wayland stable and staging protocols already built-in. Refreshing the protocol definitions is optional. It requires some additional Python dependencies:
-
-* `pip install lxml`
-* `pip install requests`
+The package is installed with the latest Wayland stable and staging protocols already built-in (`wayland/protocols.json`). Refreshing the protocol definitions is optional. It requires the python library `lxml` to be installed.
 
 To rebuild the Wayland protocols from the locally installed protocol definitions:
 
@@ -128,28 +124,43 @@ python -m wayland --compare
 Example output:
 
     Protocol definitions which have been updated:
-
+    
     None
-
+    
     Available remote protocol definitions, but not installed locally:
-
+    
     ext_image_capture_source_v1: version 1
     ext_output_image_capture_source_manager_v1: version 1
     ext_foreign_toplevel_image_capture_source_manager_v1: version 1
-
+    
     Protocol definitions installed locally but not in official stable or staging repositories:
-
+    
     zwp_fullscreen_shell_v1: version 1
     zwp_fullscreen_shell_mode_feedback_v1: version 1
     zwp_idle_inhibit_manager_v1: version 1
 
 ## Protocol Level Debugging
 
-Set the environment variable `WAYLAND_DEBUG=1`
+Set the environment variable `WAYLAND_DEBUG=1` before you your application, e.g.:
+
+```bash
+# WAYLAND_DEBUG=1 python -m your_app
+```
 
 ## Development of python-wayland
 
-For developing `python-wayland` itself, rather than using it the following are handy:
+For developing `python-wayland` itself, rather than using it, the following may be handy. `python-wayland` is configured for `hatch`.  
+
+You can install `hatch` through `pipx`. A full bootstrap may look like:
+
+```bash
+# Install pipx
+sudo apt-get install pipx  # debian / ubuntu
+sudo pacman -S python-pipx  # arch
+
+# Install hatch with pipx
+pipx install hatch
+```
 
 * Run tests with `hatch test`
 * Run lint check with `hatch fmt`

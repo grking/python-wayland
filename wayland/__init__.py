@@ -50,7 +50,8 @@ __should_init = os.getenv("WAYLAND_INITIALISE", "") == "TRUE"
 __environment = os.getenv("WAYLAND_DISPLAY", "")
 if not __environment:
     __environment = os.getenv("XDG_SESSION_TYPE", "")
-__should_init = "wayland" in __environment.lower() or __should_init
-if __should_init:
+# This one is handy so we make it public
+is_wayland = "wayland" in __environment.lower() or __should_init
+if is_wayland:
     with contextlib.suppress(FileNotFoundError):
         initialise(True)

@@ -430,7 +430,7 @@ class WaylandParser:
                 return None
             tree = etree.parse(self.definition_uri, parser=xml_parser)
             return tree.getroot()
-        except etree.XMLSyntaxError as e:
+        except etree.LxmlError as e:
             log.error(f"Failed to parse XML from {current_file_path_for_logging}: {e}")
             return None
         except OSError as e:
@@ -505,7 +505,12 @@ class WaylandParser:
             for line in (description.text or "").split("\n")
             if line.strip()
         )
-        return f"{summary}\n{text}" if text else summary
+        if summary and text:
+            return f"{summary}\n{text}"
+        if text:  # Only text, no summary
+            return text
+        # Only summary (or neither, in which case summary is "")
+        return summary
 
     def fix_arguments(self, original_args: list[dict], item_type: str) -> list[dict]:
         new_args = []

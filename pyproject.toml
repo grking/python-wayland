@@ -1,7 +1,3 @@
-[build-system]
-requires = ["hatchling", "black", "lxml", "pytest", "ruff"]
-build-backend = "hatchling.build"
-
 [project]
 name = "python-wayland"
 dynamic = ["version"]
@@ -9,7 +5,7 @@ description = 'An implementation of the Wayland protocol with no external depend
 readme = "README.md"
 requires-python = ">=3.8"
 license = {file = "LICENSE"}
-keywords = []
+keywords = ["wayland", "libwayland"]
 authors = [
   { name = "Graham King", email = "grking.email@gmail.com" },
 ]
@@ -28,15 +24,30 @@ classifiers = [
 ]
 dependencies = []
 
-[project.optional-dependencies]
-build = ["lxml"]
-
 [project.urls]
 Homepage = "https://github.com/grking/python-wayland"
 Documentation = "https://github.com/grking/python-wayland#readme"
 Issues = "https://github.com/grking/python-wayland/issues"
 Source = "https://github.com/grking/python-wayland"
 Changelog = "https://github.com/grking/python-wayland/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+build=["lxml"]
+
+[tool.hatch.envs.hatch-test]
+extra-dependencies = [
+  "black",
+  "ruff"
+]
+extra-args = [
+    "--import-mode=importlib",
+    "--capture=no",
+    "-q"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.hatch.version]
 path = "wayland/__about__.py"
@@ -45,6 +56,7 @@ path = "wayland/__about__.py"
 extra-dependencies = [
   "mypy>=1.0.0",
 ]
+
 [tool.hatch.envs.types.scripts]
 check = "mypy --install-types --non-interactive {args:wayland tests}"
 
@@ -89,18 +101,13 @@ extend-select = ["C901"]
 "__init__.py" = ["F403"]  # import *
 "parser.py" = ["S320", "SLF001"]  # lxml
 "proxy.py" = ["SLF001"]  # private members
+"tests/*" = ["SLF001", "ARG002"]  # private members, mock args
+"tests/test_parser.py" = ["ARG005"]  # lambda
 "log.py" = ["FBT001"]  # bool param
 "typehint.py" = ["FBT001"]  # bool param
 "unixsocket.py" = ["BLE001"]  # blind exception
 "__main__.py" = ["T201"]  # print
 "*" = ["ARG001", "TRY003", "A002"]  # unused argument, builtin
-
-[tool.pytest.ini_options]
-addopts = [
-    "--import-mode=importlib",
-    "--capture=no",
-    "-q"
-]
 
 [tool.ruff]
 line-length = 88
