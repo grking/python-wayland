@@ -21,37 +21,22 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import contextlib
-import os
-
-from wayland.proxy import Proxy
+from os import getenv as __getenv
 
 
-def get_package_root():
-    # Returns the directory that this project is sitting in
-    package_name = __package__.split(".")[0]
-    package_module = __import__(package_name)
-    return os.path.abspath(package_module.__path__[0])
+# Wayland methods are injected into the package global scope
+# so, for example, "wayland.wl_display" just works. This is
+# purely syntactic sugar for library callers.
+if __getenv("WAYLAND_INITIALISE", "").lower() != "false" and (
+    __getenv("WAYLAND_INITIALISE", "").lower() == "true"
+    or "wayland" in __getenv("WAYLAND_DISPLAY", "").lower()
+    or "wayland" in __getenv("XDG_SESSION_TYPE", "").lower()
+):
+    from wayland.proxy import Proxy
 
+    __proxy = Proxy()
+    __proxy.initialise(globals())
+    del __proxy
+    del Proxy
 
-def initialise(auto=None):
-    if auto:
-        proxy = Proxy()
-        proxy.initialise(globals(), get_package_root())
-        return
-
-    proxy = Proxy()
-    proxy.initialise(proxy, get_package_root())
-    return proxy
-
-
-# Auto initialise if we are running under wayland
-__should_init = os.getenv("WAYLAND_INITIALISE", "") == "TRUE"
-__environment = os.getenv("WAYLAND_DISPLAY", "")
-if not __environment:
-    __environment = os.getenv("XDG_SESSION_TYPE", "")
-# This one is handy so we make it public
-is_wayland = "wayland" in __environment.lower() or __should_init
-if is_wayland:
-    with contextlib.suppress(FileNotFoundError):
-        initialise(True)
+del __getenv

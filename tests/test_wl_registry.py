@@ -1,7 +1,7 @@
 import wayland as wl
 from tests.utils import process_messages
 
-wayland = wl.initialise()
+wayland = wl.client.initialise()
 
 
 def test_get_registry():

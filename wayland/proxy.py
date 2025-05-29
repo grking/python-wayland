@@ -29,7 +29,7 @@ from enum import Enum, IntFlag
 
 from wayland.log import log
 from wayland.state import WaylandState
-
+from wayland.client import get_package_root
 
 class Proxy:
     class Request:
@@ -346,13 +346,15 @@ class Proxy:
         msg = f"'{key}' not found"
         raise KeyError(msg)
 
-    def initialise(self, scope, path):
+    def initialise(self, scope, path=None):
         self.scope = scope
+        if path is None:
+            path = get_package_root()
         try:
             with open(f"{path}/protocols.json", encoding="utf-8") as infile:
                 structure = json.load(infile)
         except (FileNotFoundError, json.JSONDecodeError) as e:
-            msg = f"Error loading structure: {e}"
+            msg = f"Wayland protocol definitions not found: {e}"
             raise FileNotFoundError(msg) from e
 
         for class_name, details in structure.items():
