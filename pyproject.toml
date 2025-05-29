@@ -36,6 +36,7 @@ build=["lxml"]
 
 [tool.hatch.envs.hatch-test]
 extra-dependencies = [
+  "lxml",
   "black",
   "ruff"
 ]
