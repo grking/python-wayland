@@ -1,5 +1,3 @@
-import time
-
 import wayland as wl
 
 wayland = wl.client.initialise()
@@ -17,7 +15,7 @@ def test_get_registry():
     # Hook the event to get the registry results
     wayland.wl_registry.events.global_ += on_wl_registry_global
     wayland.wl_display.get_registry()
-    time.sleep(1)
+    wayland.wl_display.dispatch_timeout(0.5)
 
     # Check we got some interfaces we should have
     for proto in protocols:

@@ -30,7 +30,7 @@ import threading
 import time
 from typing import Any, Callable
 
-from wayland.constants import PROTOCOL_HEADER_SIZE
+from wayland.constants import MAX_EVENT_RESOLUTION, PROTOCOL_HEADER_SIZE
 from wayland.log import log
 from wayland.unixsocket import UnixSocketConnection
 
@@ -54,9 +54,6 @@ class WaylandState:
         self._object_id_to_instance: dict[int, Any] = {}
         self._instance_to_object_id: dict[Any, int] = {}
         # By default check for incoming events at least every millisecond
-        self._event_frequency = (
-            int(os.getenv("WAYLAND_EVENT_FREQUENCY_HZ", "0")) or 1000
-        )
         if not disable_event_dispatch_thread:
             self._start_event_monitor()
 
@@ -187,4 +184,4 @@ class WaylandState:
         """Process all pending wayland messages"""
         while True:
             if not self.get_next_message():
-                time.sleep(1 / self._event_frequency)
+                time.sleep(1 / MAX_EVENT_RESOLUTION)

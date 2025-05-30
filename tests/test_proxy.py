@@ -448,23 +448,25 @@ class TestProxyEvent(unittest.TestCase):
         mock_handler1 = MagicMock(name="handler1")
         mock_handler2 = MagicMock(name="handler2")
 
+        tid = self.proxy_event_uint._thread_id()
+
         self.proxy_event_uint += mock_handler1
-        assert mock_handler1 in self.proxy_event_uint._handlers
+        assert mock_handler1 in self.proxy_event_uint._event_handlers[tid]
 
         self.proxy_event_uint += mock_handler2
-        assert mock_handler2 in self.proxy_event_uint._handlers
-        assert len(self.proxy_event_uint._handlers) == 2
+        assert mock_handler2 in self.proxy_event_uint._event_handlers[tid]
+        assert len(self.proxy_event_uint._event_handlers[tid]) == 2
 
         self.proxy_event_uint -= mock_handler1
-        assert mock_handler1 not in self.proxy_event_uint._handlers
-        assert mock_handler2 in self.proxy_event_uint._handlers
-        assert len(self.proxy_event_uint._handlers) == 1
+        assert mock_handler1 not in self.proxy_event_uint._event_handlers[tid]
+        assert mock_handler2 in self.proxy_event_uint._event_handlers[tid]
+        assert len(self.proxy_event_uint._event_handlers[tid]) == 1
 
         self.proxy_event_uint -= mock_handler1  # Test removing a non-existent handler
-        assert len(self.proxy_event_uint._handlers) == 1
+        assert len(self.proxy_event_uint._event_handlers[tid]) == 1
 
         self.proxy_event_uint -= mock_handler2  # Test removing the last handler
-        assert len(self.proxy_event_uint._handlers) == 0
+        assert len(self.proxy_event_uint._event_handlers[tid]) == 0
 
     def test_event_call_invokes_handlers_with_unpacked_uint(self):
         """Tests that calling an event unpacks a uint and invokes handlers."""
@@ -476,6 +478,7 @@ class TestProxyEvent(unittest.TestCase):
         mock_get_fd = MagicMock()
 
         self.proxy_event_uint(packet_data, mock_get_fd)
+        Proxy._dispatch_timeout(0.2)
 
         mock_handler.assert_called_once_with(data=test_uint_value)
         mock_get_fd.assert_not_called()
@@ -538,6 +541,7 @@ class TestProxyEvent(unittest.TestCase):
 
         mock_get_fd = MagicMock()
         proxy_event_str(packet_data, mock_get_fd)
+        Proxy._dispatch_timeout(0.2)
 
         mock_handler.assert_called_once_with(greeting=test_string_value)
         mock_get_fd.assert_not_called()
@@ -580,6 +584,7 @@ class TestProxyEvent(unittest.TestCase):
 
         mock_get_fd = MagicMock()
         proxy_event_int(packet_data, mock_get_fd)
+        Proxy._dispatch_timeout(0.2)
 
         mock_handler.assert_called_once_with(value=test_int_value)
         mock_get_fd.assert_not_called()
@@ -630,6 +635,7 @@ class TestProxyEvent(unittest.TestCase):
 
         mock_get_fd = MagicMock()
         proxy_event_fixed(packed_fixed_val, mock_get_fd)
+        Proxy._dispatch_timeout(0.2)
 
         mock_handler.assert_called_once()
         assert "scale_factor" in mock_handler.call_args.kwargs
@@ -672,6 +678,7 @@ class TestProxyEvent(unittest.TestCase):
 
         mock_get_fd = MagicMock()
         proxy_event_object(packet_data, mock_get_fd)
+        Proxy._dispatch_timeout(0.2)
 
         mock_handler.assert_called_once_with(target=test_obj_id_val)
         mock_get_fd.assert_not_called()
@@ -713,6 +720,7 @@ class TestProxyEvent(unittest.TestCase):
         packet_data = b""
 
         proxy_event_fd(packet_data, mock_get_fd_func)
+        Proxy._dispatch_timeout(0.2)
 
         mock_get_fd_func.assert_called_once()
         mock_handler.assert_called_once_with(mem_fd=test_fd_val)
@@ -761,6 +769,7 @@ class TestProxyEvent(unittest.TestCase):
 
         mock_get_fd = MagicMock()
         proxy_event_array(packet_data, mock_get_fd)
+        Proxy._dispatch_timeout(0.2)
 
         expected_unpacked_array = (
             test_byte_array[:-1] if len(test_byte_array) > 0 else b""
@@ -825,6 +834,7 @@ class TestProxyEvent(unittest.TestCase):
 
         mock_get_fd = MagicMock()
         proxy_event_enum(packet_data, mock_get_fd)
+        Proxy._dispatch_timeout(0.2)
 
         mock_handler.assert_called_once_with(reason=test_enum_val)
         mock_get_fd.assert_not_called()

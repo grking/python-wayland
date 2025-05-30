@@ -99,7 +99,7 @@ preview = false
 extend-select = ["C901"]
 
 [tool.ruff.lint.extend-per-file-ignores]
-"__init__.py" = ["F403"]  # import *
+"__init__.py" = ["F403", "PERF401"]  # import *
 "parser.py" = ["S320", "SLF001"]  # lxml
 "proxy.py" = ["SLF001"]  # private members
 "tests/*" = ["SLF001", "ARG002"]  # private members, mock args
