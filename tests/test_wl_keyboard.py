@@ -35,7 +35,6 @@ def test_keyboard():
     start = time.time()
     while not keymap and time.time() < start + 3:
         time.sleep(0.1)
-        wayland.process_messages()
 
     # If we don't have a keyboard, don't test it
     if not have_keyboard:

@@ -31,11 +31,23 @@ if __getenv("WAYLAND_INITIALISE", "").lower() != "false" and (
     or "wayland" in __getenv("WAYLAND_DISPLAY", "").lower()
     or "wayland" in __getenv("XDG_SESSION_TYPE", "").lower()
 ):
+    import contextlib
+
     from wayland.proxy import Proxy
 
     __proxy = Proxy()
     __proxy.initialise(globals())
-    del __proxy
-    del Proxy
+    # Clean up the package scope
+    for var_name in [
+        "log",
+        "state",
+        "unixsocket",
+        "constants",
+        "__proxy",
+        "Proxy",
+        "proxy",
+    ]:
+        with contextlib.suppress(NameError):
+            del globals()[var_name]
 
 del __getenv

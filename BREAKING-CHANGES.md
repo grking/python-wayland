@@ -9,6 +9,10 @@ Methods and attributes in the top-level package namespace `wayland` that were no
 
 `wayland.client` now contains any and all functionality introduced by the `python-wayland` library, leaving the top level `wayland` namespace as a pure wayland protocol namespace.
 
+Removed method:
+
+* `wayland.process_messages()` this method has been removed. Event polling and dispatching is now handled automatically. As a library user you don't need to be concerned with this. Events will be dispatched to your registered event handlers as they arrive.
+
 Other than cleaning up junk from the `wayland` namespace this changes the following methods (none of which are required in the normal use of this library):
 
 * `wayland.initialise()` becomes `wayland.client.initialise()`

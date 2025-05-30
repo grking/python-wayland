@@ -347,16 +347,21 @@ class Proxy:
         msg = f"'{key}' not found"
         raise KeyError(msg)
 
-    def initialise(self, scope, path=None):
-        self.scope = scope
+    def initialise(self, scope=None, path=None):
+        if scope is None:
+            self.scope = self
+        else:
+            self.scope = scope
         if path is None:
             path = get_package_root()
+
         try:
             with open(f"{path}/protocols.json", encoding="utf-8") as infile:
                 structure = json.load(infile)
         except (FileNotFoundError, json.JSONDecodeError) as e:
             msg = f"Wayland protocol definitions not found: {e}"
-            raise FileNotFoundError(msg) from e
+            log.error(msg)
+            return False
 
         for class_name, details in structure.items():
             # Process requests
@@ -368,13 +373,10 @@ class Proxy:
                 class_name, self.scope, requests, events, enums, self.state
             )
             # Inject instance into scope
-            if isinstance(scope, dict):
-                scope[class_name] = instance
+            if isinstance(self.scope, dict):
+                self.scope[class_name] = instance
             else:
-                setattr(scope, class_name, instance)
+                setattr(self.scope, class_name, instance)
 
-        # Inject event processing function into scope
-        if isinstance(scope, dict):
-            scope["process_messages"] = self.state.process_messages
-        else:
-            scope.process_messages = self.state.process_messages
+        # initialised ok
+        return True

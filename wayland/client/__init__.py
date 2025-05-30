@@ -22,9 +22,9 @@ def is_wayland():
 
 
 def initialise(_=None):
-    # Return an object that contains all the wayland methods
+    # Return an object that contains all the wayland interfaces
     from wayland.proxy import Proxy
 
     proxy = Proxy()
-    proxy.initialise(proxy)
+    proxy.initialise()
     return proxy

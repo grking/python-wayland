@@ -1130,11 +1130,6 @@ class TestProxyMainClass(unittest.TestCase):
         assert isinstance(test_scope["wl_callback"], Proxy.DynamicObject)
         assert test_scope["wl_callback"]._name == "wl_callback"
 
-        assert "process_messages" in test_scope
-        assert (
-            test_scope["process_messages"] == self.mock_state_for_proxy.process_messages
-        )
-
         found_wl_display_call = False
         for call_args in self.mock_state_for_proxy.new_object.call_args_list:
             if call_args[0][0] == test_scope["wl_display"]:
@@ -1166,31 +1161,16 @@ class TestProxyMainClass(unittest.TestCase):
         assert isinstance(test_scope_obj.wl_display, Proxy.DynamicObject)
         assert test_scope_obj.wl_display._name == "wl_display"
 
-        assert hasattr(test_scope_obj, "process_messages")
-        assert (
-            test_scope_obj.process_messages
-            == self.mock_state_for_proxy.process_messages
-        )
-
     @patch("builtins.open", side_effect=FileNotFoundError("File not found"))
     def test_proxy_initialise_file_not_found(self, mock_open):
-        """Tests FileNotFoundError during initialise."""
-        with pytest.raises(
-            FileNotFoundError,
-            match="Wayland protocol definitions not found: File not found",
-        ):
-            self.proxy_main.initialise({}, "/nonexistent/path")
+        assert self.proxy_main.initialise({}, "/nonexistent/path") is False
 
     @patch("builtins.open")
     @patch("json.load", side_effect=json.JSONDecodeError("Decode error", "doc", 0))
     def test_proxy_initialise_json_decode_error(self, mock_json_load, mock_open):
         """Tests JSONDecodeError during initialise."""
         mock_open.return_value.__enter__.return_value = MagicMock()
-        with pytest.raises(
-            FileNotFoundError,
-            match="Wayland protocol definitions not found: Decode error",
-        ):
-            self.proxy_main.initialise({}, "/some/path")
+        assert self.proxy_main.initialise({}, "/some/path") is False
 
     def test_proxy_getitem(self):
         """Tests the __getitem__ method of the main Proxy class."""
