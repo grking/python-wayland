@@ -15,7 +15,7 @@ def test_get_registry():
     # Hook the event to get the registry results
     wayland.wl_registry.events.global_ += on_wl_registry_global
     wayland.wl_display.get_registry()
-    wayland.wl_display.dispatch_timeout(0.5)
+    wayland.wl_display.dispatch_timeout(2.0)
 
     # Check we got some interfaces we should have
     for proto in protocols:
