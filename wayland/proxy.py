@@ -27,9 +27,10 @@ import socket
 import struct
 from enum import Enum, IntFlag
 
+from wayland.client import get_package_root
 from wayland.log import log
 from wayland.state import WaylandState
-from wayland.client import get_package_root
+
 
 class Proxy:
     class Request:

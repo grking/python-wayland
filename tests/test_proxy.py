@@ -1176,7 +1176,8 @@ class TestProxyMainClass(unittest.TestCase):
     def test_proxy_initialise_file_not_found(self, mock_open):
         """Tests FileNotFoundError during initialise."""
         with pytest.raises(
-            FileNotFoundError, match="Wayland protocol definitions not found: File not found"
+            FileNotFoundError,
+            match="Wayland protocol definitions not found: File not found",
         ):
             self.proxy_main.initialise({}, "/nonexistent/path")
 
@@ -1186,7 +1187,8 @@ class TestProxyMainClass(unittest.TestCase):
         """Tests JSONDecodeError during initialise."""
         mock_open.return_value.__enter__.return_value = MagicMock()
         with pytest.raises(
-            FileNotFoundError, match="Wayland protocol definitions not found: Decode error"
+            FileNotFoundError,
+            match="Wayland protocol definitions not found: Decode error",
         ):
             self.proxy_main.initialise({}, "/some/path")
 

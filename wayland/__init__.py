@@ -23,7 +23,6 @@
 
 from os import getenv as __getenv
 
-
 # Wayland methods are injected into the package global scope
 # so, for example, "wayland.wl_display" just works. This is
 # purely syntactic sugar for library callers.
