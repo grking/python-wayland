@@ -1,42 +1,115 @@
-# python-wayland Client API
+# python-wayland
 
-A Python implementation of the Wayland protocol, from scratch, with no external dependencies, not even any dependency on any Wayland libraries.
+A pure Python implementation of the Wayland protocol, from scratch, with no external runtime dependencies.
 
-This documentation covers the **client API** provided by the `wayland.client` module - the main interface for Python applications to interact with Wayland compositors.
+## Installation
 
-## Features
-
-* **Pure Python**: No external dependencies, needs no Wayland libraries
-* **Complete Protocol Support**: Includes support for all standard Wayland protocols and extensions
-* **Type Safety**: Full type hints for better development experience
-* **Intellisense Support**: Code completion for methods and events
-* **Compatibility**: Maintains original Wayland naming conventions
-
-## Quick Start
-
-```python
-import wayland.client
-
-# Check if running under Wayland
-if wayland.client.is_wayland():
-    # Initialize the client
-    client = wayland.client.initialise()
-
-    # Get the registry to discover available interfaces
-    registry = client.wl_display.get_registry()
-
-    # Process Wayland messages
-    client.process_messages()
+```bash
+pip install python-wayland
 ```
 
-## Navigation
+## Basic Example
 
-* **[Getting Started](getting-started.md)** - Installation and basic usage
+Wayland is a low level protocol and therefore fairly verbose. The following example connects to the compositor, requests information on the current displays and prints it. For example:
+
+```text
+Sharp Corporation LQ173M1JW12  (eDP-1)
+  Resolution: 1920x1080 @ 360.0Hz
+  Monitor: Sharp Corporation LQ173M1JW12
+  Position: 0, 0
+  Physical size: 380x210mm
+
+Sharp Corporation LQ173M1JW12  (eDP-2)
+  Resolution: 1920x1080 @ 360.0Hz
+  Monitor: Sharp Corporation LQ173M1JW12
+  Position: 1, 0
+  Physical size: 380x210mm
+```
+
+It is a simple implementation which demonstrates:
+
+* Accessing some core wayland interfaces
+* Handling wayland events
+* Event loop message processing with `wayland.process_messages()`
+* Handling multiple object instances with individual handlers
+* Synchronisation with `done` events.
+
+```python
+# Print information about the available displays.
+import wayland
+import time
+
+displays_done = 0
+total_displays = 0
+
+# Define some basic event handlers
+def on_error(object_id, code, message):
+    # See: https://wayland.app/protocols/wayland#wl_display:event:error
+    print(f"Fatal error: {object_id} {code} {message}")
+    exit(1)
+
+
+def on_wl_registry_global(name, interface, version):
+    global total_displays
+
+    # See: https://wayland.app/protocols/wayland#wl_registry:event:global
+    if interface == "wl_output":
+        # "output" here is actually an object instance, we ignore that
+        # fact for the purposes of this simple example. In a real implementation
+        # we could handle these events in a more object oriented manner.
+        output = wayland.wl_registry.bind(name, interface, version)
+        total_displays += 1
+    else:
+        return
+
+    def make_handlers():
+        def on_geometry(
+            x, y, physical_width, physical_height, subpixel, make, model, transform
+        ):
+            # See: https://wayland.app/protocols/wayland#wl_output:event:geometry
+            print(f"  Monitor: {make} {model}")
+            print(f"  Position: {x}, {y}")
+            print(f"  Physical size: {physical_width}x{physical_height}mm")
+
+        def on_mode(flags, width, height, refresh):
+            # See: https://wayland.app/protocols/wayland#wl_output:event:mode
+            if flags & 1:  # Current mode
+                print(f"  Resolution: {width}x{height} @ {refresh / 1000:.1f}Hz")
+
+        def on_description(description):
+            # See: https://wayland.app/protocols/wayland#wl_output:event:description
+            print(f"{description}")
+
+        def on_done():
+            # See: https://wayland.app/protocols/wayland#wl_output:event:done
+            global displays_done
+            displays_done += 1
+
+        return on_geometry, on_mode, on_description, on_done
+
+    geo, mode, desc, done = make_handlers()
+    output.events.geometry += geo
+    output.events.mode += mode
+    output.events.description += desc
+    output.events.done += done
+
+
+# Register our event handlers
+wayland.wl_registry.events.global_ += on_wl_registry_global
+wayland.wl_display.events.error += on_error
+
+# Request the global registry from the wayland compositor
+# See https://wayland.app/protocols/wayland#wl_display:request:get_registry
+wayland.wl_display.get_registry()
+
+# Simple event loop to get the responses
+while not displays_done or displays_done < total_displays:
+    wayland.process_messages()
+    time.sleep(0.1)
+```
+
+## API Reference
+
 * **[API Reference](api/client.md)** - Complete client API documentation
-* **[Examples](examples.md)** - Practical usage examples
-
-## About
-
-This library seeks to be a Python implementation of libwayland-client, providing a replacement rather than a wrapper for the native C library.
-
-For more information about the complete library, see the [main repository](https://github.com/grking/python-wayland).
+* **[More Examples](examples.md)** - Further usage examples
+* **[Developing python-wayland](developing.md)** - Developing this library itself.

@@ -31,10 +31,6 @@ Issues = "https://github.com/grking/python-wayland/issues"
 Source = "https://github.com/grking/python-wayland"
 Changelog = "https://github.com/grking/python-wayland/blob/main/CHANGELOG.md"
 
-[project.optional-dependencies]
-build=["lxml"]
-docs=["mkdocs", "mkdocs-material", "mkdocstrings[python]"]
-
 [tool.hatch.envs.hatch-test]
 extra-dependencies = [
   "lxml",
@@ -47,16 +43,29 @@ extra-args = [
     "-q"
 ]
 
+[tool.hatch.envs.wayland]
+extra-dependencies = [
+  "lxml",
+  "black",
+  "ruff"
+]
+
 [tool.hatch.envs.docs]
 extra-dependencies = [
+  "mypy",
   "mkdocs",
   "mkdocs-material",
   "mkdocstrings[python]"
 ]
 
 [tool.hatch.envs.docs.scripts]
-build = "mkdocs build"
+build = ["mypy", "mkdocs build"]
 serve = "mkdocs serve"
+
+[tool.hatch.envs.wayland.scripts]
+update = "python -m wayland --download"
+update-local = "python -m wayland"
+
 
 [build-system]
 requires = ["hatchling"]
@@ -64,14 +73,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.version]
 path = "wayland/__about__.py"
-
-[tool.hatch.envs.types]
-extra-dependencies = [
-  "mypy>=1.0.0",
-]
-
-[tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:wayland tests}"
 
 [tool.hatch.build.targets.sdist]
 exclude = [
@@ -130,3 +131,20 @@ exclude = [
 
 [tool.pylint]
 ignore-patterns = "*.pyi"
+
+[tool.mypy]
+files = ["wayland/client/"]
+follow_imports = "silent"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "wayland"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "wayland.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "wayland.client.*"
+ignore_errors = false
