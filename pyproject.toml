@@ -33,6 +33,7 @@ Changelog = "https://github.com/grking/python-wayland/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 build=["lxml"]
+docs=["mkdocs", "mkdocs-material", "mkdocstrings[python]"]
 
 [tool.hatch.envs.hatch-test]
 extra-dependencies = [
@@ -45,6 +46,18 @@ extra-args = [
     "--capture=no",
     "-q"
 ]
+
+[tool.hatch.envs.docs]
+extra-dependencies = [
+  "mkdocs",
+  "mkdocs-material",
+  "mkdocstrings[python]"
+]
+
+[tool.hatch.envs.docs.scripts]
+build = "mkdocs build"
+serve = "mkdocs serve"
+deploy = "mkdocs gh-deploy"
 
 [build-system]
 requires = ["hatchling"]
