@@ -57,7 +57,6 @@ extra-dependencies = [
 [tool.hatch.envs.docs.scripts]
 build = "mkdocs build"
 serve = "mkdocs serve"
-deploy = "mkdocs gh-deploy"
 
 [build-system]
 requires = ["hatchling"]
