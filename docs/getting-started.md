@@ -2,20 +2,6 @@
 
 This guide will help you get started with the python-wayland client API.
 
-## Installation
-
-Install python-wayland using pip:
-
-```bash
-pip install python-wayland
-```
-
-## Requirements
-
-* Python 3.8 or higher
-* A Wayland compositor (for runtime use)
-
-No additional dependencies are required - python-wayland is a pure Python implementation.
 
 ## Basic Usage
 
@@ -77,61 +63,6 @@ def on_error(object_id, code, message):
 # Register error handler
 client.wl_display.events.error += on_error
 ```
-
-## Naming Compatibility
-
-Wayland identifiers that collide with Python builtin keywords are renamed to end with an underscore. There are very few of these. The list of known protocols that have changes are:
-
-* `wayland.wl_registry.global` renamed to `global_`
-* `xdg_foreign_unstable_v1.zxdg_importer_v1.import` renamed to `import_`
-
-Enums with integer names, which are not permitted in Python, have the value prefixed with the name of the enum. This is also very rare, at the time of writing the below example is the only case in the stable and staging protocols.
-
-For example:
-
-```python
-class wl_output.transform(Enum):
-    normal: int
-    90: int
-    180: int
-    270: int
-    flipped: int
-    flipped_90: int
-    flipped_180: int
-    flipped_270: int
-```
-
-becomes:
-
-```python
-class wl_output.transform(Enum):
-    normal: int
-    transform_90: int
-    transform_180: int
-    transform_270: int
-    flipped: int
-    flipped_90: int
-    flipped_180: int
-    flipped_270: int
-```
-
-## Making Wayland Requests
-
-Requests are made in the standard manner, with the exception that `new_id` arguments should be omitted. There is no need to pass an integer ID for the object you want to create, that is handled automatically for you. An instance of the object created is simply returned by the request.
-
-So the request signature is _not_ this:
-
-```python
-wayland.wl_display.get_registry( some_integer: new_id ) -> None
-```
-
-It has become simply this:
-
-```python
-wayland.wl_display.get_registry() -> wl_registry
-```
-
-Where `wl_registry` is an instance of the interface created.
 
 ## Event Handlers
 

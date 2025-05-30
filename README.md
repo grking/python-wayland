@@ -20,3 +20,4 @@ For documentation on how to use `python-wayland` see the [documentation](https:/
 
 Thanks to Philippe Gaultier, whose article [Wayland From Scratch](https://gaultier.github.io/blog/wayland_from_scratch.html) inspired this project.
 
+Thanks also to Drew DeVault, who [freely available Wayland book](https://wayland-book.com/) which was an essential resource in developing this library.

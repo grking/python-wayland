@@ -4,7 +4,8 @@ repo_url: https://github.com/grking/python-wayland
 repo_name: grking/python-wayland
 
 nav:
-  - Home: index.md
+  - Installation: index.md
+  - Introduction: introduction.md
   - Getting Started: getting-started.md
   - API Reference:
     - Client API: api/client.md
