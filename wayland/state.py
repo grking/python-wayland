@@ -26,9 +26,11 @@ from __future__ import annotations
 import os
 import string
 import struct
+import threading
+import time
 from typing import Any, Callable
 
-from wayland.constants import PROTOCOL_HEADER_SIZE
+from wayland.constants import MAX_EVENT_RESOLUTION, PROTOCOL_HEADER_SIZE
 from wayland.log import log
 from wayland.unixsocket import UnixSocketConnection
 
@@ -44,12 +46,16 @@ class WaylandState:
     WaylandState is a singleton, exposed as wayland.state.
     """
 
-    def __init__(self):
+    def __init__(self, *, disable_event_dispatch_thread=False):
+        self._thread = None
         self._socket_path = self._get_socket_path()
         self._socket = UnixSocketConnection(self._socket_path)
         self._next_object_id = 1
         self._object_id_to_instance: dict[int, Any] = {}
         self._instance_to_object_id: dict[Any, int] = {}
+        # By default check for incoming events at least every millisecond
+        if not disable_event_dispatch_thread:
+            self._start_event_monitor()
 
     @staticmethod
     def _get_socket_path() -> str:
@@ -131,6 +137,10 @@ class WaylandState:
         if ancillary:
             log.protocol(f"    Plus ancillary file descriptor data: {ancillary}")
 
+    def _start_event_monitor(self):
+        self._thread = threading.Thread(target=self._process_messages, daemon=True)
+        self._thread.start()
+
     def _send(self, message: bytes, ancillary: Any = None) -> None:
         self._debug_packet(message, ancillary)
         if ancillary:
@@ -170,7 +180,8 @@ class WaylandState:
         log.event(f"Unhandled event {wayland_object}#{opcode}")
         return True
 
-    def process_messages(self) -> None:
+    def _process_messages(self) -> None:
         """Process all pending wayland messages"""
-        while self.get_next_message():
-            pass
+        while True:
+            if not self.get_next_message():
+                time.sleep(1 / MAX_EVENT_RESOLUTION)

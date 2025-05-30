@@ -4,7 +4,7 @@ import argparse
 import json
 import sys
 
-from wayland import get_package_root
+from wayland.client import get_package_root
 from wayland.log import log
 from wayland.parser import WaylandParser
 from wayland.typehint import TypeHinter

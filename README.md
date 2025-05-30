@@ -87,14 +87,6 @@ Register an event handler by adding it to the relevant event:
 
 The order of parameters in the event handler doesn't matter.
 
-## Processing Events
-
-To process all pending wayland events and call any registered event handlers:
-
-```python
-wayland.process_messages()
-```
-
 ## Refreshing Protocols
 
 The package is installed with the latest Wayland stable and staging protocols already built-in (`wayland/protocols.json`). Refreshing the protocol definitions is optional. It requires the python library `lxml` to be installed.
@@ -124,17 +116,17 @@ python -m wayland --compare
 Example output:
 
     Protocol definitions which have been updated:
-    
+
     None
-    
+
     Available remote protocol definitions, but not installed locally:
-    
+
     ext_image_capture_source_v1: version 1
     ext_output_image_capture_source_manager_v1: version 1
     ext_foreign_toplevel_image_capture_source_manager_v1: version 1
-    
+
     Protocol definitions installed locally but not in official stable or staging repositories:
-    
+
     zwp_fullscreen_shell_v1: version 1
     zwp_fullscreen_shell_mode_feedback_v1: version 1
     zwp_idle_inhibit_manager_v1: version 1
@@ -149,7 +141,7 @@ Set the environment variable `WAYLAND_DEBUG=1` before you your application, e.g.
 
 ## Development of python-wayland
 
-For developing `python-wayland` itself, rather than using it, the following may be handy. `python-wayland` is configured for `hatch`.  
+For developing `python-wayland` itself, rather than using it, the following may be handy. `python-wayland` is configured for `hatch`.
 
 You can install `hatch` through `pipx`. A full bootstrap may look like:
 

@@ -1,8 +1,8 @@
-*.png
-*.jpg
 **/__pycache__
 .venv
 wayland.log
 dist/
 .*_cache
 .vscode
+site/
+.r*

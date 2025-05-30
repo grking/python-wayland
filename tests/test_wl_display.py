@@ -1,6 +1,6 @@
 import wayland as wl
 
-wayland = wl.initialise()
+wayland = wl.client.initialise()
 
 
 def test_display_singleton():

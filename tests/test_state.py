@@ -71,7 +71,7 @@ class TestWaylandState(unittest.TestCase):
         mock_socket_instance = MagicMock()
         mock_unix_socket_conn_class.return_value = mock_socket_instance
 
-        state = WaylandState()
+        state = WaylandState(disable_event_dispatch_thread=True)
 
         mock_get_path_for_init.assert_called_once()
         mock_unix_socket_conn_class.assert_called_once_with(expected_socket_path)
@@ -92,7 +92,7 @@ class TestWaylandState(unittest.TestCase):
         )
         self.mock_instance_get_path = self.instance_path_patcher.start()
 
-        self.state = WaylandState()
+        self.state = WaylandState(disable_event_dispatch_thread=True)
         self.addCleanup(self.socket_patcher.stop)
         self.addCleanup(self.instance_path_patcher.stop)
 
@@ -328,7 +328,7 @@ class TestWaylandState(unittest.TestCase):
         """Tests get_next_message for processing incoming events."""
         self.mock_socket_instance.get_next_message.return_value = None
         assert not self.state.get_next_message()
-        self.mock_socket_instance.get_next_message.assert_called_once()
+        self.mock_socket_instance.get_next_message.assert_called()
 
         self.mock_socket_instance.reset_mock()
 
@@ -368,16 +368,6 @@ class TestWaylandState(unittest.TestCase):
             mock_log_object_gnm.event.assert_called_once_with(
                 f"Unhandled event {object_id}#{event_opcode}"
             )
-
-    def test_process_messages(self):
-        """Tests process_messages to ensure it calls get_next_message in a loop."""
-        mock_gnm_results = [True, True, False]
-
-        with patch.object(
-            self.state, "get_next_message", side_effect=mock_gnm_results
-        ) as mock_get_next_message_method:
-            self.state.process_messages()
-            assert mock_get_next_message_method.call_count == 3
 
 
 if __name__ == "__main__":

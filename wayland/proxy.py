@@ -25,13 +25,25 @@ import json
 import keyword
 import socket
 import struct
+import threading
+import time
+import types
 from enum import Enum, IntFlag
+from queue import Empty, SimpleQueue
+from typing import ClassVar
 
+from wayland.client import get_package_root
+from wayland.constants import MAX_EVENT_RESOLUTION
 from wayland.log import log
 from wayland.state import WaylandState
 
 
 class Proxy:
+    # A single shared collection of queues for output events
+    # queued per thread
+    _event_queues: ClassVar[dict] = {}
+    _event_lock = threading.Lock()
+
     class Request:
         def __init__(self, parent, name, args, opcode, state):
             self.name = name
@@ -148,21 +160,41 @@ class Proxy:
             self.opcode = opcode
             self.event = False
             self.event = True
-            self._handlers = []
+            self._lock = threading.Lock()
+            self._event_handlers = {}
+
+        def _thread_id(self):
+            tid = threading.current_thread().native_id
+            # Ensure we are setup for this thread
+            with self._lock:
+                if tid not in self._event_handlers:
+                    self._event_handlers[tid] = []
+            with Proxy._event_lock:
+                if tid not in Proxy._event_queues:
+                    Proxy._event_queues[tid] = SimpleQueue()
+            return tid
 
         def __iadd__(self, handler):
             """Registers a new handler to be called when the event is triggered."""
             if callable(handler):
-                self._handlers.append(handler)
+                tid = self._thread_id()
+                with self._lock:
+                    self._event_handlers[tid].append(handler)
             return self
 
         def __isub__(self, handler):
             """Unregisters an existing handler."""
-            if handler in self._handlers:
-                self._handlers.remove(handler)
+            tid = self._thread_id()
+            with self._lock:
+                if handler in self._event_handlers[tid]:
+                    self._event_handlers[tid].remove(handler)
             return self
 
         def __call__(self, packet, get_fd):
+            # This event has been triggered, let our event listeners
+            # know about it. In fact, don't, but queue up the notifications
+            # for when each thread is ready.
+
             # Read some properties from the class to which this event is bound
             parent_interface = self.parent._name
             object_id = self.parent.object_id
@@ -195,8 +227,14 @@ class Proxy:
             log.event(
                 f"{parent_interface}#{object_id}.{self.name}({', '.join(values)})"
             )
-            for handler in self._handlers:
-                handler(**kwargs)
+
+            # Put this event callback in each threads queue
+            with self._lock:
+                for thread_id in self._event_handlers:
+                    if len(self._event_handlers[thread_id]) > 0:
+                        for handler in self._event_handlers[thread_id]:
+                            # Store method ptr, args
+                            Proxy._queue_event(thread_id, handler, kwargs)
 
         def _int_to_enum(self, enum_name, value):
             for attr_name, attr_type in self.parent.__dict__.items():
@@ -266,9 +304,27 @@ class Proxy:
             self._events = events
             self._enums = enums
             self._object_id = 0
-            # Special wayland case
+            # Special wayland case, the global singleton interface
             if name == "wl_display":
+
+                def dispatch(self):
+                    return Proxy._dispatch()
+
+                def dispatch_pending(self):
+                    return Proxy._dispatch_pending()
+
+                def dispatch_timeout(self, timeout_in_seconds):
+                    return Proxy._dispatch_timeout(timeout_in_seconds)
+
+                # Bind these dynamic methods
+                self.dispatch = types.MethodType(dispatch, self)
+                self.dispatch_pending = types.MethodType(dispatch_pending, self)
+                self.dispatch_timeout = types.MethodType(dispatch_timeout, self)
+
                 self.object_id, _ = self._state.new_object(self)
+                self.dispatch = None
+                self.dispatch_pending = None
+
             # Bind requests and events
             self.events = Proxy.Events()
             self._bind_requests(requests)
@@ -332,6 +388,8 @@ class Proxy:
         def __bool__(self):
             return self.object_id > 0
 
+    # Proxy class methods
+
     def __init__(self):
         self.state = WaylandState()
         self.scope = None
@@ -346,14 +404,82 @@ class Proxy:
         msg = f"'{key}' not found"
         raise KeyError(msg)
 
-    def initialise(self, scope, path):
-        self.scope = scope
+    @classmethod
+    def _queue_event(cls, thread_id, func_ptr, kwargs):
+        with Proxy._event_lock:
+            qu = Proxy._event_queues[thread_id]
+        qu.put((func_ptr, kwargs))
+
+    @classmethod
+    def _dispatch_timeout(cls, timeout_in_seconds):
+        # Blocking call to event dispatch, returns once some events have
+        # been processed or timeout has elapsed. timeout in seconds and
+        # can be fractional
+        have_events = False
+        max_time = time.time() + timeout_in_seconds
+        while not have_events:
+            have_events = cls._dispatch_pending()
+            if not have_events:
+                time.sleep(1 / MAX_EVENT_RESOLUTION)
+            if time.time() > max_time:
+                break
+
+    @classmethod
+    def _dispatch(cls):
+        # Blocking call to event dispatch, returns once some events have
+        # been processed
+        have_events = False
+        while not have_events:
+            have_events = cls._dispatch_pending()
+            if not have_events:
+                time.sleep(1 / MAX_EVENT_RESOLUTION)
+
+    @classmethod
+    def _dispatch_pending(cls):
+        # Non-Blocking call to event dispatch. Dispatches all pending events
+        # returns True if any events were dispatched, False otherwise.
+        tid = threading.current_thread().native_id
+        have_events = False
+
+        # Get the queue if we haven't got it
+        with Proxy._event_lock:
+            if tid in Proxy._event_queues:
+                qu = Proxy._event_queues[tid]
+            else:
+                return False
+
+        # Call any pending event handlers, for handlers registered
+        # by the same thread context that is calling the dispatch
+        # method. We're calling the handler *in* the same thread
+        # context it was registered with also.
+        while True:
+            try:
+                func_ptr, kwargs = qu.get_nowait()
+                # We let exceptions here propagate back to the calling
+                # thread. It's that threads code that has raised the
+                # exception anyway
+                func_ptr(**kwargs)
+                have_events = True
+            except Empty:
+                break
+
+        return have_events
+
+    def initialise(self, scope=None, path=None):
+        if scope is None:
+            self.scope = self
+        else:
+            self.scope = scope
+        if path is None:
+            path = get_package_root()
+
         try:
             with open(f"{path}/protocols.json", encoding="utf-8") as infile:
                 structure = json.load(infile)
         except (FileNotFoundError, json.JSONDecodeError) as e:
-            msg = f"Error loading structure: {e}"
-            raise FileNotFoundError(msg) from e
+            msg = f"Wayland protocol definitions not found: {e}"
+            log.error(msg)
+            return False
 
         for class_name, details in structure.items():
             # Process requests
@@ -365,13 +491,10 @@ class Proxy:
                 class_name, self.scope, requests, events, enums, self.state
             )
             # Inject instance into scope
-            if isinstance(scope, dict):
-                scope[class_name] = instance
+            if isinstance(self.scope, dict):
+                self.scope[class_name] = instance
             else:
-                setattr(scope, class_name, instance)
+                setattr(self.scope, class_name, instance)
 
-        # Inject event processing function into scope
-        if isinstance(scope, dict):
-            scope["process_messages"] = self.state.process_messages
-        else:
-            scope.process_messages = self.state.process_messages
+        # initialised ok
+        return True

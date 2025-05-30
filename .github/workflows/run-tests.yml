@@ -1,4 +1,3 @@
-
 name: Tests
 
 on:
@@ -9,22 +8,29 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
       - name: Install headless wayland support
-        run: sudo apt-get install -y xwayland-run weston
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xwayland-run weston
+
       - name: Install Hatch
         run: pipx install hatch
+
       - name: Run lint check
         run: hatch fmt
+
       - name: Run tests
         run: wlheadless-run -c weston -- hatch test
