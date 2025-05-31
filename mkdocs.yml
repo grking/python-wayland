@@ -13,7 +13,7 @@ nav:
     - Overview: api/overview.md
     - wayland.client: api/client.md
     - wayland.client.package: api/package.md
-  - Wayland API Reference: wayland_reference/  # auto populated
+  - Wayland API Reference: wayland/  # auto populated
   - Project Documentation:
     - Developing:
       - Overview: developing.md

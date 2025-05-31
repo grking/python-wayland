@@ -10,7 +10,7 @@ WAYLAND_INTERFACES = [x for x in dir(wayland) if x[0] != "_" and x != "client"]
 
 # Generate a page for each interface
 for interface in WAYLAND_INTERFACES:
-    filename = f"wayland_reference/{interface}.md"
+    filename = f"wayland/{interface}.md"
 
     with mkdocs_gen_files.open(filename, "w") as f:
         print(f"# {interface}\n", file=f)
@@ -26,7 +26,7 @@ for interface in WAYLAND_INTERFACES:
     mkdocs_gen_files.set_edit_path(filename, f"wayland/{interface}.py")
 
 # Generate a summary page
-with mkdocs_gen_files.open("wayland_reference/index.md", "w") as f:
+with mkdocs_gen_files.open("wayland/index.md", "w") as f:
     print("# Wayland Interface Reference\n", file=f)
     print(
         "This section contains the reference documentation for all Wayland interfaces.\n",

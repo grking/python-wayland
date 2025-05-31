@@ -1,7 +1,7 @@
 # Introduction
 `python-wayland` is a pure python implementation of the Wayland protocol and focuses on enabling clients to connect to compositors and interact with the full range of wayland interfaces.
 
-This library seeks to expose the wayland protocol interfaces as they are, rather than convert them into some more Pythonic form. This means general wayland API documentation, such as [wayland.app](https://wayland.app), is directly useful and relevant to the use of this library.
+This library seeks to expose the wayland protocol interfaces as they are, rather than convert them into some more Pythonic form. This means general [wayland API documentation](https://python-wayland.org/wayland) is directly useful and relevant to the use of this library.
 
 The wayland protocol is designed for clients and compositors to talk to one another, it doesn't seek to be a high-level developer friendly API for GUI creation. See Drew DeVault's [wayland book](https://wayland-book.com/) for a great introduction.
 
