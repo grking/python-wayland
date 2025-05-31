@@ -1,6 +1,6 @@
 # python-wayland
 
-[![PyPI - Version](https://img.shields.io/pypi/v/python-wayland.svg)](https://pypi.org/project/python-wayland) [![Tests](https://github.com/grking/python-wayland/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/grking/python-wayland/tree/main) [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/python-wayland.svg)](https://pypi.org/project/python-wayland)
+[![PyPI - Version](https://img.shields.io/pypi/v/python-wayland.svg)](https://pypi.org/project/python-wayland) [![Tests](https://github.com/grking/python-wayland/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/grking/python-wayland/tree/main) [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/python-wayland.svg)](https://pypi.org/project/python-wayland) [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://python-wayland.org)
 
 A pure Python implementation of the Wayland protocol, from scratch, with no external run-time dependencies. The Wayland C client libraries are not required.
 
@@ -14,7 +14,7 @@ A pure Python implementation of the Wayland protocol, from scratch, with no exte
 
 ## Documentation
 
-For documentation on how to use `python-wayland` see the [online documentation](https://python-wayland.readthedocs.io/en/latest/)
+For documentation on how to use `python-wayland` see the [online documentation](https://python-wayland.org)
 
 ## Thanks
 
