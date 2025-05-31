@@ -1,14 +1,12 @@
 # Generate a JSON schema of the Python handler configuration.
+from __future__ import annotations
 
-import json
-from dataclasses import dataclass, fields
-from os.path import join
-from typing import Any
+from typing import TYPE_CHECKING
 
-from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.plugins import get_plugin_logger
 
-from mkdocstrings_handlers.python import PythonInputConfig, PythonInputOptions
+if TYPE_CHECKING:
+    from mkdocs.config.defaults import MkDocsConfig
 
 # TODO: Update when Pydantic supports Python 3.14 (sources and duties as well).
 try:

@@ -39,7 +39,7 @@ with mkdocs_gen_files.open("wayland_reference/index.md", "w") as f:
 # Include CHANGELOG.md from project root
 changelog_path = Path("CHANGELOG.md")
 if changelog_path.exists():
-    with open(changelog_path, "r", encoding="utf-8") as f:
+    with open(changelog_path, encoding="utf-8") as f:
         changelog_content = f.read()
 
     # Create it in the docs

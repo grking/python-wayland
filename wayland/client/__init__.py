@@ -9,12 +9,12 @@ def get_wayland_proxy() -> object:
     """Return a proxy object containing all the wayland interfaces.
 
     Creates and returns a Proxy object that provides access to all Wayland
-    protocol interfaces. 
+    protocol interfaces.
 
     Note:
         This is handled automatically and you do not normally
         need to call this. The `wayland` package namespace already exposes all
-        the wayland interfaces, for example `wayland.wl_display`.    
+        the wayland interfaces, for example `wayland.wl_display`.
 
     Returns:
         wayland.proxy.Proxy: A proxy object containing all Wayland protocol interfaces.
