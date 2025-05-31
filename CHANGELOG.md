@@ -8,16 +8,17 @@
 - Comprehensive documentation added, including full Wayland protocol documentation.
 - Type hint descriptions cleaned up; formatting preserved and unnecessary text removed.
 - Fixed bug with type hinting where wrong enum class was used if enum was referenced in a method signature.
+- Type hint types changed to be the actual types used in `python-wayland`.
 - Added event and method argument descriptions into type hinting.
-- The following critical breaking API change were made:
-- `wayland.process_messages()` removed.
-- `wayland.wl_display.dispatch()` added.
-- `wayland.wl_display.dispatch_timeout()` added.
-- `wayland.wl_display.dispatch_pending()` added.
+- The following breaking API change were made:
+  - `wayland.process_messages()` removed.
+  - `wayland.wl_display.dispatch()` added.
+  - `wayland.wl_display.dispatch_timeout()` added.
+  - `wayland.wl_display.dispatch_pending()` added.
 - The following breaking API changes were made, although these methods not required for the normal use of this library:
-- `wayland.initialise()` changed to `wayland.client.get_wayland_proxy()`
-- `wayland.get_package_root()` changed to `wayland.client.package.get_package_root()`
-- `wayland.is_wayland` changed to `wayland.client.is_wayland()`
+  - `wayland.initialise()` changed to `wayland.client.get_wayland_proxy()`
+  - `wayland.get_package_root()` changed to `wayland.client.package.get_package_root()`
+  - `wayland.is_wayland` changed to `wayland.client.is_wayland()`
 
 ### v0.7.1 (28th May 2025)
 - Remove dependency on requests library.

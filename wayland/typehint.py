@@ -38,12 +38,7 @@ class TypeHinter:
         "from typing import TypeAlias, Annotated",
         "from enum import Enum, IntFlag",
         "new_id: TypeAlias = int",
-        "object: TypeAlias = int",
-        "uint: TypeAlias = int",
-        "string: TypeAlias = str",
         "fd: TypeAlias = int",
-        "array: TypeAlias = list",
-        "fixed: TypeAlias = float",
         "",
     )
 
@@ -116,22 +111,34 @@ class TypeHinter:
         return_type = None
 
         for arg in deepcopy(args):
-            if arg["type"] == "new_id":
-                interface = arg.get("interface")
-                if interface and not events:
-                    return_type = interface
-                    continue
-                if interface and events:
-                    arg["type"] = interface
-            elif arg.get("enum"):
-                enum_ref = arg["enum"]
-                if "." in enum_ref:
-                    arg["type"] = enum_ref
-                else:
-                    arg["type"] = f"{class_name}.{enum_ref}"
+            processed_return_type = self._process_single_arg(arg, class_name, events)
+            if processed_return_type:
+                return_type = processed_return_type
+                continue
             new_args.append(arg)
 
         return new_args, return_type
+
+    def _process_single_arg(
+        self, arg: dict, class_name: str, events: bool
+    ) -> str | None:
+        if arg["type"] == "new_id":
+            interface = arg.get("interface")
+            if interface and not events:
+                return interface
+            if interface and events:
+                arg["type"] = interface
+        elif arg["type"] == "object" and arg.get("interface"):
+            arg["type"] = arg["interface"]
+        elif arg["type"] == "string":
+            arg["type"] = "str"
+        elif arg.get("enum"):
+            enum_ref = arg["enum"]
+            if "." in enum_ref:
+                arg["type"] = enum_ref
+            else:
+                arg["type"] = f"{class_name}.{enum_ref}"
+        return None
 
     def _create_docstring(
         self, member: dict, args: list[dict], return_type: str | None

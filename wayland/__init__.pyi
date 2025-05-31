@@ -6,12 +6,7 @@ from __future__ import annotations
 from typing import TypeAlias, Annotated
 from enum import Enum, IntFlag
 new_id: TypeAlias = int
-object: TypeAlias = int
-uint: TypeAlias = int
-string: TypeAlias = str
 fd: TypeAlias = int
-array: TypeAlias = list
-fixed: TypeAlias = float
 
 class wl_display:
  """
@@ -70,7 +65,7 @@ class wl_display:
 
  class events:
   @staticmethod
-  def error(object_id: object, code: uint, message: string) -> None:
+  def error(object_id: object, code: uint, message: str) -> None:
    """
    The error event is sent out when a fatal (non-recoverable)
    error has occurred.  The object_id argument is the object
@@ -131,7 +126,7 @@ class wl_registry:
 
 
  @staticmethod
- def bind(name: uint, interface: string, version: uint, id: new_id) -> None:
+ def bind(name: uint, interface: str, version: uint, id: new_id) -> None:
   """
   Binds a new, client-created object to the server using the
   specified name as the identifier.
@@ -145,7 +140,7 @@ class wl_registry:
 
  class events:
   @staticmethod
-  def global_(name: uint, interface: string, version: uint) -> None:
+  def global_(name: uint, interface: str, version: uint) -> None:
    """
    Notify the client of global objects.
 
@@ -578,7 +573,7 @@ class wl_data_offer:
 
 
  @staticmethod
- def accept(serial: uint, mime_type: string) -> None:
+ def accept(serial: uint, mime_type: str) -> None:
   """
   Indicate that the client can accept the given mime type, or
   NULL for not accepted.
@@ -603,7 +598,7 @@ class wl_data_offer:
   ...
 
  @staticmethod
- def receive(mime_type: string, fd: fd) -> None:
+ def receive(mime_type: str, fd: fd) -> None:
   """
   To transfer the offered data, the client issues this request
   and indicates the mime type it wants to receive.  The transfer
@@ -701,7 +696,7 @@ class wl_data_offer:
 
  class events:
   @staticmethod
-  def offer(mime_type: string) -> None:
+  def offer(mime_type: str) -> None:
    """
    Sent immediately after creating the wl_data_offer object.  One
    event per offered mime type.
@@ -787,7 +782,7 @@ class wl_data_source:
 
 
  @staticmethod
- def offer(mime_type: string) -> None:
+ def offer(mime_type: str) -> None:
   """
   This request adds a mime type to the set of mime types
   advertised to targets.  Can be called several times to offer
@@ -832,7 +827,7 @@ class wl_data_source:
 
  class events:
   @staticmethod
-  def target(mime_type: string) -> None:
+  def target(mime_type: str) -> None:
    """
    Sent when a target accepts pointer_focus or motion events.  If
    a target does not accept any of the offered types, type is NULL.
@@ -846,7 +841,7 @@ class wl_data_source:
    ...
 
   @staticmethod
-  def send(mime_type: string, fd: fd) -> None:
+  def send(mime_type: str, fd: fd) -> None:
    """
    Request for data from the client.  Send the data as the
    specified mime type over the passed file descriptor, then
@@ -967,7 +962,7 @@ class wl_data_device:
 
 
  @staticmethod
- def start_drag(source: object, origin: object, icon: object, serial: uint) -> None:
+ def start_drag(source: wl_data_source, origin: wl_surface, icon: wl_surface, serial: uint) -> None:
   """
   This request asks the compositor to start a drag-and-drop
   operation on behalf of the client.
@@ -1009,7 +1004,7 @@ class wl_data_device:
   ...
 
  @staticmethod
- def set_selection(source: object, serial: uint) -> None:
+ def set_selection(source: wl_data_source, serial: uint) -> None:
   """
   This request asks the compositor to set the selection
   to the data from the source on behalf of the client.
@@ -1054,7 +1049,7 @@ class wl_data_device:
    ...
 
   @staticmethod
-  def enter(serial: uint, surface: object, x: fixed, y: fixed, id: object) -> None:
+  def enter(serial: uint, surface: wl_surface, x: fixed, y: fixed, id: wl_data_offer) -> None:
    """
    This event is sent when an active drag-and-drop pointer enters
    a surface owned by the client.  The position of the pointer at
@@ -1118,7 +1113,7 @@ class wl_data_device:
    ...
 
   @staticmethod
-  def selection(id: object) -> None:
+  def selection(id: wl_data_offer) -> None:
    """
    The selection event is sent out to notify the client of a new
    wl_data_offer for the selection for this device.  The
@@ -1174,7 +1169,7 @@ class wl_data_device_manager:
   ...
 
  @staticmethod
- def get_data_device(seat: object) -> wl_data_device:
+ def get_data_device(seat: wl_seat) -> wl_data_device:
   """
   Create a new data device for a given seat.
 
@@ -1207,7 +1202,7 @@ class wl_shell:
 
 
  @staticmethod
- def get_shell_surface(surface: object) -> wl_shell_surface:
+ def get_shell_surface(surface: wl_surface) -> wl_shell_surface:
   """
   Create a shell surface for an existing surface. This gives
   the wl_surface the role of a shell surface. If the wl_surface
@@ -1277,7 +1272,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def move(seat: object, serial: uint) -> None:
+ def move(seat: wl_seat, serial: uint) -> None:
   """
   Start a pointer-driven move of the surface.
 
@@ -1293,7 +1288,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def resize(seat: object, serial: uint, edges: wl_shell_surface.resize) -> None:
+ def resize(seat: wl_seat, serial: uint, edges: wl_shell_surface.resize) -> None:
   """
   Start a pointer-driven resizing of the surface.
 
@@ -1320,7 +1315,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def set_transient(parent: object, x: int, y: int, flags: wl_shell_surface.transient) -> None:
+ def set_transient(parent: wl_surface, x: int, y: int, flags: wl_shell_surface.transient) -> None:
   """
   Map the surface relative to an existing surface.
 
@@ -1340,7 +1335,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def set_fullscreen(method: wl_shell_surface.fullscreen_method, framerate: uint, output: object) -> None:
+ def set_fullscreen(method: wl_shell_surface.fullscreen_method, framerate: uint, output: wl_output) -> None:
   """
   Map the surface as a fullscreen surface.
 
@@ -1385,7 +1380,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def set_popup(seat: object, serial: uint, parent: object, x: int, y: int, flags: wl_shell_surface.transient) -> None:
+ def set_popup(seat: wl_seat, serial: uint, parent: wl_surface, x: int, y: int, flags: wl_shell_surface.transient) -> None:
   """
   Map the surface as a popup.
 
@@ -1419,7 +1414,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def set_maximized(output: object) -> None:
+ def set_maximized(output: wl_output) -> None:
   """
   Map the surface as a maximized surface.
 
@@ -1447,7 +1442,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def set_title(title: string) -> None:
+ def set_title(title: str) -> None:
   """
   Set a short title for the surface.
 
@@ -1464,7 +1459,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def set_class(class_: string) -> None:
+ def set_class(class_: str) -> None:
   """
   Set a class for the surface.
 
@@ -1596,7 +1591,7 @@ class wl_surface:
   ...
 
  @staticmethod
- def attach(buffer: object, x: int, y: int) -> None:
+ def attach(buffer: wl_buffer, x: int, y: int) -> None:
   """
   Set a buffer as the content of this surface.
 
@@ -1749,7 +1744,7 @@ class wl_surface:
   ...
 
  @staticmethod
- def set_opaque_region(region: object) -> None:
+ def set_opaque_region(region: wl_region) -> None:
   """
   This request sets the region of the surface that contains
   opaque content.
@@ -1783,7 +1778,7 @@ class wl_surface:
   ...
 
  @staticmethod
- def set_input_region(region: object) -> None:
+ def set_input_region(region: wl_region) -> None:
   """
   This request sets the region of the surface that can receive
   pointer and touch events.
@@ -1987,7 +1982,7 @@ class wl_surface:
 
  class events:
   @staticmethod
-  def enter(output: object) -> None:
+  def enter(output: wl_output) -> None:
    """
    This is emitted whenever a surface's creation, movement, or resizing
    results in some part of it being within the scanout region of an
@@ -2002,7 +1997,7 @@ class wl_surface:
    ...
 
   @staticmethod
-  def leave(output: object) -> None:
+  def leave(output: wl_output) -> None:
    """
    This is emitted whenever a surface's creation, movement, or resizing
    results in it no longer having any part of it within the scanout region
@@ -2181,7 +2176,7 @@ class wl_seat:
    ...
 
   @staticmethod
-  def name(name: string) -> None:
+  def name(name: str) -> None:
    """
    In a multi-seat configuration the seat name can be used by clients to
    help identify which physical devices the seat represents.
@@ -2247,7 +2242,7 @@ class wl_pointer:
 
 
  @staticmethod
- def set_cursor(serial: uint, surface: object, hotspot_x: int, hotspot_y: int) -> None:
+ def set_cursor(serial: uint, surface: wl_surface, hotspot_x: int, hotspot_y: int) -> None:
   """
   Set the pointer surface, i.e., the surface that contains the
   pointer image (cursor). This request gives the surface the role
@@ -2306,7 +2301,7 @@ class wl_pointer:
 
  class events:
   @staticmethod
-  def enter(serial: uint, surface: object, surface_x: fixed, surface_y: fixed) -> None:
+  def enter(serial: uint, surface: wl_surface, surface_x: fixed, surface_y: fixed) -> None:
    """
    Notification that this seat's pointer is focused on a certain
    surface.
@@ -2325,7 +2320,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def leave(serial: uint, surface: object) -> None:
+  def leave(serial: uint, surface: wl_surface) -> None:
    """
    Notification that this seat's pointer is no longer focused on
    a certain surface.
@@ -2687,7 +2682,7 @@ class wl_keyboard:
    ...
 
   @staticmethod
-  def enter(serial: uint, surface: object, keys: array) -> None:
+  def enter(serial: uint, surface: wl_surface, keys: array) -> None:
    """
    Notification that this seat's keyboard focus is on a certain
    surface.
@@ -2712,7 +2707,7 @@ class wl_keyboard:
    ...
 
   @staticmethod
-  def leave(serial: uint, surface: object) -> None:
+  def leave(serial: uint, surface: wl_surface) -> None:
    """
    Notification that this seat's keyboard focus is no longer on
    a certain surface.
@@ -2843,7 +2838,7 @@ class wl_touch:
 
  class events:
   @staticmethod
-  def down(serial: uint, time: uint, surface: object, id: int, x: fixed, y: fixed) -> None:
+  def down(serial: uint, time: uint, surface: wl_surface, id: int, x: fixed, y: fixed) -> None:
    """
    A new touch point has appeared on the surface. This touch point is
    assigned a unique ID. Future events from this touch point reference
@@ -3039,7 +3034,7 @@ class wl_output:
 
  class events:
   @staticmethod
-  def geometry(x: int, y: int, physical_width: int, physical_height: int, subpixel: wl_output.subpixel, make: string, model: string, transform: wl_output.transform) -> None:
+  def geometry(x: int, y: int, physical_width: int, physical_height: int, subpixel: wl_output.subpixel, make: str, model: str, transform: wl_output.transform) -> None:
    """
    The geometry event describes geometric properties of the output.
    The event is sent when binding to the output object and whenever
@@ -3162,7 +3157,7 @@ class wl_output:
    ...
 
   @staticmethod
-  def name(name: string) -> None:
+  def name(name: str) -> None:
    """
    Many compositors will assign user-friendly names to their outputs, show
    them to the user, allow the user to refer to an output, etc. The client
@@ -3200,7 +3195,7 @@ class wl_output:
    ...
 
   @staticmethod
-  def description(description: string) -> None:
+  def description(description: str) -> None:
    """
    Many compositors can produce human-readable descriptions of their
    outputs. The client may wish to know this description as well, e.g. for
@@ -3311,7 +3306,7 @@ class wl_subcompositor:
   ...
 
  @staticmethod
- def get_subsurface(surface: object, parent: object) -> wl_subsurface:
+ def get_subsurface(surface: wl_surface, parent: wl_surface) -> wl_subsurface:
   """
   Create a sub-surface interface for the given surface, and
   associate it with the given parent surface. This turns a
@@ -3442,7 +3437,7 @@ class wl_subsurface:
   ...
 
  @staticmethod
- def place_above(sibling: object) -> None:
+ def place_above(sibling: wl_surface) -> None:
   """
   This sub-surface is taken from the stack, and put back just
   above the reference surface, changing the z-order of the sub-surfaces.
@@ -3465,7 +3460,7 @@ class wl_subsurface:
   ...
 
  @staticmethod
- def place_below(sibling: object) -> None:
+ def place_below(sibling: wl_surface) -> None:
   """
   The sub-surface is placed just below the reference surface.
   See wl_subsurface.place_above.
@@ -3540,7 +3535,7 @@ class wl_fixes:
   ...
 
  @staticmethod
- def destroy_registry(registry: object) -> None:
+ def destroy_registry(registry: wl_registry) -> None:
   """
   This request destroys a wl_registry object.
 
@@ -3665,7 +3660,7 @@ class zwp_linux_dmabuf_v1:
   ...
 
  @staticmethod
- def get_surface_feedback(surface: object) -> zwp_linux_dmabuf_feedback_v1:
+ def get_surface_feedback(surface: wl_surface) -> zwp_linux_dmabuf_feedback_v1:
   """
   This request creates a new wp_linux_dmabuf_feedback object for the
   specified wl_surface. This object will deliver feedback about dmabuf
@@ -4196,7 +4191,7 @@ class wp_presentation:
   ...
 
  @staticmethod
- def feedback(surface: object) -> wp_presentation_feedback:
+ def feedback(surface: wl_surface) -> wp_presentation_feedback:
   """
   Request presentation feedback for the current content submission
   on the given surface. This creates a new presentation_feedback
@@ -4282,7 +4277,7 @@ class wp_presentation_feedback:
 
  class events:
   @staticmethod
-  def sync_output(output: object) -> None:
+  def sync_output(output: wl_output) -> None:
    """
    As presentation can be synchronized to only one output at a
    time, this event tells which output it was. This event is only
@@ -4378,7 +4373,7 @@ class zwp_tablet_manager_v2:
 
 
  @staticmethod
- def get_tablet_seat(seat: object) -> zwp_tablet_seat_v2:
+ def get_tablet_seat(seat: wl_seat) -> zwp_tablet_seat_v2:
   """
   Get the wp_tablet_seat object for the given seat. This object
   provides access to all graphics tablets in this seat.
@@ -4525,7 +4520,7 @@ class zwp_tablet_tool_v2:
 
 
  @staticmethod
- def set_cursor(serial: uint, surface: object, hotspot_x: int, hotspot_y: int) -> None:
+ def set_cursor(serial: uint, surface: wl_surface, hotspot_x: int, hotspot_y: int) -> None:
   """
   Sets the surface of the cursor used for this tool on the given
   tablet. This request only takes effect if the tool is in proximity
@@ -4686,7 +4681,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def proximity_in(serial: uint, tablet: object, surface: object) -> None:
+  def proximity_in(serial: uint, tablet: zwp_tablet_v2, surface: wl_surface) -> None:
    """
    Notification that this tool is focused on a certain surface.
 
@@ -4937,7 +4932,7 @@ class zwp_tablet_v2:
 
  class events:
   @staticmethod
-  def name(name: string) -> None:
+  def name(name: str) -> None:
    """
    A descriptive name for the tablet device.
 
@@ -4976,7 +4971,7 @@ class zwp_tablet_v2:
    ...
 
   @staticmethod
-  def path(path: string) -> None:
+  def path(path: str) -> None:
    """
    A system-specific device path that indicates which device is behind
    this wp_tablet. This information may be used to gather additional
@@ -5056,7 +5051,7 @@ class zwp_tablet_pad_ring_v2:
 
 
  @staticmethod
- def set_feedback(description: string, serial: uint) -> None:
+ def set_feedback(description: str, serial: uint) -> None:
   """
   Request that the compositor use the provided feedback string
   associated with this ring. This request should be issued immediately
@@ -5186,7 +5181,7 @@ class zwp_tablet_pad_strip_v2:
 
 
  @staticmethod
- def set_feedback(description: string, serial: uint) -> None:
+ def set_feedback(description: str, serial: uint) -> None:
   """
   Requests the compositor to use the provided feedback string
   associated with this strip. This request should be issued immediately
@@ -5503,7 +5498,7 @@ class zwp_tablet_pad_v2:
 
 
  @staticmethod
- def set_feedback(button: uint, description: string, serial: uint) -> None:
+ def set_feedback(button: uint, description: str, serial: uint) -> None:
   """
   Requests the compositor to use the provided feedback string
   associated with this button. This request should be issued immediately
@@ -5561,7 +5556,7 @@ class zwp_tablet_pad_v2:
    ...
 
   @staticmethod
-  def path(path: string) -> None:
+  def path(path: str) -> None:
    """
    A system-specific device path that indicates which device is behind
    this wp_tablet_pad. This information may be used to gather additional
@@ -5619,7 +5614,7 @@ class zwp_tablet_pad_v2:
    ...
 
   @staticmethod
-  def enter(serial: uint, tablet: object, surface: object) -> None:
+  def enter(serial: uint, tablet: zwp_tablet_v2, surface: wl_surface) -> None:
    """
    Notification that this pad is focused on the specified surface.
 
@@ -5632,7 +5627,7 @@ class zwp_tablet_pad_v2:
    ...
 
   @staticmethod
-  def leave(serial: uint, surface: object) -> None:
+  def leave(serial: uint, surface: wl_surface) -> None:
    """
    Notification that this pad is no longer focused on the specified
    surface.
@@ -5669,7 +5664,7 @@ class zwp_tablet_pad_dial_v2:
 
 
  @staticmethod
- def set_feedback(description: string, serial: uint) -> None:
+ def set_feedback(description: str, serial: uint) -> None:
   """
   Requests the compositor to use the provided feedback string
   associated with this dial. This request should be issued immediately
@@ -5775,7 +5770,7 @@ class wp_viewporter:
   ...
 
  @staticmethod
- def get_viewport(surface: object) -> wp_viewport:
+ def get_viewport(surface: wl_surface) -> wp_viewport:
   """
   Instantiate an interface extension for the given wl_surface to
   crop and scale its content. If the given wl_surface already has
@@ -5958,7 +5953,7 @@ class xdg_wm_base:
   ...
 
  @staticmethod
- def get_xdg_surface(surface: object) -> xdg_surface:
+ def get_xdg_surface(surface: wl_surface) -> xdg_surface:
   """
   This creates an xdg_surface for the given surface. While xdg_surface
   itself is not a role, the corresponding surface may only be assigned
@@ -6339,7 +6334,7 @@ class xdg_surface:
   ...
 
  @staticmethod
- def get_popup(parent: object, positioner: object) -> xdg_popup:
+ def get_popup(parent: xdg_surface, positioner: xdg_positioner) -> xdg_popup:
   """
   This creates an xdg_popup object for the given xdg_surface and gives
   the associated wl_surface the xdg_popup role.
@@ -6547,7 +6542,7 @@ class xdg_toplevel:
   ...
 
  @staticmethod
- def set_parent(parent: object) -> None:
+ def set_parent(parent: xdg_toplevel) -> None:
   """
   Set the "parent" of this surface. This surface should be stacked
   above the parent surface and all other ancestor surfaces.
@@ -6574,7 +6569,7 @@ class xdg_toplevel:
   ...
 
  @staticmethod
- def set_title(title: string) -> None:
+ def set_title(title: str) -> None:
   """
   Set a short title for the surface.
 
@@ -6588,7 +6583,7 @@ class xdg_toplevel:
   ...
 
  @staticmethod
- def set_app_id(app_id: string) -> None:
+ def set_app_id(app_id: str) -> None:
   """
   Set an application identifier for the surface.
 
@@ -6618,7 +6613,7 @@ class xdg_toplevel:
   ...
 
  @staticmethod
- def show_window_menu(seat: object, serial: uint, x: int, y: int) -> None:
+ def show_window_menu(seat: wl_seat, serial: uint, x: int, y: int) -> None:
   """
   Clients implementing client-side decorations might want to show
   a context menu when right-clicking on the decorations, giving the
@@ -6643,7 +6638,7 @@ class xdg_toplevel:
   ...
 
  @staticmethod
- def move(seat: object, serial: uint) -> None:
+ def move(seat: wl_seat, serial: uint) -> None:
   """
   Start an interactive, user-driven move of the surface.
 
@@ -6670,7 +6665,7 @@ class xdg_toplevel:
   ...
 
  @staticmethod
- def resize(seat: object, serial: uint, edges: xdg_toplevel.resize_edge) -> None:
+ def resize(seat: wl_seat, serial: uint, edges: xdg_toplevel.resize_edge) -> None:
   """
   Start a user-driven, interactive resize of the surface.
 
@@ -6847,7 +6842,7 @@ class xdg_toplevel:
   ...
 
  @staticmethod
- def set_fullscreen(output: object) -> None:
+ def set_fullscreen(output: wl_output) -> None:
   """
   Make the surface fullscreen.
 
@@ -7056,7 +7051,7 @@ class xdg_popup:
   ...
 
  @staticmethod
- def grab(seat: object, serial: uint) -> None:
+ def grab(seat: wl_seat, serial: uint) -> None:
   """
   This request makes the created popup take an explicit grab. An explicit
   grab will be dismissed when the user dismisses the popup, or when the
@@ -7104,7 +7099,7 @@ class xdg_popup:
   ...
 
  @staticmethod
- def reposition(positioner: object, token: uint) -> None:
+ def reposition(positioner: xdg_positioner, token: uint) -> None:
   """
   Reposition an already-mapped popup. The popup will be placed given the
   details in the passed xdg_positioner object, and a
@@ -7225,7 +7220,7 @@ class wp_alpha_modifier_v1:
   ...
 
  @staticmethod
- def get_surface(surface: object) -> wp_alpha_modifier_surface_v1:
+ def get_surface(surface: wl_surface) -> wp_alpha_modifier_surface_v1:
   """
   Create a new alpha modifier surface object associated with the
   given wl_surface. If there is already such an object associated with
@@ -7360,7 +7355,7 @@ class wp_color_manager_v1:
   ...
 
  @staticmethod
- def get_output(output: object) -> wp_color_management_output_v1:
+ def get_output(output: wl_output) -> wp_color_management_output_v1:
   """
   This creates a new wp_color_management_output_v1 object for the
   given wl_output.
@@ -7374,7 +7369,7 @@ class wp_color_manager_v1:
   ...
 
  @staticmethod
- def get_surface(surface: object) -> wp_color_management_surface_v1:
+ def get_surface(surface: wl_surface) -> wp_color_management_surface_v1:
   """
   If a wp_color_management_surface_v1 object already exists for the given
   wl_surface, the protocol error surface_exists is raised.
@@ -7391,7 +7386,7 @@ class wp_color_manager_v1:
   ...
 
  @staticmethod
- def get_surface_feedback(surface: object) -> wp_color_management_surface_feedback_v1:
+ def get_surface_feedback(surface: wl_surface) -> wp_color_management_surface_feedback_v1:
   """
   This creates a new color wp_color_management_surface_feedback_v1 object
   for the given wl_surface.
@@ -7661,7 +7656,7 @@ class wp_color_management_surface_v1:
   ...
 
  @staticmethod
- def set_image_description(image_description: object, render_intent: wp_color_manager_v1.render_intent) -> None:
+ def set_image_description(image_description: wp_image_description_v1, render_intent: wp_color_manager_v1.render_intent) -> None:
   """
   If this protocol object is inert, the protocol error inert is raised.
 
@@ -8386,7 +8381,7 @@ class wp_image_description_v1:
 
  class events:
   @staticmethod
-  def failed(cause: wp_image_description_v1.cause, msg: string) -> None:
+  def failed(cause: wp_image_description_v1.cause, msg: str) -> None:
    """
    If creating a wp_image_description_v1 object fails for a reason that is
    not defined as a protocol error, this event is sent.
@@ -8690,7 +8685,7 @@ class wp_color_representation_manager_v1:
   ...
 
  @staticmethod
- def get_surface(surface: object) -> wp_color_representation_surface_v1:
+ def get_surface(surface: wl_surface) -> wp_color_representation_surface_v1:
   """
   If a wp_color_representation_surface_v1 object already exists for the
   given wl_surface, the protocol error surface_exists is raised.
@@ -8940,7 +8935,7 @@ class wp_commit_timing_manager_v1:
   ...
 
  @staticmethod
- def get_timer(surface: object) -> wp_commit_timer_v1:
+ def get_timer(surface: wl_surface) -> wp_commit_timer_v1:
   """
   Establish a timing controller for a surface.
 
@@ -9030,7 +9025,7 @@ class wp_content_type_manager_v1:
   ...
 
  @staticmethod
- def get_surface_content_type(surface: object) -> wp_content_type_v1:
+ def get_surface_content_type(surface: wl_surface) -> wp_content_type_v1:
   """
   Create a new content type object associated with the given surface.
 
@@ -9115,7 +9110,7 @@ class wp_cursor_shape_manager_v1:
   ...
 
  @staticmethod
- def get_pointer(pointer: object) -> wp_cursor_shape_device_v1:
+ def get_pointer(pointer: wl_pointer) -> wp_cursor_shape_device_v1:
   """
   Obtain a wp_cursor_shape_device_v1 for a wl_pointer object.
 
@@ -9129,7 +9124,7 @@ class wp_cursor_shape_manager_v1:
   ...
 
  @staticmethod
- def get_tablet_tool_v2(tablet_tool: object) -> wp_cursor_shape_device_v1:
+ def get_tablet_tool_v2(tablet_tool: zwp_tablet_tool_v2) -> wp_cursor_shape_device_v1:
   """
   Obtain a wp_cursor_shape_device_v1 for a zwp_tablet_tool_v2 object.
 
@@ -9382,7 +9377,7 @@ class wp_drm_lease_connector_v1:
 
  class events:
   @staticmethod
-  def name(name: string) -> None:
+  def name(name: str) -> None:
    """
    The compositor sends this event once the connector is created to
    indicate the name of this connector. This will not change for the
@@ -9400,7 +9395,7 @@ class wp_drm_lease_connector_v1:
    ...
 
   @staticmethod
-  def description(description: string) -> None:
+  def description(description: str) -> None:
    """
    The compositor sends this event once the connector is created to provide
    a human-readable description for this connector, which may be presented
@@ -9472,7 +9467,7 @@ class wp_drm_lease_request_v1:
 
 
  @staticmethod
- def request_connector(connector: object) -> None:
+ def request_connector(connector: wp_drm_lease_connector_v1) -> None:
   """
   Indicates that the client would like to lease the given connector.
   This is only used as a suggestion, the compositor may choose to
@@ -9608,7 +9603,7 @@ class ext_background_effect_manager_v1:
   ...
 
  @staticmethod
- def get_background_effect(surface: object) -> ext_background_effect_surface_v1:
+ def get_background_effect(surface: wl_surface) -> ext_background_effect_surface_v1:
   """
   Instantiate an interface extension for the given wl_surface to add
   effects like blur for the background behind it.
@@ -9660,7 +9655,7 @@ class ext_background_effect_surface_v1:
   ...
 
  @staticmethod
- def set_blur_region(region: object) -> None:
+ def set_blur_region(region: wl_region) -> None:
   """
   This request sets the region of the surface that will have its
   background blurred.
@@ -9707,7 +9702,7 @@ class ext_data_control_manager_v1:
   ...
 
  @staticmethod
- def get_data_device(seat: object) -> ext_data_control_device_v1:
+ def get_data_device(seat: wl_seat) -> ext_data_control_device_v1:
   """
   Create a data device that can be used to manage a seat's selection.
 
@@ -9740,7 +9735,7 @@ class ext_data_control_device_v1:
 
 
  @staticmethod
- def set_selection(source: object) -> None:
+ def set_selection(source: ext_data_control_source_v1) -> None:
   """
   This request asks the compositor to set the selection to the data from
   the source on behalf of the client.
@@ -9763,7 +9758,7 @@ class ext_data_control_device_v1:
   ...
 
  @staticmethod
- def set_primary_selection(source: object) -> None:
+ def set_primary_selection(source: ext_data_control_source_v1) -> None:
   """
   This request asks the compositor to set the primary selection to the
   data from the source on behalf of the client.
@@ -9797,7 +9792,7 @@ class ext_data_control_device_v1:
    ...
 
   @staticmethod
-  def selection(id: object) -> None:
+  def selection(id: ext_data_control_offer_v1) -> None:
    """
    The selection event is sent out to notify the client of a new
    ext_data_control_offer for the selection for this device. The
@@ -9826,7 +9821,7 @@ class ext_data_control_device_v1:
    ...
 
   @staticmethod
-  def primary_selection(id: object) -> None:
+  def primary_selection(id: ext_data_control_offer_v1) -> None:
    """
    The primary_selection event is sent out to notify the client of a new
    ext_data_control_offer for the primary selection for this device. The
@@ -9862,7 +9857,7 @@ class ext_data_control_source_v1:
 
 
  @staticmethod
- def offer(mime_type: string) -> None:
+ def offer(mime_type: str) -> None:
   """
   This request adds a MIME type to the set of MIME types advertised to
   targets. Can be called several times to offer multiple types.
@@ -9886,7 +9881,7 @@ class ext_data_control_source_v1:
 
  class events:
   @staticmethod
-  def send(mime_type: string, fd: fd) -> None:
+  def send(mime_type: str, fd: fd) -> None:
    """
    Request for data from the client. Send the data as the specified MIME
    type over the passed file descriptor, then close it.
@@ -9921,7 +9916,7 @@ class ext_data_control_offer_v1:
 
 
  @staticmethod
- def receive(mime_type: string, fd: fd) -> None:
+ def receive(mime_type: str, fd: fd) -> None:
   """
   To transfer the offered data, the client issues this request and
   indicates the MIME type it wants to receive. The transfer happens
@@ -9951,7 +9946,7 @@ class ext_data_control_offer_v1:
 
  class events:
   @staticmethod
-  def offer(mime_type: string) -> None:
+  def offer(mime_type: str) -> None:
    """
    Sent immediately after creating the ext_data_control_offer object.
    One event per offered MIME type.
@@ -10102,7 +10097,7 @@ class ext_foreign_toplevel_handle_v1:
    ...
 
   @staticmethod
-  def title(title: string) -> None:
+  def title(title: str) -> None:
    """
    The title of the toplevel has changed.
 
@@ -10113,7 +10108,7 @@ class ext_foreign_toplevel_handle_v1:
    ...
 
   @staticmethod
-  def app_id(app_id: string) -> None:
+  def app_id(app_id: str) -> None:
    """
    The app id of the toplevel has changed.
 
@@ -10124,7 +10119,7 @@ class ext_foreign_toplevel_handle_v1:
    ...
 
   @staticmethod
-  def identifier(identifier: string) -> None:
+  def identifier(identifier: str) -> None:
    """
    This identifier is used to check if two or more toplevel handles belong
    to the same toplevel.
@@ -10171,7 +10166,7 @@ class ext_idle_notifier_v1:
   ...
 
  @staticmethod
- def get_idle_notification(timeout: uint, seat: object) -> ext_idle_notification_v1:
+ def get_idle_notification(timeout: uint, seat: wl_seat) -> ext_idle_notification_v1:
   """
   Create a new idle notification object.
 
@@ -10192,7 +10187,7 @@ class ext_idle_notifier_v1:
   ...
 
  @staticmethod
- def get_input_idle_notification(timeout: uint, seat: object) -> ext_idle_notification_v1:
+ def get_input_idle_notification(timeout: uint, seat: wl_seat) -> ext_idle_notification_v1:
   """
   Create a new idle notification object to track input from the
   user, such as keyboard and mouse movement. Because this object is
@@ -10307,7 +10302,7 @@ class ext_output_image_capture_source_manager_v1:
 
 
  @staticmethod
- def create_source(output: object) -> ext_image_capture_source_v1:
+ def create_source(output: wl_output) -> ext_image_capture_source_v1:
   """
   Creates a source object for an output. Images captured from this source
   will show the same content as the output. Some elements may be omitted,
@@ -10340,7 +10335,7 @@ class ext_foreign_toplevel_image_capture_source_manager_v1:
 
 
  @staticmethod
- def create_source(toplevel_handle: object) -> ext_image_capture_source_v1:
+ def create_source(toplevel_handle: ext_foreign_toplevel_handle_v1) -> ext_image_capture_source_v1:
   """
   Creates a source object for a foreign toplevel handle. Images captured
   from this source will show the same content as the toplevel.
@@ -10378,7 +10373,7 @@ class ext_image_copy_capture_manager_v1:
 
 
  @staticmethod
- def create_session(source: object, options: ext_image_copy_capture_manager_v1.options) -> ext_image_copy_capture_session_v1:
+ def create_session(source: ext_image_capture_source_v1, options: ext_image_copy_capture_manager_v1.options) -> ext_image_copy_capture_session_v1:
   """
   Create a capturing session for an image capture source.
 
@@ -10396,7 +10391,7 @@ class ext_image_copy_capture_manager_v1:
   ...
 
  @staticmethod
- def create_pointer_cursor_session(source: object, pointer: object) -> ext_image_copy_capture_cursor_session_v1:
+ def create_pointer_cursor_session(source: ext_image_capture_source_v1, pointer: wl_pointer) -> ext_image_copy_capture_cursor_session_v1:
   """
   Create a cursor capturing session for the pointer of an image capture
   source.
@@ -10598,7 +10593,7 @@ class ext_image_copy_capture_frame_v1:
   ...
 
  @staticmethod
- def attach_buffer(buffer: object) -> None:
+ def attach_buffer(buffer: wl_buffer) -> None:
   """
   Attach a buffer to the session.
 
@@ -10953,7 +10948,7 @@ class ext_session_lock_v1:
   ...
 
  @staticmethod
- def get_lock_surface(surface: object, output: object) -> ext_session_lock_surface_v1:
+ def get_lock_surface(surface: wl_surface, output: wl_output) -> ext_session_lock_surface_v1:
   """
   The client is expected to create lock surfaces for all outputs
   currently present and any new outputs as they are advertised. These
@@ -11356,7 +11351,7 @@ class ext_workspace_group_handle_v1:
 
 
  @staticmethod
- def create_workspace(workspace: string) -> None:
+ def create_workspace(workspace: str) -> None:
   """
   Request that the compositor create a new workspace with the given name
   and assign it to this group.
@@ -11404,7 +11399,7 @@ class ext_workspace_group_handle_v1:
    ...
 
   @staticmethod
-  def output_enter(output: object) -> None:
+  def output_enter(output: wl_output) -> None:
    """
    This event is emitted whenever an output is assigned to the workspace
    group or a new `wl_output` object is bound by the client, which was already
@@ -11414,7 +11409,7 @@ class ext_workspace_group_handle_v1:
    ...
 
   @staticmethod
-  def output_leave(output: object) -> None:
+  def output_leave(output: wl_output) -> None:
    """
    This event is emitted whenever an output is removed from the workspace
    group.
@@ -11423,7 +11418,7 @@ class ext_workspace_group_handle_v1:
    ...
 
   @staticmethod
-  def workspace_enter(workspace: object) -> None:
+  def workspace_enter(workspace: ext_workspace_handle_v1) -> None:
    """
    This event is emitted whenever a workspace is assigned to this group.
    A workspace may only ever be assigned to a single group at a single point
@@ -11433,7 +11428,7 @@ class ext_workspace_group_handle_v1:
    ...
 
   @staticmethod
-  def workspace_leave(workspace: object) -> None:
+  def workspace_leave(workspace: ext_workspace_handle_v1) -> None:
    """
    This event is emitted whenever a workspace is removed from this group.
    """
@@ -11526,7 +11521,7 @@ class ext_workspace_handle_v1:
   ...
 
  @staticmethod
- def assign(workspace_group: object) -> None:
+ def assign(workspace_group: ext_workspace_group_handle_v1) -> None:
   """
   Requests that this workspace is assigned to the given workspace group.
 
@@ -11547,7 +11542,7 @@ class ext_workspace_handle_v1:
 
  class events:
   @staticmethod
-  def id(id: string) -> None:
+  def id(id: str) -> None:
    """
    If this event is emitted, it will be send immediately after the
    ext_workspace_handle_v1 is created or when an id is assigned to
@@ -11567,7 +11562,7 @@ class ext_workspace_handle_v1:
    ...
 
   @staticmethod
-  def name(name: string) -> None:
+  def name(name: str) -> None:
    """
    This event is emitted immediately after the ext_workspace_handle_v1 is
    created and whenever the name of the workspace changes.
@@ -11687,7 +11682,7 @@ class wp_fifo_manager_v1:
   ...
 
  @staticmethod
- def get_fifo(surface: object) -> wp_fifo_v1:
+ def get_fifo(surface: wl_surface) -> wp_fifo_v1:
   """
   Establish a fifo object for a surface that may be used to add
   display refresh constraints to content updates.
@@ -11798,7 +11793,7 @@ class wp_fractional_scale_manager_v1:
   ...
 
  @staticmethod
- def get_fractional_scale(surface: object) -> wp_fractional_scale_v1:
+ def get_fractional_scale(surface: wl_surface) -> wp_fractional_scale_v1:
   """
   Create an add-on object for the the wl_surface to let the compositor
   request fractional scales. If the given wl_surface already has a
@@ -11872,7 +11867,7 @@ class wp_linux_drm_syncobj_manager_v1:
   ...
 
  @staticmethod
- def get_surface(surface: object) -> wp_linux_drm_syncobj_surface_v1:
+ def get_surface(surface: wl_surface) -> wp_linux_drm_syncobj_surface_v1:
   """
   Instantiate an interface extension for the given wl_surface to provide
   explicit synchronization.
@@ -11984,7 +11979,7 @@ class wp_linux_drm_syncobj_surface_v1:
   ...
 
  @staticmethod
- def set_acquire_point(timeline: object, point_hi: uint, point_lo: uint) -> None:
+ def set_acquire_point(timeline: wp_linux_drm_syncobj_timeline_v1, point_hi: uint, point_lo: uint) -> None:
   """
   Set the timeline point that must be signalled before the compositor may
   sample from the buffer attached with wl_surface.attach.
@@ -12017,7 +12012,7 @@ class wp_linux_drm_syncobj_surface_v1:
   ...
 
  @staticmethod
- def set_release_point(timeline: object, point_hi: uint, point_lo: uint) -> None:
+ def set_release_point(timeline: wp_linux_drm_syncobj_timeline_v1, point_hi: uint, point_lo: uint) -> None:
   """
   Set the timeline point that must be signalled by the compositor when it
   has finished its usage of the buffer attached with wl_surface.attach
@@ -12168,7 +12163,7 @@ class wp_security_context_v1:
   ...
 
  @staticmethod
- def set_sandbox_engine(name: string) -> None:
+ def set_sandbox_engine(name: str) -> None:
   """
   Attach a unique sandbox engine name to the security context. The name
   should follow the reverse-DNS style (e.g. "org.flatpak").
@@ -12186,7 +12181,7 @@ class wp_security_context_v1:
   ...
 
  @staticmethod
- def set_app_id(app_id: string) -> None:
+ def set_app_id(app_id: str) -> None:
   """
   Attach an application ID to the security context.
 
@@ -12209,7 +12204,7 @@ class wp_security_context_v1:
   ...
 
  @staticmethod
- def set_instance_id(instance_id: string) -> None:
+ def set_instance_id(instance_id: str) -> None:
   """
   Attach an instance ID to the security context.
 
@@ -12323,7 +12318,7 @@ class wp_tearing_control_manager_v1:
   ...
 
  @staticmethod
- def get_tearing_control(surface: object) -> wp_tearing_control_v1:
+ def get_tearing_control(surface: wl_surface) -> wp_tearing_control_v1:
   """
   Instantiate an interface extension for the given wl_surface to request
   asynchronous page flips for presentation.
@@ -12414,7 +12409,7 @@ class xdg_activation_v1:
   ...
 
  @staticmethod
- def activate(token: string, surface: object) -> None:
+ def activate(token: str, surface: wl_surface) -> None:
   """
   Requests surface activation. It's up to the compositor to display
   this information as desired, for example by placing the surface above
@@ -12453,7 +12448,7 @@ class xdg_activation_token_v1:
 
 
  @staticmethod
- def set_serial(serial: uint, seat: object) -> None:
+ def set_serial(serial: uint, seat: wl_seat) -> None:
   """
   Provides information about the seat and serial event that requested the
   token.
@@ -12476,7 +12471,7 @@ class xdg_activation_token_v1:
   ...
 
  @staticmethod
- def set_app_id(app_id: string) -> None:
+ def set_app_id(app_id: str) -> None:
   """
   The requesting client can specify an app_id to associate the token
   being created with it.
@@ -12490,7 +12485,7 @@ class xdg_activation_token_v1:
   ...
 
  @staticmethod
- def set_surface(surface: object) -> None:
+ def set_surface(surface: wl_surface) -> None:
   """
   This request sets the surface requesting the activation. Note, this is
   different from the surface that will be activated.
@@ -12526,7 +12521,7 @@ class xdg_activation_token_v1:
 
  class events:
   @staticmethod
-  def done(token: string) -> None:
+  def done(token: str) -> None:
    """
    The 'done' event contains the unique token of this activation request
    and notifies that the provider is done.
@@ -12568,7 +12563,7 @@ class xdg_wm_dialog_v1:
   ...
 
  @staticmethod
- def get_xdg_dialog(toplevel: object) -> xdg_dialog_v1:
+ def get_xdg_dialog(toplevel: xdg_toplevel) -> xdg_dialog_v1:
   """
   Creates a xdg_dialog_v1 object for the given toplevel. See the interface
           description for more details.
@@ -12657,7 +12652,7 @@ class xdg_system_bell_v1:
   ...
 
  @staticmethod
- def ring(surface: object) -> None:
+ def ring(surface: wl_surface) -> None:
   """
   This requests rings the system bell on behalf of a client. How ringing
   	the bell is implemented is up to the compositor. It may be an audible
@@ -12729,7 +12724,7 @@ class xdg_toplevel_drag_manager_v1:
   ...
 
  @staticmethod
- def get_xdg_toplevel_drag(data_source: object) -> xdg_toplevel_drag_v1:
+ def get_xdg_toplevel_drag(data_source: wl_data_source) -> xdg_toplevel_drag_v1:
   """
   Create an xdg_toplevel_drag for a drag and drop operation that is going
   to be started with data_source.
@@ -12772,7 +12767,7 @@ class xdg_toplevel_drag_v1:
   ...
 
  @staticmethod
- def attach(toplevel: object, x_offset: int, y_offset: int) -> None:
+ def attach(toplevel: xdg_toplevel, x_offset: int, y_offset: int) -> None:
   """
   Request that the window will be moved with the cursor during the drag
   operation. The offset is a hint to the compositor how the toplevel
@@ -12828,7 +12823,7 @@ class xdg_toplevel_icon_manager_v1:
   ...
 
  @staticmethod
- def set_icon(toplevel: object, icon: object) -> None:
+ def set_icon(toplevel: xdg_toplevel, icon: xdg_toplevel_icon_v1) -> None:
   """
   This request assigns the icon 'icon' to 'toplevel', or clears the
   toplevel icon if 'icon' was null.
@@ -12919,7 +12914,7 @@ class xdg_toplevel_icon_v1:
   ...
 
  @staticmethod
- def set_name(icon_name: string) -> None:
+ def set_name(icon_name: str) -> None:
   """
   This request assigns an icon name to this icon.
   Any previously set name is overridden.
@@ -12941,7 +12936,7 @@ class xdg_toplevel_icon_v1:
   ...
 
  @staticmethod
- def add_buffer(buffer: object, scale: int) -> None:
+ def add_buffer(buffer: wl_buffer, scale: int) -> None:
   """
   This request adds pixel data supplied as wl_buffer to the icon.
 
@@ -13002,7 +12997,7 @@ class xdg_toplevel_tag_manager_v1:
   ...
 
  @staticmethod
- def set_toplevel_tag(toplevel: object, tag: string) -> None:
+ def set_toplevel_tag(toplevel: xdg_toplevel, tag: str) -> None:
   """
   Set a tag for a toplevel. The tag may be shown to the user in UI, so
   it's preferable for it to be human readable, but it must be suitable
@@ -13026,7 +13021,7 @@ class xdg_toplevel_tag_manager_v1:
   ...
 
  @staticmethod
- def set_toplevel_description(toplevel: object, description: string) -> None:
+ def set_toplevel_description(toplevel: xdg_toplevel, description: str) -> None:
   """
   Set a description for a toplevel. This description may be shown to the
   user in UI or read by a screen reader for accessibility purposes, and
@@ -13079,7 +13074,7 @@ class xwayland_shell_v1:
   ...
 
  @staticmethod
- def get_xwayland_surface(surface: object) -> xwayland_surface_v1:
+ def get_xwayland_surface(surface: wl_surface) -> xwayland_surface_v1:
   """
   Create an xwayland_surface_v1 interface for a given wl_surface
   object and gives it the xwayland_surface role.
@@ -13228,7 +13223,7 @@ class zwp_fullscreen_shell_v1:
   ...
 
  @staticmethod
- def present_surface(surface: object, method: zwp_fullscreen_shell_v1.present_method, output: object) -> None:
+ def present_surface(surface: wl_surface, method: zwp_fullscreen_shell_v1.present_method, output: wl_output) -> None:
   """
   Present a surface on the given output.
 
@@ -13256,7 +13251,7 @@ class zwp_fullscreen_shell_v1:
   ...
 
  @staticmethod
- def present_surface_for_mode(surface: object, output: object, framerate: int) -> zwp_fullscreen_shell_mode_feedback_v1:
+ def present_surface_for_mode(surface: wl_surface, output: wl_output, framerate: int) -> zwp_fullscreen_shell_mode_feedback_v1:
   """
   Presents a surface on the given output for a particular mode.
 
@@ -13399,7 +13394,7 @@ class zwp_idle_inhibit_manager_v1:
   ...
 
  @staticmethod
- def create_inhibitor(surface: object) -> zwp_idle_inhibitor_v1:
+ def create_inhibitor(surface: wl_surface) -> zwp_idle_inhibitor_v1:
   """
   Create a new inhibitor object associated with the given surface.
 
@@ -13478,7 +13473,7 @@ class zwp_input_method_context_v1:
   ...
 
  @staticmethod
- def commit_string(serial: uint, text: string) -> None:
+ def commit_string(serial: uint, text: str) -> None:
   """
   Send the commit string text for insertion to the application.
 
@@ -13497,7 +13492,7 @@ class zwp_input_method_context_v1:
   ...
 
  @staticmethod
- def preedit_string(serial: uint, text: string, commit: string) -> None:
+ def preedit_string(serial: uint, text: str, commit: str) -> None:
   """
   Send the pre-edit string text to the application text input.
 
@@ -13641,7 +13636,7 @@ class zwp_input_method_context_v1:
   ...
 
  @staticmethod
- def language(serial: uint, language: string) -> None:
+ def language(serial: uint, language: str) -> None:
   """
 
   Args:
@@ -13662,7 +13657,7 @@ class zwp_input_method_context_v1:
 
  class events:
   @staticmethod
-  def surrounding_text(text: string, cursor: uint, anchor: uint) -> None:
+  def surrounding_text(text: str, cursor: uint, anchor: uint) -> None:
    """
    The plain surrounding text around the input position. Cursor is the
    position in bytes within the surrounding text relative to the beginning
@@ -13708,7 +13703,7 @@ class zwp_input_method_context_v1:
    ...
 
   @staticmethod
-  def preferred_language(language: string) -> None:
+  def preferred_language(language: str) -> None:
    """
 
    """
@@ -13738,7 +13733,7 @@ class zwp_input_method_v1:
    ...
 
   @staticmethod
-  def deactivate(context: object) -> None:
+  def deactivate(context: zwp_input_method_context_v1) -> None:
    """
    The text input corresponding to the context argument was deactivated.
    The input method context should be destroyed after deactivation is
@@ -13756,7 +13751,7 @@ class zwp_input_panel_v1:
 
 
  @staticmethod
- def get_input_panel_surface(surface: object) -> zwp_input_panel_surface_v1:
+ def get_input_panel_surface(surface: wl_surface) -> zwp_input_panel_surface_v1:
   """
 
   Returns:
@@ -13777,7 +13772,7 @@ class zwp_input_panel_surface_v1:
 
 
  @staticmethod
- def set_toplevel(output: object, position: uint) -> None:
+ def set_toplevel(output: wl_output, position: uint) -> None:
   """
   Set the input_panel_surface type to keyboard.
 
@@ -13817,7 +13812,7 @@ class zwp_input_timestamps_manager_v1:
   ...
 
  @staticmethod
- def get_keyboard_timestamps(keyboard: object) -> zwp_input_timestamps_v1:
+ def get_keyboard_timestamps(keyboard: wl_keyboard) -> zwp_input_timestamps_v1:
   """
   Creates a new input timestamps object that represents a subscription
   to high-resolution timestamp events for all wl_keyboard events that
@@ -13838,7 +13833,7 @@ class zwp_input_timestamps_manager_v1:
   ...
 
  @staticmethod
- def get_pointer_timestamps(pointer: object) -> zwp_input_timestamps_v1:
+ def get_pointer_timestamps(pointer: wl_pointer) -> zwp_input_timestamps_v1:
   """
   Creates a new input timestamps object that represents a subscription
   to high-resolution timestamp events for all wl_pointer events that
@@ -13859,7 +13854,7 @@ class zwp_input_timestamps_manager_v1:
   ...
 
  @staticmethod
- def get_touch_timestamps(touch: object) -> zwp_input_timestamps_v1:
+ def get_touch_timestamps(touch: wl_touch) -> zwp_input_timestamps_v1:
   """
   Creates a new input timestamps object that represents a subscription
   to high-resolution timestamp events for all wl_touch events that
@@ -13946,7 +13941,7 @@ class zwp_keyboard_shortcuts_inhibit_manager_v1:
   ...
 
  @staticmethod
- def inhibit_shortcuts(surface: object, seat: object) -> zwp_keyboard_shortcuts_inhibitor_v1:
+ def inhibit_shortcuts(surface: wl_surface, seat: wl_seat) -> zwp_keyboard_shortcuts_inhibitor_v1:
   """
   Create a new keyboard shortcuts inhibitor object associated with
   the given surface for the given seat.
@@ -14079,7 +14074,7 @@ class zwp_linux_explicit_synchronization_v1:
   ...
 
  @staticmethod
- def get_synchronization(surface: object) -> zwp_linux_surface_synchronization_v1:
+ def get_synchronization(surface: wl_surface) -> zwp_linux_surface_synchronization_v1:
   """
   Instantiate an interface extension for the given wl_surface to provide
   explicit synchronization.
@@ -14325,7 +14320,7 @@ class zwp_pointer_constraints_v1:
   ...
 
  @staticmethod
- def lock_pointer(surface: object, pointer: object, region: object, lifetime: zwp_pointer_constraints_v1.lifetime) -> zwp_locked_pointer_v1:
+ def lock_pointer(surface: wl_surface, pointer: wl_pointer, region: wl_region, lifetime: zwp_pointer_constraints_v1.lifetime) -> zwp_locked_pointer_v1:
   """
   The lock_pointer request lets the client request to disable movements of
   the virtual pointer (i.e. the cursor), effectively locking the pointer
@@ -14375,7 +14370,7 @@ class zwp_pointer_constraints_v1:
   ...
 
  @staticmethod
- def confine_pointer(surface: object, pointer: object, region: object, lifetime: zwp_pointer_constraints_v1.lifetime) -> zwp_confined_pointer_v1:
+ def confine_pointer(surface: wl_surface, pointer: wl_pointer, region: wl_region, lifetime: zwp_pointer_constraints_v1.lifetime) -> zwp_confined_pointer_v1:
   """
   The confine_pointer request lets the client request to confine the
   pointer cursor to a given region. This request may not take effect
@@ -14468,7 +14463,7 @@ class zwp_locked_pointer_v1:
   ...
 
  @staticmethod
- def set_region(region: object) -> None:
+ def set_region(region: wl_region) -> None:
   """
   Set a new region used to lock the pointer.
 
@@ -14537,7 +14532,7 @@ class zwp_confined_pointer_v1:
   ...
 
  @staticmethod
- def set_region(region: object) -> None:
+ def set_region(region: wl_region) -> None:
   """
   Set a new region used to confine the pointer.
 
@@ -14607,7 +14602,7 @@ class zwp_pointer_gestures_v1:
 
 
  @staticmethod
- def get_swipe_gesture(pointer: object) -> zwp_pointer_gesture_swipe_v1:
+ def get_swipe_gesture(pointer: wl_pointer) -> zwp_pointer_gesture_swipe_v1:
   """
   Create a swipe gesture object. See the
   wl_pointer_gesture_swipe interface for details.
@@ -14619,7 +14614,7 @@ class zwp_pointer_gestures_v1:
   ...
 
  @staticmethod
- def get_pinch_gesture(pointer: object) -> zwp_pointer_gesture_pinch_v1:
+ def get_pinch_gesture(pointer: wl_pointer) -> zwp_pointer_gesture_pinch_v1:
   """
   Create a pinch gesture object. See the
   wl_pointer_gesture_pinch interface for details.
@@ -14640,7 +14635,7 @@ class zwp_pointer_gestures_v1:
   ...
 
  @staticmethod
- def get_hold_gesture(pointer: object) -> zwp_pointer_gesture_hold_v1:
+ def get_hold_gesture(pointer: wl_pointer) -> zwp_pointer_gesture_hold_v1:
   """
   Create a hold gesture object. See the
   wl_pointer_gesture_hold interface for details.
@@ -14683,7 +14678,7 @@ class zwp_pointer_gesture_swipe_v1:
 
  class events:
   @staticmethod
-  def begin(serial: uint, time: uint, surface: object, fingers: uint) -> None:
+  def begin(serial: uint, time: uint, surface: wl_surface, fingers: uint) -> None:
    """
    This event is sent when a multi-finger swipe gesture is detected
    on the device.
@@ -14762,7 +14757,7 @@ class zwp_pointer_gesture_pinch_v1:
 
  class events:
   @staticmethod
-  def begin(serial: uint, time: uint, surface: object, fingers: uint) -> None:
+  def begin(serial: uint, time: uint, surface: wl_surface, fingers: uint) -> None:
    """
    This event is sent when a multi-finger pinch gesture is detected
    on the device.
@@ -14852,7 +14847,7 @@ class zwp_pointer_gesture_hold_v1:
 
  class events:
   @staticmethod
-  def begin(serial: uint, time: uint, surface: object, fingers: uint) -> None:
+  def begin(serial: uint, time: uint, surface: wl_surface, fingers: uint) -> None:
    """
    This event is sent when a hold gesture is detected on the device.
 
@@ -14906,7 +14901,7 @@ class zwp_primary_selection_device_manager_v1:
   ...
 
  @staticmethod
- def get_device(seat: object) -> zwp_primary_selection_device_v1:
+ def get_device(seat: wl_seat) -> zwp_primary_selection_device_v1:
   """
   Create a new data device for a given seat.
 
@@ -14933,7 +14928,7 @@ class zwp_primary_selection_device_v1:
 
 
  @staticmethod
- def set_selection(source: object, serial: uint) -> None:
+ def set_selection(source: zwp_primary_selection_source_v1, serial: uint) -> None:
   """
   Replaces the current selection. The previous owner of the primary
   selection will receive a wp_primary_selection_source.cancelled event.
@@ -14968,7 +14963,7 @@ class zwp_primary_selection_device_v1:
    ...
 
   @staticmethod
-  def selection(id: object) -> None:
+  def selection(id: zwp_primary_selection_offer_v1) -> None:
    """
    The wp_primary_selection_device.selection event is sent to notify the
    client of a new primary selection. This event is sent after the
@@ -14996,7 +14991,7 @@ class zwp_primary_selection_offer_v1:
 
 
  @staticmethod
- def receive(mime_type: string, fd: fd) -> None:
+ def receive(mime_type: str, fd: fd) -> None:
   """
   To transfer the contents of the primary selection clipboard, the client
   issues this request and indicates the mime type that it wants to
@@ -15021,7 +15016,7 @@ class zwp_primary_selection_offer_v1:
 
  class events:
   @staticmethod
-  def offer(mime_type: string) -> None:
+  def offer(mime_type: str) -> None:
    """
    Sent immediately after creating announcing the
    wp_primary_selection_offer through
@@ -15042,7 +15037,7 @@ class zwp_primary_selection_source_v1:
 
 
  @staticmethod
- def offer(mime_type: string) -> None:
+ def offer(mime_type: str) -> None:
   """
   This request adds a mime type to the set of mime types advertised to
   targets. Can be called several times to offer multiple types.
@@ -15060,7 +15055,7 @@ class zwp_primary_selection_source_v1:
 
  class events:
   @staticmethod
-  def send(mime_type: string, fd: fd) -> None:
+  def send(mime_type: str, fd: fd) -> None:
    """
    Request for the current primary selection contents from the client.
    Send the specified mime type over the passed file descriptor, then
@@ -15097,7 +15092,7 @@ class zwp_relative_pointer_manager_v1:
   ...
 
  @staticmethod
- def get_relative_pointer(pointer: object) -> zwp_relative_pointer_v1:
+ def get_relative_pointer(pointer: wl_pointer) -> zwp_relative_pointer_v1:
   """
   Create a relative pointer interface given a wl_pointer object. See the
   wp_relative_pointer interface for more details.
@@ -15184,7 +15179,7 @@ class zwp_tablet_manager_v1:
 
 
  @staticmethod
- def get_tablet_seat(seat: object) -> zwp_tablet_seat_v1:
+ def get_tablet_seat(seat: wl_seat) -> zwp_tablet_seat_v1:
   """
   Get the wp_tablet_seat object for the given seat. This object
   provides access to all graphics tablets in this seat.
@@ -15311,7 +15306,7 @@ class zwp_tablet_tool_v1:
 
 
  @staticmethod
- def set_cursor(serial: uint, surface: object, hotspot_x: int, hotspot_y: int) -> None:
+ def set_cursor(serial: uint, surface: wl_surface, hotspot_x: int, hotspot_y: int) -> None:
   """
   Sets the surface of the cursor used for this tool on the given
   tablet. This request only takes effect if the tool is in proximity
@@ -15474,7 +15469,7 @@ class zwp_tablet_tool_v1:
    ...
 
   @staticmethod
-  def proximity_in(serial: uint, tablet: object, surface: object) -> None:
+  def proximity_in(serial: uint, tablet: zwp_tablet_v1, surface: wl_surface) -> None:
    """
    Notification that this tool is focused on a certain surface.
 
@@ -15718,7 +15713,7 @@ class zwp_tablet_v1:
 
  class events:
   @staticmethod
-  def name(name: string) -> None:
+  def name(name: str) -> None:
    """
    This event is sent in the initial burst of events before the
    wp_tablet.done event.
@@ -15743,7 +15738,7 @@ class zwp_tablet_v1:
    ...
 
   @staticmethod
-  def path(path: string) -> None:
+  def path(path: str) -> None:
    """
    A system-specific device path that indicates which device is behind
    this wp_tablet. This information may be used to gather additional
@@ -15874,7 +15869,7 @@ class zwp_text_input_v1:
 
 
  @staticmethod
- def activate(seat: object, surface: object) -> None:
+ def activate(seat: wl_seat, surface: wl_surface) -> None:
   """
   Requests the text_input object to be activated (typically when the
   text entry gets focus).
@@ -15888,7 +15883,7 @@ class zwp_text_input_v1:
   ...
 
  @staticmethod
- def deactivate(seat: object) -> None:
+ def deactivate(seat: wl_seat) -> None:
   """
   Requests the text_input object to be deactivated (typically when the
   text entry lost focus). The seat argument is a wl_seat which was used
@@ -15924,7 +15919,7 @@ class zwp_text_input_v1:
   ...
 
  @staticmethod
- def set_surrounding_text(text: string, cursor: uint, anchor: uint) -> None:
+ def set_surrounding_text(text: str, cursor: uint, anchor: uint) -> None:
   """
   Sets the plain surrounding text around the input position. Text is
   UTF-8 encoded. Cursor is the byte offset within the
@@ -15958,7 +15953,7 @@ class zwp_text_input_v1:
   ...
 
  @staticmethod
- def set_preferred_language(language: string) -> None:
+ def set_preferred_language(language: str) -> None:
   """
   Sets a specific language. This allows for example a virtual keyboard to
   show a language specific layout. The "language" argument is an RFC-3066
@@ -15991,7 +15986,7 @@ class zwp_text_input_v1:
 
  class events:
   @staticmethod
-  def enter(surface: object) -> None:
+  def enter(surface: wl_surface) -> None:
    """
    Notify the text_input object when it received focus. Typically in
    response to an activate request.
@@ -16028,7 +16023,7 @@ class zwp_text_input_v1:
    ...
 
   @staticmethod
-  def preedit_string(serial: uint, text: string, commit: string) -> None:
+  def preedit_string(serial: uint, text: str, commit: str) -> None:
    """
    Notify when a new composing text (pre-edit) should be set around the
    current cursor position. Any previously set composing text should
@@ -16073,7 +16068,7 @@ class zwp_text_input_v1:
    ...
 
   @staticmethod
-  def commit_string(serial: uint, text: string) -> None:
+  def commit_string(serial: uint, text: str) -> None:
    """
    Notify when text should be inserted into the editor widget. The text to
    commit could be either just a single character after a key press or the
@@ -16132,7 +16127,7 @@ class zwp_text_input_v1:
    ...
 
   @staticmethod
-  def language(serial: uint, language: string) -> None:
+  def language(serial: uint, language: str) -> None:
    """
    Sets the language of the input text. The "language" argument is an
    RFC-3066 format language tag.
@@ -16303,7 +16298,7 @@ class zwp_text_input_v3:
   ...
 
  @staticmethod
- def set_surrounding_text(text: string, cursor: int, anchor: int) -> None:
+ def set_surrounding_text(text: str, cursor: int, anchor: int) -> None:
   """
   Sets the surrounding plain text around the input, excluding the preedit
   text.
@@ -16435,7 +16430,7 @@ class zwp_text_input_v3:
 
  class events:
   @staticmethod
-  def enter(surface: object) -> None:
+  def enter(surface: wl_surface) -> None:
    """
    Notification that this seat's text-input focus is on a certain surface.
 
@@ -16450,7 +16445,7 @@ class zwp_text_input_v3:
    ...
 
   @staticmethod
-  def leave(surface: object) -> None:
+  def leave(surface: wl_surface) -> None:
    """
    Notification that this seat's text-input focus is no longer on a
    certain surface. The client should reset any preedit string previously
@@ -16468,7 +16463,7 @@ class zwp_text_input_v3:
    ...
 
   @staticmethod
-  def preedit_string(text: string, cursor_begin: int, cursor_end: int) -> None:
+  def preedit_string(text: str, cursor_begin: int, cursor_end: int) -> None:
    """
    Notify when a new composing text (pre-edit) should be set at the
    current cursor position. Any previously set composing text must be
@@ -16493,7 +16488,7 @@ class zwp_text_input_v3:
    ...
 
   @staticmethod
-  def commit_string(text: string) -> None:
+  def commit_string(text: str) -> None:
    """
    Notify when text should be inserted into the editor widget. The text to
    commit could be either just a single character after a key press or the
@@ -16583,7 +16578,7 @@ class zwp_text_input_manager_v3:
   ...
 
  @staticmethod
- def get_text_input(seat: object) -> zwp_text_input_v3:
+ def get_text_input(seat: wl_seat) -> zwp_text_input_v3:
   """
   Creates a new text-input object for a given seat.
 
@@ -16632,7 +16627,7 @@ class zxdg_decoration_manager_v1:
   ...
 
  @staticmethod
- def get_toplevel_decoration(toplevel: object) -> zxdg_toplevel_decoration_v1:
+ def get_toplevel_decoration(toplevel: xdg_toplevel) -> zxdg_toplevel_decoration_v1:
   """
   Create a new decoration object associated with the given toplevel.
 
@@ -16760,7 +16755,7 @@ class zxdg_exporter_v1:
   ...
 
  @staticmethod
- def export(surface: object) -> zxdg_exported_v1:
+ def export(surface: wl_surface) -> zxdg_exported_v1:
   """
   The export request exports the passed surface so that it can later be
   imported via xdg_importer. When called, a new xdg_exported object will
@@ -16800,7 +16795,7 @@ class zxdg_importer_v1:
   ...
 
  @staticmethod
- def import_(handle: string) -> zxdg_imported_v1:
+ def import_(handle: str) -> zxdg_imported_v1:
   """
   The import request imports a surface from any client given a handle
   retrieved by exporting said surface using xdg_exporter.export. When
@@ -16840,7 +16835,7 @@ class zxdg_exported_v1:
 
  class events:
   @staticmethod
-  def handle(handle: string) -> None:
+  def handle(handle: str) -> None:
    """
    The handle event contains the unique handle of this exported surface
    reference. It may be shared with any client, which then can use it to
@@ -16874,7 +16869,7 @@ class zxdg_imported_v1:
   ...
 
  @staticmethod
- def set_parent_of(surface: object) -> None:
+ def set_parent_of(surface: wl_surface) -> None:
   """
   Set the imported surface as the parent of some surface of the client.
   The passed surface must be a toplevel xdg_surface. Calling this function
@@ -16921,7 +16916,7 @@ class zxdg_exporter_v2:
   ...
 
  @staticmethod
- def export_toplevel(surface: object) -> zxdg_exported_v2:
+ def export_toplevel(surface: wl_surface) -> zxdg_exported_v2:
   """
   The export_toplevel request exports the passed surface so that it can later be
   	imported via xdg_importer. When called, a new xdg_exported object will
@@ -16962,7 +16957,7 @@ class zxdg_importer_v2:
   ...
 
  @staticmethod
- def import_toplevel(handle: string) -> zxdg_imported_v2:
+ def import_toplevel(handle: str) -> zxdg_imported_v2:
   """
   The import_toplevel request imports a surface from any client given a handle
   retrieved by exporting said surface using xdg_exporter.export_toplevel.
@@ -17002,7 +16997,7 @@ class zxdg_exported_v2:
 
  class events:
   @staticmethod
-  def handle(handle: string) -> None:
+  def handle(handle: str) -> None:
    """
    The handle event contains the unique handle of this exported surface
    reference. It may be shared with any client, which then can use it to
@@ -17039,7 +17034,7 @@ class zxdg_imported_v2:
   ...
 
  @staticmethod
- def set_parent_of(surface: object) -> None:
+ def set_parent_of(surface: wl_surface) -> None:
   """
   Set the imported surface as the parent of some surface of the client.
   The passed surface must be an xdg_toplevel equivalent, otherwise an
@@ -17085,7 +17080,7 @@ class zxdg_output_manager_v1:
   ...
 
  @staticmethod
- def get_xdg_output(output: object) -> zxdg_output_v1:
+ def get_xdg_output(output: wl_output) -> zxdg_output_v1:
   """
   This creates a new xdg_output object for the given wl_output.
 
@@ -17196,7 +17191,7 @@ class zxdg_output_v1:
    ...
 
   @staticmethod
-  def name(name: string) -> None:
+  def name(name: str) -> None:
    """
    Many compositors will assign names to their outputs, show them to the
    	user, allow them to be configured by name, etc. The client may wish to
@@ -17227,7 +17222,7 @@ class zxdg_output_v1:
    ...
 
   @staticmethod
-  def description(description: string) -> None:
+  def description(description: str) -> None:
    """
    Many compositors can produce human-readable descriptions of their
    outputs.  The client may wish to know this description as well, to
@@ -17300,7 +17295,7 @@ class xdg_shell:
   ...
 
  @staticmethod
- def get_xdg_surface(surface: object) -> xdg_surface:
+ def get_xdg_surface(surface: wl_surface) -> xdg_surface:
   """
   This creates an xdg_surface for the given surface and gives it the
   xdg_surface role. A wl_surface can only be given an xdg_surface role
@@ -17318,7 +17313,7 @@ class xdg_shell:
   ...
 
  @staticmethod
- def get_xdg_popup(surface: object, parent: object, seat: object, serial: uint, x: int, y: int) -> xdg_popup:
+ def get_xdg_popup(surface: wl_surface, parent: wl_surface, seat: wl_seat, serial: uint, x: int, y: int) -> xdg_popup:
   """
   This creates an xdg_popup for the given surface and gives it the
   xdg_popup role. A wl_surface can only be given an xdg_popup role
@@ -17421,7 +17416,7 @@ class zxdg_shell_v6:
   ...
 
  @staticmethod
- def get_xdg_surface(surface: object) -> zxdg_surface_v6:
+ def get_xdg_surface(surface: wl_surface) -> zxdg_surface_v6:
   """
   This creates an xdg_surface for the given surface. While xdg_surface
   itself is not a role, the corresponding surface may only be assigned
@@ -17731,7 +17726,7 @@ class zxdg_surface_v6:
   ...
 
  @staticmethod
- def get_popup(parent: object, positioner: object) -> zxdg_popup_v6:
+ def get_popup(parent: zxdg_surface_v6, positioner: zxdg_positioner_v6) -> zxdg_popup_v6:
   """
   This creates an xdg_popup object for the given xdg_surface and gives the
   	associated wl_surface the xdg_popup role. If the surface already
@@ -17876,7 +17871,7 @@ class zxdg_toplevel_v6:
   ...
 
  @staticmethod
- def set_parent(parent: object) -> None:
+ def set_parent(parent: zxdg_toplevel_v6) -> None:
   """
   Set the "parent" of this surface. This window should be stacked
   above a parent. The parent surface must be mapped as long as this
@@ -17890,7 +17885,7 @@ class zxdg_toplevel_v6:
   ...
 
  @staticmethod
- def set_title(title: string) -> None:
+ def set_title(title: str) -> None:
   """
   Set a short title for the surface.
 
@@ -17904,7 +17899,7 @@ class zxdg_toplevel_v6:
   ...
 
  @staticmethod
- def set_app_id(app_id: string) -> None:
+ def set_app_id(app_id: str) -> None:
   """
   Set an application identifier for the surface.
 
@@ -17931,7 +17926,7 @@ class zxdg_toplevel_v6:
   ...
 
  @staticmethod
- def show_window_menu(seat: object, serial: uint, x: int, y: int) -> None:
+ def show_window_menu(seat: wl_seat, serial: uint, x: int, y: int) -> None:
   """
   Clients implementing client-side decorations might want to show
   a context menu when right-clicking on the decorations, giving the
@@ -17955,7 +17950,7 @@ class zxdg_toplevel_v6:
   ...
 
  @staticmethod
- def move(seat: object, serial: uint) -> None:
+ def move(seat: wl_seat, serial: uint) -> None:
   """
   Start an interactive, user-driven move of the surface.
 
@@ -17982,7 +17977,7 @@ class zxdg_toplevel_v6:
   ...
 
  @staticmethod
- def resize(seat: object, serial: uint, edges: uint) -> None:
+ def resize(seat: wl_seat, serial: uint, edges: uint) -> None:
   """
   Start a user-driven, interactive resize of the surface.
 
@@ -18161,7 +18156,7 @@ class zxdg_toplevel_v6:
   ...
 
  @staticmethod
- def set_fullscreen(output: object) -> None:
+ def set_fullscreen(output: wl_output) -> None:
   """
   Make the surface fullscreen.
 
@@ -18297,7 +18292,7 @@ class zxdg_popup_v6:
   ...
 
  @staticmethod
- def grab(seat: object, serial: uint) -> None:
+ def grab(seat: wl_seat, serial: uint) -> None:
   """
   This request makes the created popup take an explicit grab. An explicit
   grab will be dismissed when the user dismisses the popup, or when the
@@ -18396,7 +18391,7 @@ class zwp_xwayland_keyboard_grab_manager_v1:
   ...
 
  @staticmethod
- def grab_keyboard(surface: object, seat: object) -> zwp_xwayland_keyboard_grab_v1:
+ def grab_keyboard(surface: wl_surface, seat: wl_seat) -> zwp_xwayland_keyboard_grab_v1:
   """
   The grab_keyboard request asks for a grab of the keyboard, forcing
   the keyboard focus for the given seat upon the given surface.
@@ -18460,7 +18455,7 @@ class hyprland_ctm_control_manager_v1:
 
 
  @staticmethod
- def set_ctm_for_output(output: object, mat0: fixed, mat1: fixed, mat2: fixed, mat3: fixed, mat4: fixed, mat5: fixed, mat6: fixed, mat7: fixed, mat8: fixed) -> None:
+ def set_ctm_for_output(output: wl_output, mat0: fixed, mat1: fixed, mat2: fixed, mat3: fixed, mat4: fixed, mat5: fixed, mat6: fixed, mat7: fixed, mat8: fixed) -> None:
   """
   Set a CTM for a wl_output.
 
@@ -18563,7 +18558,7 @@ class hyprland_focus_grab_v1:
 
 
  @staticmethod
- def add_surface(surface: object) -> None:
+ def add_surface(surface: wl_surface) -> None:
   """
   Add a surface to the whitelist. Destroying the surface is treated the
   same as an explicit call to remove_surface and duplicate additions are
@@ -18575,7 +18570,7 @@ class hyprland_focus_grab_v1:
   ...
 
  @staticmethod
- def remove_surface(surface: object) -> None:
+ def remove_surface(surface: wl_surface) -> None:
   """
   Remove a surface from the whitelist. Destroying the surface is treated
   the same as an explicit call to this function.
@@ -18630,7 +18625,7 @@ class hyprland_global_shortcuts_manager_v1:
 
 
  @staticmethod
- def register_shortcut(id: string, app_id: string, description: string, trigger_description: string) -> hyprland_global_shortcut_v1:
+ def register_shortcut(id: str, app_id: str, description: str, trigger_description: str) -> hyprland_global_shortcut_v1:
   """
   Register a new global shortcut.
 
@@ -18804,7 +18799,7 @@ class hyprland_surface_manager_v1:
 
 
  @staticmethod
- def get_hyprland_surface(surface: object) -> hyprland_surface_v1:
+ def get_hyprland_surface(surface: wl_surface) -> hyprland_surface_v1:
   """
   Create a hyprland surface object for the given wayland surface.
 
@@ -18865,7 +18860,7 @@ class hyprland_surface_v1:
   ...
 
  @staticmethod
- def set_visible_region(region: object) -> None:
+ def set_visible_region(region: wl_region) -> None:
   """
   This request sets the region of the surface that contains visible content.
   Visible content refers to content that has an alpha value greater than zero.
@@ -18933,7 +18928,7 @@ class hyprland_toplevel_export_manager_v1:
   ...
 
  @staticmethod
- def capture_toplevel_with_wlr_toplevel_handle(overlay_cursor: int, handle: object) -> hyprland_toplevel_export_frame_v1:
+ def capture_toplevel_with_wlr_toplevel_handle(overlay_cursor: int, handle: zwlr_foreign_toplevel_handle_v1) -> hyprland_toplevel_export_frame_v1:
   """
   Same as capture_toplevel, but with a zwlr_foreign_toplevel_handle_v1 handle.
 
@@ -18978,7 +18973,7 @@ class hyprland_toplevel_export_frame_v1:
 
 
  @staticmethod
- def copy(buffer: object, ignore_damage: int) -> None:
+ def copy(buffer: wl_buffer, ignore_damage: int) -> None:
   """
   Copy the frame to the supplied buffer. The buffer must have the
   correct size, see hyprland_toplevel_export_frame_v1.buffer and
@@ -19124,7 +19119,7 @@ class hyprland_toplevel_mapping_manager_v1:
 
 
  @staticmethod
- def get_window_for_toplevel(toplevel: object) -> hyprland_toplevel_window_mapping_handle_v1:
+ def get_window_for_toplevel(toplevel: ext_foreign_toplevel_handle_v1) -> hyprland_toplevel_window_mapping_handle_v1:
   """
   Get the window address for a toplevel.
 
@@ -19138,7 +19133,7 @@ class hyprland_toplevel_mapping_manager_v1:
   ...
 
  @staticmethod
- def get_window_for_toplevel_wlr(toplevel: object) -> hyprland_toplevel_window_mapping_handle_v1:
+ def get_window_for_toplevel_wlr(toplevel: zwlr_foreign_toplevel_handle_v1) -> hyprland_toplevel_window_mapping_handle_v1:
   """
   Get the window address for a wlr toplevel.
 
@@ -19224,7 +19219,7 @@ class zwlr_data_control_manager_v1:
   ...
 
  @staticmethod
- def get_data_device(seat: object) -> zwlr_data_control_device_v1:
+ def get_data_device(seat: wl_seat) -> zwlr_data_control_device_v1:
   """
   Create a data device that can be used to manage a seat's selection.
 
@@ -19257,7 +19252,7 @@ class zwlr_data_control_device_v1:
 
 
  @staticmethod
- def set_selection(source: object) -> None:
+ def set_selection(source: zwlr_data_control_source_v1) -> None:
   """
   This request asks the compositor to set the selection to the data from
   the source on behalf of the client.
@@ -19280,7 +19275,7 @@ class zwlr_data_control_device_v1:
   ...
 
  @staticmethod
- def set_primary_selection(source: object) -> None:
+ def set_primary_selection(source: zwlr_data_control_source_v1) -> None:
   """
   This request asks the compositor to set the primary selection to the
   data from the source on behalf of the client.
@@ -19314,7 +19309,7 @@ class zwlr_data_control_device_v1:
    ...
 
   @staticmethod
-  def selection(id: object) -> None:
+  def selection(id: zwlr_data_control_offer_v1) -> None:
    """
    The selection event is sent out to notify the client of a new
    wlr_data_control_offer for the selection for this device. The
@@ -19342,7 +19337,7 @@ class zwlr_data_control_device_v1:
    ...
 
   @staticmethod
-  def primary_selection(id: object) -> None:
+  def primary_selection(id: zwlr_data_control_offer_v1) -> None:
    """
    The primary_selection event is sent out to notify the client of a new
    wlr_data_control_offer for the primary selection for this device. The
@@ -19376,7 +19371,7 @@ class zwlr_data_control_source_v1:
 
 
  @staticmethod
- def offer(mime_type: string) -> None:
+ def offer(mime_type: str) -> None:
   """
   This request adds a MIME type to the set of MIME types advertised to
   targets. Can be called several times to offer multiple types.
@@ -19400,7 +19395,7 @@ class zwlr_data_control_source_v1:
 
  class events:
   @staticmethod
-  def send(mime_type: string, fd: fd) -> None:
+  def send(mime_type: str, fd: fd) -> None:
    """
    Request for data from the client. Send the data as the specified MIME
    type over the passed file descriptor, then close it.
@@ -19435,7 +19430,7 @@ class zwlr_data_control_offer_v1:
 
 
  @staticmethod
- def receive(mime_type: string, fd: fd) -> None:
+ def receive(mime_type: str, fd: fd) -> None:
   """
   To transfer the offered data, the client issues this request and
   indicates the MIME type it wants to receive. The transfer happens
@@ -19465,7 +19460,7 @@ class zwlr_data_control_offer_v1:
 
  class events:
   @staticmethod
-  def offer(mime_type: string) -> None:
+  def offer(mime_type: str) -> None:
    """
    Sent immediately after creating the wlr_data_control_offer object.
    One event per offered MIME type.
@@ -19485,7 +19480,7 @@ class zwlr_export_dmabuf_manager_v1:
 
 
  @staticmethod
- def capture_output(overlay_cursor: int, output: object) -> zwlr_export_dmabuf_frame_v1:
+ def capture_output(overlay_cursor: int, output: wl_output) -> zwlr_export_dmabuf_frame_v1:
   """
   Capture the next frame of an entire output.
 
@@ -19748,7 +19743,7 @@ class zwlr_foreign_toplevel_handle_v1:
   ...
 
  @staticmethod
- def activate(seat: object) -> None:
+ def activate(seat: wl_seat) -> None:
   """
   Request that this toplevel be activated on the given seat.
   There is no guarantee the toplevel will be actually activated.
@@ -19770,7 +19765,7 @@ class zwlr_foreign_toplevel_handle_v1:
   ...
 
  @staticmethod
- def set_rectangle(surface: object, x: int, y: int, width: int, height: int) -> None:
+ def set_rectangle(surface: wl_surface, x: int, y: int, width: int, height: int) -> None:
   """
   The rectangle of the surface specified in this request corresponds to
   the place where the app using this protocol represents the given toplevel.
@@ -19800,7 +19795,7 @@ class zwlr_foreign_toplevel_handle_v1:
   ...
 
  @staticmethod
- def set_fullscreen(output: object) -> None:
+ def set_fullscreen(output: wl_output) -> None:
   """
   Requests that the toplevel be fullscreened on the given output. If the
   fullscreen state and/or the outputs the toplevel is visible on actually
@@ -19825,7 +19820,7 @@ class zwlr_foreign_toplevel_handle_v1:
 
  class events:
   @staticmethod
-  def title(title: string) -> None:
+  def title(title: str) -> None:
    """
    This event is emitted whenever the title of the toplevel changes.
    """
@@ -19833,7 +19828,7 @@ class zwlr_foreign_toplevel_handle_v1:
    ...
 
   @staticmethod
-  def app_id(app_id: string) -> None:
+  def app_id(app_id: str) -> None:
    """
    This event is emitted whenever the app-id of the toplevel changes.
    """
@@ -19841,7 +19836,7 @@ class zwlr_foreign_toplevel_handle_v1:
    ...
 
   @staticmethod
-  def output_enter(output: object) -> None:
+  def output_enter(output: wl_output) -> None:
    """
    This event is emitted whenever the toplevel becomes visible on
    the given output. A toplevel may be visible on multiple outputs.
@@ -19850,7 +19845,7 @@ class zwlr_foreign_toplevel_handle_v1:
    ...
 
   @staticmethod
-  def output_leave(output: object) -> None:
+  def output_leave(output: wl_output) -> None:
    """
    This event is emitted whenever the toplevel stops being visible on
    the given output. It is guaranteed that an entered-output event
@@ -19893,7 +19888,7 @@ class zwlr_foreign_toplevel_handle_v1:
    ...
 
   @staticmethod
-  def parent(parent: object) -> None:
+  def parent(parent: zwlr_foreign_toplevel_handle_v1) -> None:
    """
    This event is emitted whenever the parent of the toplevel changes.
 
@@ -19912,7 +19907,7 @@ class zwlr_gamma_control_manager_v1:
 
 
  @staticmethod
- def get_gamma_control(output: object) -> zwlr_gamma_control_v1:
+ def get_gamma_control(output: wl_output) -> zwlr_gamma_control_v1:
   """
   Create a gamma control that can be used to adjust gamma tables for the
   provided output.
@@ -20087,7 +20082,7 @@ class zwlr_layer_shell_v1:
 
 
  @staticmethod
- def get_layer_surface(surface: object, output: object, layer: zwlr_layer_shell_v1.layer, namespace: string) -> zwlr_layer_surface_v1:
+ def get_layer_surface(surface: wl_surface, output: wl_output, layer: zwlr_layer_shell_v1.layer, namespace: str) -> zwlr_layer_surface_v1:
   """
   Create a layer surface for an existing surface. This assigns the role of
   layer_surface, or raises a protocol error if another role is already
@@ -20277,7 +20272,7 @@ class zwlr_layer_surface_v1:
   ...
 
  @staticmethod
- def get_popup(popup: object) -> None:
+ def get_popup(popup: xdg_popup) -> None:
   """
   This assigns an xdg_popup's parent to this layer_surface.  This popup
   should have been created via xdg_surface::get_popup with the parent set
@@ -20527,7 +20522,7 @@ class zwlr_output_head_v1:
 
  class events:
   @staticmethod
-  def name(name: string) -> None:
+  def name(name: str) -> None:
    """
    This event describes the head name.
 
@@ -20552,7 +20547,7 @@ class zwlr_output_head_v1:
    ...
 
   @staticmethod
-  def description(description: string) -> None:
+  def description(description: str) -> None:
    """
    This event describes a human-readable description of the head.
 
@@ -20615,7 +20610,7 @@ class zwlr_output_head_v1:
    ...
 
   @staticmethod
-  def current_mode(mode: object) -> None:
+  def current_mode(mode: zwlr_output_mode_v1) -> None:
    """
    This event describes the mode currently in use for this head. It is only
    sent if the output is enabled.
@@ -20665,7 +20660,7 @@ class zwlr_output_head_v1:
    ...
 
   @staticmethod
-  def make(make: string) -> None:
+  def make(make: str) -> None:
    """
    This event describes the manufacturer of the head.
 
@@ -20694,7 +20689,7 @@ class zwlr_output_head_v1:
    ...
 
   @staticmethod
-  def model(model: string) -> None:
+  def model(model: str) -> None:
    """
    This event describes the model of the head.
 
@@ -20723,7 +20718,7 @@ class zwlr_output_head_v1:
    ...
 
   @staticmethod
-  def serial_number(serial_number: string) -> None:
+  def serial_number(serial_number: str) -> None:
    """
    This event describes the serial number of the head.
 
@@ -20852,7 +20847,7 @@ class zwlr_output_configuration_v1:
 
 
  @staticmethod
- def enable_head(head: object) -> zwlr_output_configuration_head_v1:
+ def enable_head(head: zwlr_output_head_v1) -> zwlr_output_configuration_head_v1:
   """
   Enable a head. This request creates a head configuration object that can
   be used to change the head's properties.
@@ -20867,7 +20862,7 @@ class zwlr_output_configuration_v1:
   ...
 
  @staticmethod
- def disable_head(head: object) -> None:
+ def disable_head(head: zwlr_output_head_v1) -> None:
   """
   Disable a head.
 
@@ -20984,7 +20979,7 @@ class zwlr_output_configuration_head_v1:
 
 
  @staticmethod
- def set_mode(mode: object) -> None:
+ def set_mode(mode: zwlr_output_mode_v1) -> None:
   """
   This request sets the head's mode.
   """
@@ -21055,7 +21050,7 @@ class zwlr_output_power_manager_v1:
 
 
  @staticmethod
- def get_output_power(output: object) -> zwlr_output_power_v1:
+ def get_output_power(output: wl_output) -> zwlr_output_power_v1:
   """
   Create an output power management mode control that can be used to
   adjust the power management mode for a given output.
@@ -21157,7 +21152,7 @@ class zwlr_screencopy_manager_v1:
 
 
  @staticmethod
- def capture_output(overlay_cursor: int, output: object) -> zwlr_screencopy_frame_v1:
+ def capture_output(overlay_cursor: int, output: wl_output) -> zwlr_screencopy_frame_v1:
   """
   Capture the next frame of an entire output.
 
@@ -21171,7 +21166,7 @@ class zwlr_screencopy_manager_v1:
   ...
 
  @staticmethod
- def capture_output_region(overlay_cursor: int, output: object, x: int, y: int, width: int, height: int) -> zwlr_screencopy_frame_v1:
+ def capture_output_region(overlay_cursor: int, output: wl_output, x: int, y: int, width: int, height: int) -> zwlr_screencopy_frame_v1:
   """
   Capture the next frame of an output's region.
 
@@ -21229,7 +21224,7 @@ class zwlr_screencopy_frame_v1:
 
 
  @staticmethod
- def copy(buffer: object) -> None:
+ def copy(buffer: wl_buffer) -> None:
   """
   Copy the frame to the supplied buffer. The buffer must have the
   correct size, see zwlr_screencopy_frame_v1.buffer and
@@ -21251,7 +21246,7 @@ class zwlr_screencopy_frame_v1:
   ...
 
  @staticmethod
- def copy_with_damage(buffer: object) -> None:
+ def copy_with_damage(buffer: wl_buffer) -> None:
   """
   Same as copy, except it waits until there is damage to copy.
   """
@@ -21506,7 +21501,7 @@ class zwlr_virtual_pointer_manager_v1:
 
 
  @staticmethod
- def create_virtual_pointer(seat: object) -> zwlr_virtual_pointer_v1:
+ def create_virtual_pointer(seat: wl_seat) -> zwlr_virtual_pointer_v1:
   """
   Creates a new virtual pointer. The optional seat is a suggestion to the
   compositor.
@@ -21526,7 +21521,7 @@ class zwlr_virtual_pointer_manager_v1:
   ...
 
  @staticmethod
- def create_virtual_pointer_with_output(seat: object, output: object) -> zwlr_virtual_pointer_v1:
+ def create_virtual_pointer_with_output(seat: wl_seat, output: wl_output) -> zwlr_virtual_pointer_v1:
   """
   Creates a new virtual pointer. The seat and the output arguments are
   optional. If the seat argument is set, the compositor should assign the
