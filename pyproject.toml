@@ -45,6 +45,7 @@ extra-args = [
 
 [tool.hatch.envs.wayland]
 extra-dependencies = [
+  "mypy",
   "lxml",
   "black",
   "ruff"

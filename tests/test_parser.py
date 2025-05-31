@@ -28,17 +28,17 @@ class TestWaylandParserHelpers(unittest.TestCase):
         assert WaylandParser.get_description(None) == ""
 
         # Test with summary and text
-        mock_desc_node.attrib = {"summary": "Test Summary"}
-        mock_desc_node.text = "  Line 1 \n  Line 2  \n\n Line 3  "
-        expected = "Test Summary\nLine 1\nLine 2\nLine 3"
+        mock_desc_node.attrib = {"summary": "test summary"}
+        mock_desc_node.text = "  Line 1 \n  Line 2  \n\n  Line 3  "
+        expected = "Line 1\nLine 2\n\nLine 3"
         assert WaylandParser.get_description(mock_desc_node) == expected
 
         # Test with only summary
         mock_desc_node.text = None
-        assert WaylandParser.get_description(mock_desc_node) == "Test Summary"
+        assert WaylandParser.get_description(mock_desc_node) == "Test summary"
 
         mock_desc_node.text = "   "  # Whitespace only text
-        assert WaylandParser.get_description(mock_desc_node) == "Test Summary"
+        assert WaylandParser.get_description(mock_desc_node) == "Test summary"
 
         # Test with only text (no summary in attrib)
         mock_desc_node.attrib = {}

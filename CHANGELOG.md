@@ -5,7 +5,8 @@
 - Event handling changed to correctly support asynchronous event processing across multiple threads, rather than the previous synchronous, single threaded event queue.
 - All non-wayland protocol functionality introduced by `python-wayland` moved to the namespace `wayland.client`
 - The `wayland` package namespace cleaned up so it only contains wayland interfaces and the `client` module.
-- Library API documentation added.
+- Comprehensive documentation added, including full Wayland protocol documentation.
+- Type hint descriptions cleaned up; formatting preserved and unnecessary text removed.
 - The following critical breaking API change were made:
 - `wayland.process_messages()` removed.
 - `wayland.wl_display.dispatch()` added.
