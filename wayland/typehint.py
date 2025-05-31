@@ -68,18 +68,18 @@ class TypeHinter:
         return declaration
 
     def _create_class_body(self, class_name: str, details: dict) -> str:
-        body = ""
-        body += self.process_enums(details.get("enums", []))
+        body = []
+        body.append(self.process_enums(details.get("enums", [])))
 
-        body += self.process_members(class_name, details.get("requests", []))
+        body.append(self.process_members(class_name, details.get("requests", [])))
 
         events = self.process_members(
             class_name, details.get("events", []), events=True
         )
         if events:
-            body += self._pad("class events:\n" + events, 1)
+            body.append(self._pad("class events:\n" + events, 1))
 
-        return body
+        return "\n".join(body) + "\n"
 
     def process_members(
         self, class_name: str, members: list[dict], *, events: bool = False
@@ -93,6 +93,7 @@ class TypeHinter:
                 class_name, member["args"], events
             )
 
+            docstring = self._create_docstring(member, new_args, return_type)
             signature = [
                 self._pad("@staticmethod", indent_level),
                 self._pad(
@@ -100,11 +101,11 @@ class TypeHinter:
                     f" -> {return_type or 'None'}:",
                     indent_level,
                 ),
-                self.indent(member["description"], indent_level + 1),
-                self._pad("...\n", indent_level + 1),
+                self.indent(docstring, indent_level + 1),
+                self._pad("...", indent_level + 1),
             ]
 
-            definitions.append("\n".join(signature))
+            definitions.append("\n".join(signature) + "\n")
 
         return "\n".join(definitions)
 
@@ -127,6 +128,30 @@ class TypeHinter:
             new_args.append(arg)
 
         return new_args, return_type
+
+    def _create_docstring(
+        self, member: dict, args: list[dict], return_type: str | None
+    ) -> str:
+        docstring_parts = []
+
+        if member.get("description"):
+            docstring_parts.append(member["description"])
+
+        args_with_descriptions = [arg for arg in args if arg.get("description")]
+        if args_with_descriptions:
+            docstring_parts.append("")
+            docstring_parts.append("Args:")
+            for arg in args_with_descriptions:
+                arg_desc = arg["description"].strip()
+                if arg_desc:
+                    docstring_parts.append(self._pad(f"{arg['name']}: {arg_desc}", 1))
+
+        if return_type:
+            docstring_parts.append("")
+            docstring_parts.append("Returns:")
+            docstring_parts.append(self._pad(f"{return_type}: The created object", 1))
+
+        return "\n".join(docstring_parts) if docstring_parts else ""
 
     def process_enums(self, members: list[dict]) -> str:
         indent_level = 1

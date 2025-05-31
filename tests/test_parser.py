@@ -492,14 +492,21 @@ class TestWaylandParserProcessElement(unittest.TestCase):
 
         self.parser._process_protocol_element(mock_node, interface_name)
 
-        self.parser.fix_arguments.assert_called_once_with(
-            [dict(a) for a in arg_data], "request"
-        )
+        expected_args = [
+            {
+                "name": "buffer",
+                "type": "object",
+                "interface": "wl_buffer",
+                "description": "",
+            },
+            {"name": "x", "type": "int", "description": ""},
+        ]
+        self.parser.fix_arguments.assert_called_once_with(expected_args, "request")
         self.parser.get_description.assert_called_once()
 
         expected_wayland_object = {
             "name": "attach",
-            "args": arg_data,
+            "args": expected_args,
             "description": "Mocked Description",
             "signature": "wl_surface.attach(buffer: object, x: int)",
         }
@@ -522,15 +529,21 @@ class TestWaylandParserProcessElement(unittest.TestCase):
 
         self.parser._process_protocol_element(mock_node, interface_name)
 
-        self.parser.fix_arguments.assert_called_once_with(
-            [dict(a) for a in arg_data], "event"
-        )
+        expected_args = [
+            {
+                "name": "capabilities",
+                "type": "uint",
+                "enum": "wl_seat.capability",
+                "description": "",
+            }
+        ]
+        self.parser.fix_arguments.assert_called_once_with(expected_args, "event")
         self.parser.get_description.assert_called_once()
 
         expected_wayland_object = {
             "name": "capabilities",
             "since": "1",
-            "args": arg_data,
+            "args": expected_args,
             "description": "Mocked Description",
             "signature": "wl_seat.capabilities(capabilities: uint)",
         }
@@ -556,15 +569,27 @@ class TestWaylandParserProcessElement(unittest.TestCase):
 
         self.parser._process_protocol_element(mock_node, interface_name)
 
-        self.parser.fix_arguments.assert_called_once_with(
-            [dict(e) for e in entry_data], "enum"
-        )
+        expected_args = [
+            {
+                "name": "normal",
+                "value": "0",
+                "summary": "normal",
+                "description": "normal",
+            },
+            {
+                "name": "90",
+                "value": "1",
+                "summary": "90 degrees",
+                "description": "90 degrees",
+            },
+        ]
+        self.parser.fix_arguments.assert_called_once_with(expected_args, "enum")
         self.parser.get_description.assert_called_once()
 
         expected_wayland_object = {
             "name": "transform",
             "bitfield": "true",
-            "args": entry_data,
+            "args": expected_args,
             "description": "Mocked Description",
             "signature": "wl_output.transform(normal: , 90: )",
         }

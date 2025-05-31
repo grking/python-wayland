@@ -16,7 +16,7 @@ for interface in WAYLAND_INTERFACES:
         print(f"# {interface}\n", file=f)
         print(f"::: wayland.{interface}", file=f)
         print("    options:", file=f)
-        print("      show_source: true", file=f)
+        print("      show_source: false", file=f)
         print("      show_root_heading: true", file=f)
         print("      show_root_toc_entry: true", file=f)
         print("      members_order: source", file=f)

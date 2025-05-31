@@ -41,7 +41,7 @@ REMOTE_PROTOCOL_SOURCES = [
         "name": "Wayland Main Protocol",
         "url": "https://gitlab.freedesktop.org/wayland/wayland.git",
         "dirs": ["protocol"],
-        "ignore": ["tests.xml"]
+        "ignore": ["tests.xml"],
     },
     {
         "name": "Official Wayland Protocol Definitions",
@@ -342,7 +342,9 @@ class WaylandParser:
 
         child_tag = "arg" if object_type != "enum" else "entry"
         params = node.findall(child_tag)
-        args = self.fix_arguments([dict(x.attrib) for x in params], object_type)
+        args = self.fix_arguments(
+            self._extract_arguments_with_descriptions(params), object_type
+        )
 
         description_node = node.find("description")
         description = self.get_description(description_node)
@@ -511,7 +513,20 @@ class WaylandParser:
             text = description.attrib.get("summary", "").strip().capitalize()
         else:
             text = ""
-        return '\n'.join(line.rstrip() for line in text.splitlines())
+        return "\n".join(line.rstrip() for line in text.splitlines())
+
+    def _extract_arguments_with_descriptions(
+        self, params: list[etree.Element]
+    ) -> list[dict]:
+        args = []
+        for param in params:
+            arg_dict = dict(param.attrib)
+            if "summary" in arg_dict:
+                arg_dict["description"] = arg_dict["summary"]
+            else:
+                arg_dict["description"] = ""
+            args.append(arg_dict)
+        return args
 
     def fix_arguments(self, original_args: list[dict], item_type: str) -> list[dict]:
         new_args = []
