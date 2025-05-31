@@ -28,11 +28,3 @@ If you want to use the `python-wayland` library it's easier to install as above.
 ```bash
 git clone https://github.com/grking/python-wayland
 ```
-
-See [Developing](developing.md).
-
-## Next Steps
-
-* **[Getting Started](getting-started.md)** - Getting started with `python-wayland`
-* **[API Reference](api/client.md)** - Complete client API documentation
-* **[More Examples](examples.md)** - Further usage examples

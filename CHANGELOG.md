@@ -1,6 +1,6 @@
 ### Changelog
 
-### v1.0.0 (xxth xxx 2025)
+### v1.0.0 (XXth June 2025)
 - Event dispatching changed to more closely align with the pattern in `libwayland-client`, using dispatch and dispatch_pending for blocking and non-blocking event dispatching. (see the below breaking API changes)
 - Event handling changed to correctly support asynchronous event processing across multiple threads, rather than the previous synchronous, single threaded event queue.
 - All non-wayland protocol functionality introduced by `python-wayland` moved to the namespace `wayland.client`
@@ -12,9 +12,9 @@
 - `wayland.wl_display.dispatch_timeout()` added.
 - `wayland.wl_display.dispatch_pending()` added.
 - The following breaking API changes were made, although these methods not required for the normal use of this library:
-- `wayland.initialise()` changed to `wayland.client.initialise()`
-- `wayland.get_package_root()` changed to `wayland.client.get_package_root()`
-- `wayland.is_wayland` changed to `wayland.client.is_wayland()` (note it became a function too)
+- `wayland.initialise()` changed to `wayland.client.get_wayland_proxy()`
+- `wayland.get_package_root()` changed to `wayland.client.package.get_package_root()`
+- `wayland.is_wayland` changed to `wayland.client.is_wayland()`
 
 ### v0.7.1 (28th May 2025)
 - Remove dependency on requests library.
@@ -53,12 +53,12 @@
 - Add interface version and description to type checking / intellisense file.
 - Add interface version to protocols.json runtime file.
 
-#### v0.2.0 (22nd August 2024)
+### v0.2.0 (22nd August 2024)
 - Improve low-level socket handling.
 - Add support for file descriptors in events.
 - Add support for Wayland enum data type.
 - Add support for Wayland "fixed" floating point types.
 - Search for Wayland protocol definitions online and locally.
 
-#### v0.1.0 (17th August 2024)
+### v0.1.0 (17th August 2024)
 - Initial commit.

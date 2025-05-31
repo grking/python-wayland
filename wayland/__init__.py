@@ -38,7 +38,8 @@ if __getenv("WAYLAND_INITIALISE", "").lower() != "false" and (
     __proxy = Proxy()
     __proxy.initialise(globals())
 
-    # Clean up namespace - keep only dynamic objects, dunder methods, and "client"
+    # Clean up namespace - keep only dynamic objects,
+    # dunder methods, and "client"
     __keys_to_delete = []
     for __key in list(globals().keys()):
         if (

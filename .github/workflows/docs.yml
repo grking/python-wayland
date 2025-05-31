@@ -1,0 +1,16 @@
+# .github/workflows/docs.yml
+name: Deploy docs
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - run: pip install hatch
+      - run: hatch run docs:mkdocs gh-deploy --force

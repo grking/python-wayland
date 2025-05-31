@@ -53,9 +53,21 @@ extra-dependencies = [
 [tool.hatch.envs.docs]
 extra-dependencies = [
   "mypy",
-  "mkdocs",
-  "mkdocs-material",
-  "mkdocstrings[python]"
+  "black",
+  "ruff",
+  "mkdocs>=1.6.1",
+  "mkdocs-material>=9.6.14",
+  "mkdocstrings[python]",
+  "markdown-callouts>=0.4",
+  "markdown-exec>=1.8",
+  "mkdocs-autorefs",
+  "mkdocs-coverage>=1.0",
+  "mkdocs-material>=9.5",
+  "mkdocs-gen-files",
+  "mkdocs-literate-nav",
+  "mkdocs-minify-plugin>=0.8",
+  "mkdocs-section-index>=0.3",
+  "pydantic>=2.10",
 ]
 
 [tool.hatch.envs.docs.scripts]
