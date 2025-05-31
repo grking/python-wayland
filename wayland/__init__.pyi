@@ -253,7 +253,7 @@ class wl_shm_pool:
 
 
  @staticmethod
- def create_buffer(offset: int, width: int, height: int, stride: int, format: wl_shm_pool.wl_shm.format) -> wl_buffer:
+ def create_buffer(offset: int, width: int, height: int, stride: int, format: wl_shm.format) -> wl_buffer:
   """
   Create a wl_buffer object from the pool.
 
@@ -658,7 +658,7 @@ class wl_data_offer:
   ...
 
  @staticmethod
- def set_actions(dnd_actions: wl_data_offer.wl_data_device_manager.dnd_action, preferred_action: wl_data_offer.wl_data_device_manager.dnd_action) -> None:
+ def set_actions(dnd_actions: wl_data_device_manager.dnd_action, preferred_action: wl_data_device_manager.dnd_action) -> None:
   """
   Sets the actions that the destination side client supports for
   this operation. This request may trigger the emission of
@@ -713,7 +713,7 @@ class wl_data_offer:
    ...
 
   @staticmethod
-  def source_actions(source_actions: wl_data_offer.wl_data_device_manager.dnd_action) -> None:
+  def source_actions(source_actions: wl_data_device_manager.dnd_action) -> None:
    """
    This event indicates the actions offered by the data source. It
    will be sent immediately after creating the wl_data_offer object,
@@ -727,7 +727,7 @@ class wl_data_offer:
    ...
 
   @staticmethod
-  def action(dnd_action: wl_data_offer.wl_data_device_manager.dnd_action) -> None:
+  def action(dnd_action: wl_data_device_manager.dnd_action) -> None:
    """
    This event indicates the action selected by the compositor after
    matching the source/destination side actions. Only one action (or
@@ -808,7 +808,7 @@ class wl_data_source:
   ...
 
  @staticmethod
- def set_actions(dnd_actions: wl_data_source.wl_data_device_manager.dnd_action) -> None:
+ def set_actions(dnd_actions: wl_data_device_manager.dnd_action) -> None:
   """
   Sets the actions that the source side client supports for this
   operation. This request may trigger wl_data_source.action and
@@ -916,7 +916,7 @@ class wl_data_source:
    ...
 
   @staticmethod
-  def action(dnd_action: wl_data_source.wl_data_device_manager.dnd_action) -> None:
+  def action(dnd_action: wl_data_device_manager.dnd_action) -> None:
    """
    This event indicates the action selected by the compositor after
    matching the source/destination side actions. Only one action (or
@@ -1841,7 +1841,7 @@ class wl_surface:
   ...
 
  @staticmethod
- def set_buffer_transform(transform: wl_surface.wl_output.transform) -> None:
+ def set_buffer_transform(transform: wl_output.transform) -> None:
   """
   This request sets the transformation that the client has already applied
   to the content of the buffer. The accepted values for the transform
@@ -2043,7 +2043,7 @@ class wl_surface:
    ...
 
   @staticmethod
-  def preferred_buffer_transform(transform: wl_surface.wl_output.transform) -> None:
+  def preferred_buffer_transform(transform: wl_output.transform) -> None:
    """
    This event indicates the preferred buffer transform for this surface.
    It is sent whenever the compositor's preference changes.
@@ -7661,7 +7661,7 @@ class wp_color_management_surface_v1:
   ...
 
  @staticmethod
- def set_image_description(image_description: object, render_intent: wp_color_management_surface_v1.wp_color_manager_v1.render_intent) -> None:
+ def set_image_description(image_description: object, render_intent: wp_color_manager_v1.render_intent) -> None:
   """
   If this protocol object is inert, the protocol error inert is raised.
 
@@ -8021,7 +8021,7 @@ class wp_image_description_creator_params_v1:
   ...
 
  @staticmethod
- def set_tf_named(tf: wp_image_description_creator_params_v1.wp_color_manager_v1.transfer_function) -> None:
+ def set_tf_named(tf: wp_color_manager_v1.transfer_function) -> None:
   """
   Sets the transfer characteristic using explicitly enumerated named
   functions.
@@ -8074,7 +8074,7 @@ class wp_image_description_creator_params_v1:
   ...
 
  @staticmethod
- def set_primaries_named(primaries: wp_image_description_creator_params_v1.wp_color_manager_v1.primaries) -> None:
+ def set_primaries_named(primaries: wp_color_manager_v1.primaries) -> None:
   """
   Sets the color primaries and white point using explicitly named sets.
   This describes the primary color volume which is the basis for color
@@ -8524,7 +8524,7 @@ class wp_image_description_info_v1:
    ...
 
   @staticmethod
-  def primaries_named(primaries: wp_image_description_info_v1.wp_color_manager_v1.primaries) -> None:
+  def primaries_named(primaries: wp_color_manager_v1.primaries) -> None:
    """
    Delivers the primary color volume primaries and white point using an
    explicitly enumerated named set.
@@ -8553,7 +8553,7 @@ class wp_image_description_info_v1:
    ...
 
   @staticmethod
-  def tf_named(tf: wp_image_description_info_v1.wp_color_manager_v1.transfer_function) -> None:
+  def tf_named(tf: wp_color_manager_v1.transfer_function) -> None:
    """
    Delivers the transfer characteristic using an explicitly enumerated
    named function.
@@ -8708,7 +8708,7 @@ class wp_color_representation_manager_v1:
 
  class events:
   @staticmethod
-  def supported_alpha_mode(alpha_mode: wp_color_representation_manager_v1.wp_color_representation_surface_v1.alpha_mode) -> None:
+  def supported_alpha_mode(alpha_mode: wp_color_representation_surface_v1.alpha_mode) -> None:
    """
    When this object is created, it shall immediately send this event once
    for each alpha mode the compositor supports.
@@ -8723,7 +8723,7 @@ class wp_color_representation_manager_v1:
    ...
 
   @staticmethod
-  def supported_coefficients_and_ranges(coefficients: wp_color_representation_manager_v1.wp_color_representation_surface_v1.coefficients, range: wp_color_representation_manager_v1.wp_color_representation_surface_v1.range) -> None:
+  def supported_coefficients_and_ranges(coefficients: wp_color_representation_surface_v1.coefficients, range: wp_color_representation_surface_v1.range) -> None:
    """
    When this object is created, it shall immediately send this event once
    for each matrix coefficient and color range combination the compositor
@@ -10486,7 +10486,7 @@ class ext_image_copy_capture_session_v1:
    ...
 
   @staticmethod
-  def shm_format(format: ext_image_copy_capture_session_v1.wl_shm.format) -> None:
+  def shm_format(format: wl_shm.format) -> None:
    """
    Provides the format that must be used for shared-memory buffers.
 
@@ -10664,7 +10664,7 @@ class ext_image_copy_capture_frame_v1:
 
  class events:
   @staticmethod
-  def transform(transform: ext_image_copy_capture_frame_v1.wl_output.transform) -> None:
+  def transform(transform: wl_output.transform) -> None:
    """
    This event is sent before the ready event and holds the transform that
    the compositor has applied to the buffer contents.
@@ -19004,7 +19004,7 @@ class hyprland_toplevel_export_frame_v1:
 
  class events:
   @staticmethod
-  def buffer(format: hyprland_toplevel_export_frame_v1.wl_shm.format, width: uint, height: uint, stride: uint) -> None:
+  def buffer(format: wl_shm.format, width: uint, height: uint, stride: uint) -> None:
    """
    Provides information about wl_shm buffer parameters that need to be
    used for this frame. This event is sent once after the frame is created
@@ -20324,7 +20324,7 @@ class zwlr_layer_surface_v1:
   ...
 
  @staticmethod
- def set_layer(layer: zwlr_layer_surface_v1.zwlr_layer_shell_v1.layer) -> None:
+ def set_layer(layer: zwlr_layer_shell_v1.layer) -> None:
   """
   Change the layer that the surface is rendered on.
 
@@ -20637,7 +20637,7 @@ class zwlr_output_head_v1:
    ...
 
   @staticmethod
-  def transform(transform: zwlr_output_head_v1.wl_output.transform) -> None:
+  def transform(transform: wl_output.transform) -> None:
    """
    This event describes the transformation currently applied to the head.
    It is only sent if the output is enabled.
@@ -21021,7 +21021,7 @@ class zwlr_output_configuration_head_v1:
   ...
 
  @staticmethod
- def set_transform(transform: zwlr_output_configuration_head_v1.wl_output.transform) -> None:
+ def set_transform(transform: wl_output.transform) -> None:
   """
   This request sets the head's transform.
   """
@@ -21037,7 +21037,7 @@ class zwlr_output_configuration_head_v1:
   ...
 
  @staticmethod
- def set_adaptive_sync(state: zwlr_output_configuration_head_v1.zwlr_output_head_v1.adaptive_sync_state) -> None:
+ def set_adaptive_sync(state: zwlr_output_head_v1.adaptive_sync_state) -> None:
   """
   This request enables/disables adaptive sync. Adaptive sync is also
   known as Variable Refresh Rate or VRR.
@@ -21260,7 +21260,7 @@ class zwlr_screencopy_frame_v1:
 
  class events:
   @staticmethod
-  def buffer(format: zwlr_screencopy_frame_v1.wl_shm.format, width: uint, height: uint, stride: uint) -> None:
+  def buffer(format: wl_shm.format, width: uint, height: uint, stride: uint) -> None:
    """
    Provides information about wl_shm buffer parameters that need to be
    used for this frame. This event is sent once after the frame is created
@@ -21416,7 +21416,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def button(time: uint, button: uint, state: zwlr_virtual_pointer_v1.wl_pointer.button_state) -> None:
+ def button(time: uint, button: uint, state: wl_pointer.button_state) -> None:
   """
   A button was pressed or released.
 
@@ -21429,7 +21429,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def axis(time: uint, axis: zwlr_virtual_pointer_v1.wl_pointer.axis, value: fixed) -> None:
+ def axis(time: uint, axis: wl_pointer.axis, value: fixed) -> None:
   """
   Scroll and other axis requests.
 
@@ -21450,7 +21450,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def axis_source(axis_source: zwlr_virtual_pointer_v1.wl_pointer.axis_source) -> None:
+ def axis_source(axis_source: wl_pointer.axis_source) -> None:
   """
   Source information for scroll and other axis.
 
@@ -21461,7 +21461,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def axis_stop(time: uint, axis: zwlr_virtual_pointer_v1.wl_pointer.axis) -> None:
+ def axis_stop(time: uint, axis: wl_pointer.axis) -> None:
   """
   Stop notification for scroll and other axes.
 
@@ -21473,7 +21473,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def axis_discrete(time: uint, axis: zwlr_virtual_pointer_v1.wl_pointer.axis, value: fixed, discrete: int) -> None:
+ def axis_discrete(time: uint, axis: wl_pointer.axis, value: fixed, discrete: int) -> None:
   """
   Discrete step information for scroll and other axes.
 

@@ -7,6 +7,8 @@
 - The `wayland` package namespace cleaned up so it only contains wayland interfaces and the `client` module.
 - Comprehensive documentation added, including full Wayland protocol documentation.
 - Type hint descriptions cleaned up; formatting preserved and unnecessary text removed.
+- Fixed bug with type hinting where wrong enum class was used if enum was referenced in a method signature.
+- Added event and method argument descriptions into type hinting.
 - The following critical breaking API change were made:
 - `wayland.process_messages()` removed.
 - `wayland.wl_display.dispatch()` added.

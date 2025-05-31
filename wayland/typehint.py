@@ -124,7 +124,11 @@ class TypeHinter:
                 if interface and events:
                     arg["type"] = interface
             elif arg.get("enum"):
-                arg["type"] = f"{class_name}.{arg['enum']}"
+                enum_ref = arg["enum"]
+                if "." in enum_ref:
+                    arg["type"] = enum_ref
+                else:
+                    arg["type"] = f"{class_name}.{enum_ref}"
             new_args.append(arg)
 
         return new_args, return_type
