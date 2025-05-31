@@ -32,7 +32,7 @@ from enum import Enum, IntFlag
 from queue import Empty, SimpleQueue
 from typing import ClassVar
 
-from wayland.client import get_package_root
+from wayland.client.package import get_package_root
 from wayland.constants import MAX_EVENT_RESOLUTION
 from wayland.log import log
 from wayland.state import WaylandState

@@ -29,6 +29,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import textwrap
 from copy import deepcopy
 
 from lxml import etree
@@ -40,6 +41,7 @@ REMOTE_PROTOCOL_SOURCES = [
         "name": "Wayland Main Protocol",
         "url": "https://gitlab.freedesktop.org/wayland/wayland.git",
         "dirs": ["protocol"],
+        "ignore": ["tests.xml"],
     },
     {
         "name": "Official Wayland Protocol Definitions",
@@ -340,7 +342,9 @@ class WaylandParser:
 
         child_tag = "arg" if object_type != "enum" else "entry"
         params = node.findall(child_tag)
-        args = self.fix_arguments([dict(x.attrib) for x in params], object_type)
+        args = self.fix_arguments(
+            self._extract_arguments_with_descriptions(params), object_type
+        )
 
         description_node = node.find("description")
         description = self.get_description(description_node)
@@ -497,20 +501,32 @@ class WaylandParser:
 
     @staticmethod
     def get_description(description: etree.Element) -> str:
-        if description is None:
-            return ""
-        summary = description.attrib.get("summary", "").strip()
-        text = "\n".join(
-            line.strip()
-            for line in (description.text or "").split("\n")
-            if line.strip()
-        )
-        if summary and text:
-            return f"{summary}\n{text}"
-        if text:  # Only text, no summary
-            return text
-        # Only summary (or neither, in which case summary is "")
-        return summary
+        if (
+            description is not None
+            and hasattr(description, "text")
+            and description.text is not None
+            and description.text.strip()
+        ):
+            text = textwrap.dedent(description.text).strip()
+        elif description is not None and description.attrib.get("summary", "").strip():
+            # Only use summary if there is nothing else
+            text = description.attrib.get("summary", "").strip().capitalize()
+        else:
+            text = ""
+        return "\n".join(line.rstrip() for line in text.splitlines())
+
+    def _extract_arguments_with_descriptions(
+        self, params: list[etree.Element]
+    ) -> list[dict]:
+        args = []
+        for param in params:
+            arg_dict = dict(param.attrib)
+            if "summary" in arg_dict:
+                arg_dict["description"] = arg_dict["summary"]
+            else:
+                arg_dict["description"] = ""
+            args.append(arg_dict)
+        return args
 
     def fix_arguments(self, original_args: list[dict], item_type: str) -> list[dict]:
         new_args = []

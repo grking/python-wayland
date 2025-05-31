@@ -23,5 +23,5 @@
 
 PROTOCOL_HEADER_SIZE = 8
 
-"""Things that poll for events do so this many times per second"""
 MAX_EVENT_RESOLUTION = 1000
+"""Things that poll for events do so this many times per second"""

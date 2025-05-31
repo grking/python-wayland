@@ -1450,47 +1450,6 @@
   ],
   "version":1
  },
- "fd_passer":{
-  "enums":[],
-  "events":[
-   {
-    "args":[],
-    "name":"pre_fd",
-    "opcode":0
-   },
-   {
-    "args":[
-     {
-      "name":"fd",
-      "type":"fd"
-     }
-    ],
-    "name":"fd",
-    "opcode":1
-   }
-  ],
-  "requests":[
-   {
-    "args":[],
-    "name":"destroy",
-    "opcode":0,
-    "type":"destructor"
-   },
-   {
-    "args":[
-     {
-      "interface":"fd_passer",
-      "name":"passer",
-      "type":"object"
-     }
-    ],
-    "name":"conjoin",
-    "opcode":1,
-    "since":"2"
-   }
-  ],
-  "version":2
- },
  "hyprland_ctm_control_manager_v1":{
   "enums":[
    {
