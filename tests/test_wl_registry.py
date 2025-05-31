@@ -19,4 +19,7 @@ def test_get_registry():
 
     # Check we got some interfaces we should have
     for proto in protocols:
+        if proto not in received_protocols:
+            # Wait bit longer
+            wayland.wl_display.dispatch_timeout(2.0)
         assert proto in received_protocols
