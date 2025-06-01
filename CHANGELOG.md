@@ -13,9 +13,9 @@
 - Added event and method argument descriptions into type hinting.
 - The following breaking API change were made:
   - `wayland.process_messages()` removed.
-  - `wayland.wl_display.dispatch()` added.
-  - `wayland.wl_display.dispatch_timeout()` added.
-  - `wayland.wl_display.dispatch_pending()` added.
+  - [`wayland.wl_display.dispatch()`](https://python-wayland.org/wayland/wl_display/#wayland.wl_display.dispatch) added.
+  - [`wayland.wl_display.dispatch_timeout()`](https://python-wayland.org/wayland/wl_display/#wayland.wl_display.dispatch_timeout) added.
+  - [`wayland.wl_display.dispatch_pending()`](https://python-wayland.org/wayland/wl_display/#wayland.wl_display.dispatch_pending) added.
 - The following breaking API changes were made, although these methods not required for the normal use of this library:
   - `wayland.initialise()` changed to `wayland.client.get_wayland_proxy()`
   - `wayland.get_package_root()` changed to `wayland.client.package.get_package_root()`

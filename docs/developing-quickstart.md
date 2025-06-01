@@ -22,8 +22,7 @@ pipx install hatch
 
 ## Generating Documentation
 
-* Build the docs with `hatch run docs:build`
-* Serve the docs locally with `hatch run docs:serve`
+* Build and serve the docs locally: `hatch run docs:serve`
 
 The documentation is automatically produced using [MkDocs](https://www.mkdocs.org/).
 
