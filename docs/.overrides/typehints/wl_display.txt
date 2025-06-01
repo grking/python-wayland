@@ -1,0 +1,53 @@
+    @staticmethod
+    def dispatch() -> None:
+        """
+        Call `dispatch` to dispatch incoming Wayland events to your
+        event handlers.
+
+        This is a blocking call. It is not return until some events
+        have been dispatched.
+        """
+
+        ...
+
+    @staticmethod
+    def dispatch_pending() -> bool:
+        """
+        Call `dispatch_pending` to dispatch any pending Wayland events to your
+        event handlers.
+
+        This is a non-blocking call. It returns as soon as any pending
+        events have been dispatched. If there are no pending events it
+        returns immediately.
+
+        Returns:
+            bool: True if any events were dispatched, otherwise False
+        """
+
+        ...
+
+    @staticmethod
+    def dispatch_timeout(timeout: float) -> None:
+        """
+        Call `dispatch_timeout` to dispatch incoming Wayland events
+        to your event handlers.
+
+        This is a blocking call. It returns either when some events
+        have been dispatched or when the wait time specified by
+        `timeout` has been exceeded.
+
+        Examples:
+            Wait for 1/50th of a second for events and return
+
+            ```python
+            had_events = wayland.wl_display.dispatch_timeout(1/50)
+            ```
+
+        Args:
+            timeout: the maximum time to wait for events in seconds.
+
+        Returns:
+            bool: True if any events were dispatched, otherwise False
+        """
+        ...
+
