@@ -1,0 +1,23 @@
+# .dockerignore
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.git
+.github
+.pytest_cache
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+.tox/
+docs/_build/
+.venv/
+env/
+venv/
+wayland.log
+.*_cache
+.vscode
+site/
+.r*

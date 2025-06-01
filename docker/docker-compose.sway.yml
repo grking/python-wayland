@@ -1,0 +1,24 @@
+# docker/docker-compose.sway.yml
+services:
+  # Sway service extending wayland-base
+  env-sway-base:
+    extends:
+      file: docker-compose.yml
+      service: wayland-base
+    depends_on:
+      - base
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.sway
+    image: python-wayland:sway
+    command: ["sway"]
+
+  # GUI Sway
+  env-sway-gui:
+    extends: env-sway-base
+    command: ["sway", "-d"]
+
+  # Shell
+  env-sway-shell:
+    extends: env-sway-base
+    command: "/bin/bash"

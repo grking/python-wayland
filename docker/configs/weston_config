@@ -1,0 +1,11 @@
+# docker/configs/weston.ini
+[core]
+backend=wayland
+
+[terminal]
+font=DejaVuSansMono
+font-size=18
+
+[autolaunch]
+path=/home/user/weston.sh
+watch=true

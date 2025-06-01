@@ -23,8 +23,21 @@ pipx install hatch
 ## Generating Documentation
 
 * Build and serve the docs locally: `hatch run docs:serve`
+* Build the docs locally: `hatch run docs:build`
 
 The documentation is automatically produced using [MkDocs](https://www.mkdocs.org/).
+
+## Docker Containers
+
+* Run unit tests in Sway `hatch run docker-sway`
+* Run unit tests in Weston `hatch run docker-weston`
+
+* Stop all docker containers `hatch run docker-stop`
+
+* Sway container shell `hatch run docker-sway-shell`
+* Weston container shell `hatch run docker-sway-shell`
+
+* Build all images `hatch run docker-build`
 
 ## Updating Wayland Protocol Definitions
 

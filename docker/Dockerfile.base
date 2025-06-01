@@ -1,0 +1,46 @@
+# docker/Dockerfile.base
+FROM archlinux:base-devel
+
+# Install common Wayland dependencies
+RUN pacman -Syu --noconfirm && \
+    pacman -S --noconfirm \
+    base-devel \
+    python \
+    python-pip \
+    python-hatch \
+    wayland \
+    wayland-protocols \
+    mesa \
+    xorg-xwayland \
+    git \
+    sudo \
+    helix \
+    man-db \
+    ttf-dejavu \
+    && pacman -Scc --noconfirm
+
+# Create wayland user with common groups
+RUN useradd -m -G video,input,tty,audio,wheel user && \
+    echo "user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+# Setup runtime directory
+RUN mkdir -p /tmp/runtime-dir && \
+    chown user:user /tmp/runtime-dir && \
+    chmod 0700 /tmp/runtime-dir
+
+# Switch to user
+USER user
+WORKDIR /home/user
+
+# Create config directories
+RUN mkdir -p /home/user/.config && \
+    mkdir -p /home/user/.cache && \
+    mkdir -p /home/user/.local/share
+
+# Set environment variables
+ENV XDG_RUNTIME_DIR=/tmp/runtime-dir
+ENV XDG_CONFIG_HOME=/home/user/.config
+ENV XDG_CACHE_HOME=/home/user/.cache
+ENV XDG_DATA_HOME=/home/user/.local/share
+
+WORKDIR /home/user

@@ -1,0 +1,29 @@
+# docker/Dockerfile.sway
+FROM python-wayland:base AS wayland-sway
+
+USER root
+
+RUN pacman -S --noconfirm \
+    sway \
+    foot \
+    dmenu \
+    fuzzel \
+    swaybg \
+    swaylock \
+    swayidle \
+    && pacman -Scc --noconfirm
+
+USER user
+WORKDIR /home/user
+
+# Create Sway-specific config directories
+RUN mkdir -p /home/user/.config/sway \
+            /home/user/.config/foot
+
+# Copy configs with correct ownership
+COPY --chown=user:user docker/configs/sway_config /home/user/.config/sway/config
+COPY --chown=user:user docker/configs/foot_config /home/user/.config/foot/foot.ini
+COPY --chown=user:user docker/configs/startup.sh /home/user/
+RUN chmod +x /home/user/startup.sh
+
+CMD ["sway"]
