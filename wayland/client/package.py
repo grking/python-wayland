@@ -1,3 +1,4 @@
+import subprocess
 from os import path
 
 from wayland.__about__ import __version__
@@ -15,16 +16,42 @@ def get_package_root() -> str:
 
 
 def get_package_version() -> str:
-    """Get the version of the wayland package.
+    """Get the version of the python-wayland package.
+
+    Note:
+        Will include the git commit hash or tag if the package
+        is being run from a git repository.
 
     Examples:
         Print the current library version
 
         >>> print(wayland.client.get_package_version())
-        0.9.0
+        1.0.0
+
+        Print the current library version from a local git repo
+
+        >>> print(wayland.client.get_package_version())
+        1.0.0+b347d2e-dirty
 
     Returns:
-        Version string in semantic versioning format (e.g., "1.0.0").
+        The package version identifier.
 
     """
-    return __version__
+    version = __version__
+
+    try:
+        result = subprocess.run(
+            ["git", "describe", "--dirty", "--alway"],  # noqa: S607
+            capture_output=True,
+            text=True,
+            check=True,
+            cwd=get_package_root()
+        )
+        commit = result.stdout.strip()
+
+        version += f"+{commit}"
+
+    except (subprocess.CalledProcessError, FileNotFoundError, OSError):
+        pass
+
+    return version
