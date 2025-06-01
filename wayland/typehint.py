@@ -123,28 +123,41 @@ class TypeHinter:
         self, arg: dict, class_name: str, events: bool
     ) -> str | None:
         if arg["type"] == "new_id":
-            interface = arg.get("interface")
-            if interface and not events:
-                return interface
-            if interface and events:
-                arg["type"] = interface
-        elif arg["type"] == "object" and arg.get("interface"):
+            return self._handle_new_id_type(arg, events)
+
+        if arg["type"] == "object" and arg.get("interface"):
             arg["type"] = arg["interface"]
-        elif arg["type"] == "string":
-            arg["type"] = "str"
-        elif arg["type"] == "fixed":
-            arg["type"] = "float"
-        elif arg["type"] == "uint":
-            arg["type"] = "int"
-        elif arg["type"] == "array":
-            arg["type"] = "list"
         elif arg.get("enum"):
-            enum_ref = arg["enum"]
-            if "." in enum_ref:
-                arg["type"] = enum_ref
-            else:
-                arg["type"] = f"{class_name}.{enum_ref}"
+            self._handle_enum_type(arg, class_name)
+        else:
+            self._apply_simple_type_mapping(arg)
+
         return None
+
+    def _handle_new_id_type(self, arg: dict, events: bool) -> str | None:
+        interface = arg.get("interface")
+        if interface and not events:
+            return interface
+        if interface and events:
+            arg["type"] = interface
+        return None
+
+    def _handle_enum_type(self, arg: dict, class_name: str) -> None:
+        enum_ref = arg["enum"]
+        if "." in enum_ref:
+            arg["type"] = enum_ref
+        else:
+            arg["type"] = f"{class_name}.{enum_ref}"
+
+    def _apply_simple_type_mapping(self, arg: dict) -> None:
+        type_mapping = {
+            "string": "str",
+            "fixed": "float",
+            "uint": "int",
+            "array": "list",
+        }
+        if arg["type"] in type_mapping:
+            arg["type"] = type_mapping[arg["type"]]
 
     def _create_docstring(
         self, member: dict, args: list[dict], return_type: str | None

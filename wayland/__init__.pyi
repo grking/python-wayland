@@ -248,7 +248,7 @@ class wl_shm_pool:
 
 
  @staticmethod
- def create_buffer(offset: int, width: int, height: int, stride: int, format: int) -> wl_buffer:
+ def create_buffer(offset: int, width: int, height: int, stride: int, format: wl_shm.format) -> wl_buffer:
   """
   Create a wl_buffer object from the pool.
 
@@ -486,7 +486,7 @@ class wl_shm:
 
  class events:
   @staticmethod
-  def format(format: int) -> None:
+  def format(format: wl_shm.format) -> None:
    """
    Informs the client about a valid pixel format that
    can be used for buffers. Known formats include
@@ -653,7 +653,7 @@ class wl_data_offer:
   ...
 
  @staticmethod
- def set_actions(dnd_actions: int, preferred_action: int) -> None:
+ def set_actions(dnd_actions: wl_data_device_manager.dnd_action, preferred_action: wl_data_device_manager.dnd_action) -> None:
   """
   Sets the actions that the destination side client supports for
   this operation. This request may trigger the emission of
@@ -708,7 +708,7 @@ class wl_data_offer:
    ...
 
   @staticmethod
-  def source_actions(source_actions: int) -> None:
+  def source_actions(source_actions: wl_data_device_manager.dnd_action) -> None:
    """
    This event indicates the actions offered by the data source. It
    will be sent immediately after creating the wl_data_offer object,
@@ -722,7 +722,7 @@ class wl_data_offer:
    ...
 
   @staticmethod
-  def action(dnd_action: int) -> None:
+  def action(dnd_action: wl_data_device_manager.dnd_action) -> None:
    """
    This event indicates the action selected by the compositor after
    matching the source/destination side actions. Only one action (or
@@ -803,7 +803,7 @@ class wl_data_source:
   ...
 
  @staticmethod
- def set_actions(dnd_actions: int) -> None:
+ def set_actions(dnd_actions: wl_data_device_manager.dnd_action) -> None:
   """
   Sets the actions that the source side client supports for this
   operation. This request may trigger wl_data_source.action and
@@ -911,7 +911,7 @@ class wl_data_source:
    ...
 
   @staticmethod
-  def action(dnd_action: int) -> None:
+  def action(dnd_action: wl_data_device_manager.dnd_action) -> None:
    """
    This event indicates the action selected by the compositor after
    matching the source/destination side actions. Only one action (or
@@ -1288,7 +1288,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def resize(seat: wl_seat, serial: int, edges: int) -> None:
+ def resize(seat: wl_seat, serial: int, edges: wl_shell_surface.resize) -> None:
   """
   Start a pointer-driven resizing of the surface.
 
@@ -1315,7 +1315,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def set_transient(parent: wl_surface, x: int, y: int, flags: int) -> None:
+ def set_transient(parent: wl_surface, x: int, y: int, flags: wl_shell_surface.transient) -> None:
   """
   Map the surface relative to an existing surface.
 
@@ -1335,7 +1335,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def set_fullscreen(method: int, framerate: int, output: wl_output) -> None:
+ def set_fullscreen(method: wl_shell_surface.fullscreen_method, framerate: int, output: wl_output) -> None:
   """
   Map the surface as a fullscreen surface.
 
@@ -1380,7 +1380,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def set_popup(seat: wl_seat, serial: int, parent: wl_surface, x: int, y: int, flags: int) -> None:
+ def set_popup(seat: wl_seat, serial: int, parent: wl_surface, x: int, y: int, flags: wl_shell_surface.transient) -> None:
   """
   Map the surface as a popup.
 
@@ -1488,7 +1488,7 @@ class wl_shell_surface:
    ...
 
   @staticmethod
-  def configure(edges: int, width: int, height: int) -> None:
+  def configure(edges: wl_shell_surface.resize, width: int, height: int) -> None:
    """
    The configure event asks the client to resize its surface.
 
@@ -2038,7 +2038,7 @@ class wl_surface:
    ...
 
   @staticmethod
-  def preferred_buffer_transform(transform: int) -> None:
+  def preferred_buffer_transform(transform: wl_output.transform) -> None:
    """
    This event indicates the preferred buffer transform for this surface.
    It is sent whenever the compositor's preference changes.
@@ -2141,7 +2141,7 @@ class wl_seat:
 
  class events:
   @staticmethod
-  def capabilities(capabilities: int) -> None:
+  def capabilities(capabilities: wl_seat.capability) -> None:
    """
    This is sent on binding to the seat global or whenever a seat gains
    or loses the pointer, keyboard or touch capabilities.
@@ -2351,7 +2351,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def button(serial: int, time: int, button: int, state: int) -> None:
+  def button(serial: int, time: int, button: int, state: wl_pointer.button_state) -> None:
    """
    Mouse button click and release notifications.
 
@@ -2378,7 +2378,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def axis(time: int, axis: int, value: float) -> None:
+  def axis(time: int, axis: wl_pointer.axis, value: float) -> None:
    """
    Scroll and other axis notifications.
 
@@ -2447,7 +2447,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def axis_source(axis_source: int) -> None:
+  def axis_source(axis_source: wl_pointer.axis_source) -> None:
    """
    Source information for scroll and other axes.
 
@@ -2482,7 +2482,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def axis_stop(time: int, axis: int) -> None:
+  def axis_stop(time: int, axis: wl_pointer.axis) -> None:
    """
    Stop notification for scroll and other axes.
 
@@ -2507,7 +2507,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def axis_discrete(axis: int, discrete: int) -> None:
+  def axis_discrete(axis: wl_pointer.axis, discrete: int) -> None:
    """
    Discrete step information for scroll and other axes.
 
@@ -2548,7 +2548,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def axis_value120(axis: int, value120: int) -> None:
+  def axis_value120(axis: wl_pointer.axis, value120: int) -> None:
    """
    Discrete high-resolution scroll information.
 
@@ -2580,7 +2580,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def axis_relative_direction(axis: int, direction: int) -> None:
+  def axis_relative_direction(axis: wl_pointer.axis, direction: wl_pointer.axis_relative_direction) -> None:
    """
    Relative directional information of the entity causing the axis
    motion.
@@ -2664,7 +2664,7 @@ class wl_keyboard:
 
  class events:
   @staticmethod
-  def keymap(format: int, fd: fd, size: int) -> None:
+  def keymap(format: wl_keyboard.keymap_format, fd: fd, size: int) -> None:
    """
    This event provides a file descriptor to the client which can be
    memory-mapped in read-only mode to provide a keyboard mapping
@@ -2728,7 +2728,7 @@ class wl_keyboard:
    ...
 
   @staticmethod
-  def key(serial: int, time: int, key: int, state: int) -> None:
+  def key(serial: int, time: int, key: int, state: wl_keyboard.key_state) -> None:
    """
    A key was pressed or released.
    The time argument is a timestamp with millisecond
@@ -3071,7 +3071,7 @@ class wl_output:
    ...
 
   @staticmethod
-  def mode(flags: int, width: int, height: int, refresh: int) -> None:
+  def mode(flags: wl_output.mode, width: int, height: int, refresh: int) -> None:
    """
    The mode event describes an available mode for the output.
 
@@ -3815,7 +3815,7 @@ class zwp_linux_buffer_params_v1:
   ...
 
  @staticmethod
- def create(width: int, height: int, format: int, flags: int) -> None:
+ def create(width: int, height: int, format: int, flags: zwp_linux_buffer_params_v1.flags) -> None:
   """
   This asks for creation of a wl_buffer from the added dmabuf
   buffers. The wl_buffer is not created immediately but returned via
@@ -3887,7 +3887,7 @@ class zwp_linux_buffer_params_v1:
   ...
 
  @staticmethod
- def create_immed(width: int, height: int, format: int, flags: int) -> wl_buffer:
+ def create_immed(width: int, height: int, format: int, flags: zwp_linux_buffer_params_v1.flags) -> wl_buffer:
   """
   This asks for immediate creation of a wl_buffer by importing the
   added dmabufs.
@@ -4151,7 +4151,7 @@ class zwp_linux_dmabuf_feedback_v1:
    ...
 
   @staticmethod
-  def tranche_flags(flags: int) -> None:
+  def tranche_flags(flags: zwp_linux_dmabuf_feedback_v1.tranche_flags) -> None:
    """
    This event sets tranche-specific flags.
 
@@ -4295,7 +4295,7 @@ class wp_presentation_feedback:
    ...
 
   @staticmethod
-  def presented(tv_sec_hi: int, tv_sec_lo: int, tv_nsec: int, refresh: int, seq_hi: int, seq_lo: int, flags: int) -> None:
+  def presented(tv_sec_hi: int, tv_sec_lo: int, tv_nsec: int, refresh: int, seq_hi: int, seq_lo: int, flags: wp_presentation_feedback.kind) -> None:
    """
    The associated content update was displayed to the user at the
    indicated time (tv_sec_hi/lo, tv_nsec). For the interpretation of
@@ -4571,7 +4571,7 @@ class zwp_tablet_tool_v2:
 
  class events:
   @staticmethod
-  def type(tool_type: int) -> None:
+  def type(tool_type: zwp_tablet_tool_v2.type) -> None:
    """
    The tool type is the high-level type of the tool and usually decides
    the interaction expected from this tool.
@@ -4633,7 +4633,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def capability(capability: int) -> None:
+  def capability(capability: zwp_tablet_tool_v2.capability) -> None:
    """
    This event notifies the client of any capabilities of this tool,
    beyond the main set of x/y axes and tip up/down detection.
@@ -4870,7 +4870,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def button(serial: int, button: int, state: int) -> None:
+  def button(serial: int, button: int, state: zwp_tablet_tool_v2.button_state) -> None:
    """
    Sent whenever a button on the tool is pressed or released.
 
@@ -5018,7 +5018,7 @@ class zwp_tablet_v2:
    ...
 
   @staticmethod
-  def bustype(bustype: int) -> None:
+  def bustype(bustype: zwp_tablet_v2.bustype) -> None:
    """
    The bustype argument is one of the BUS_ defines in the Linux kernel's
    linux/input.h
@@ -5090,7 +5090,7 @@ class zwp_tablet_pad_ring_v2:
 
  class events:
   @staticmethod
-  def source(source: int) -> None:
+  def source(source: zwp_tablet_pad_ring_v2.source) -> None:
    """
    Source information for ring events.
 
@@ -5220,7 +5220,7 @@ class zwp_tablet_pad_strip_v2:
 
  class events:
   @staticmethod
-  def source(source: int) -> None:
+  def source(source: zwp_tablet_pad_strip_v2.source) -> None:
    """
    Source information for strip events.
 
@@ -5602,7 +5602,7 @@ class zwp_tablet_pad_v2:
    ...
 
   @staticmethod
-  def button(time: int, button: int, state: int) -> None:
+  def button(time: int, button: int, state: zwp_tablet_pad_v2.button_state) -> None:
    """
    Sent whenever the physical state of a button changes.
 
@@ -6123,7 +6123,7 @@ class xdg_positioner:
   ...
 
  @staticmethod
- def set_anchor(anchor: int) -> None:
+ def set_anchor(anchor: xdg_positioner.anchor) -> None:
   """
   Defines the anchor point for the anchor rectangle. The specified anchor
   is used derive an anchor point that the child surface will be
@@ -6139,7 +6139,7 @@ class xdg_positioner:
   ...
 
  @staticmethod
- def set_gravity(gravity: int) -> None:
+ def set_gravity(gravity: xdg_positioner.gravity) -> None:
   """
   Defines in what direction a surface should be positioned, relative to
   the anchor point of the parent surface. If a corner gravity is
@@ -6156,7 +6156,7 @@ class xdg_positioner:
   ...
 
  @staticmethod
- def set_constraint_adjustment(constraint_adjustment: int) -> None:
+ def set_constraint_adjustment(constraint_adjustment: xdg_positioner.constraint_adjustment) -> None:
   """
   Specify how the window should be positioned if the originally intended
   position caused the surface to be constrained, meaning at least
@@ -6665,7 +6665,7 @@ class xdg_toplevel:
   ...
 
  @staticmethod
- def resize(seat: wl_seat, serial: int, edges: int) -> None:
+ def resize(seat: wl_seat, serial: int, edges: xdg_toplevel.resize_edge) -> None:
   """
   Start a user-driven, interactive resize of the surface.
 
@@ -7492,7 +7492,7 @@ class wp_color_manager_v1:
 
  class events:
   @staticmethod
-  def supported_intent(render_intent: int) -> None:
+  def supported_intent(render_intent: wp_color_manager_v1.render_intent) -> None:
    """
    When this object is created, it shall immediately send this event once
    for each rendering intent the compositor supports.
@@ -7504,7 +7504,7 @@ class wp_color_manager_v1:
    ...
 
   @staticmethod
-  def supported_feature(feature: int) -> None:
+  def supported_feature(feature: wp_color_manager_v1.feature) -> None:
    """
    When this object is created, it shall immediately send this event once
    for each compositor supported feature listed in the enumeration.
@@ -7516,7 +7516,7 @@ class wp_color_manager_v1:
    ...
 
   @staticmethod
-  def supported_tf_named(tf: int) -> None:
+  def supported_tf_named(tf: wp_color_manager_v1.transfer_function) -> None:
    """
    When this object is created, it shall immediately send this event once
    for each named transfer function the compositor supports with the
@@ -7529,7 +7529,7 @@ class wp_color_manager_v1:
    ...
 
   @staticmethod
-  def supported_primaries_named(primaries: int) -> None:
+  def supported_primaries_named(primaries: wp_color_manager_v1.primaries) -> None:
    """
    When this object is created, it shall immediately send this event once
    for each named set of primaries the compositor supports with the
@@ -7656,7 +7656,7 @@ class wp_color_management_surface_v1:
   ...
 
  @staticmethod
- def set_image_description(image_description: wp_image_description_v1, render_intent: int) -> None:
+ def set_image_description(image_description: wp_image_description_v1, render_intent: wp_color_manager_v1.render_intent) -> None:
   """
   If this protocol object is inert, the protocol error inert is raised.
 
@@ -8016,7 +8016,7 @@ class wp_image_description_creator_params_v1:
   ...
 
  @staticmethod
- def set_tf_named(tf: int) -> None:
+ def set_tf_named(tf: wp_color_manager_v1.transfer_function) -> None:
   """
   Sets the transfer characteristic using explicitly enumerated named
   functions.
@@ -8069,7 +8069,7 @@ class wp_image_description_creator_params_v1:
   ...
 
  @staticmethod
- def set_primaries_named(primaries: int) -> None:
+ def set_primaries_named(primaries: wp_color_manager_v1.primaries) -> None:
   """
   Sets the color primaries and white point using explicitly named sets.
   This describes the primary color volume which is the basis for color
@@ -8381,7 +8381,7 @@ class wp_image_description_v1:
 
  class events:
   @staticmethod
-  def failed(cause: int, msg: str) -> None:
+  def failed(cause: wp_image_description_v1.cause, msg: str) -> None:
    """
    If creating a wp_image_description_v1 object fails for a reason that is
    not defined as a protocol error, this event is sent.
@@ -8519,7 +8519,7 @@ class wp_image_description_info_v1:
    ...
 
   @staticmethod
-  def primaries_named(primaries: int) -> None:
+  def primaries_named(primaries: wp_color_manager_v1.primaries) -> None:
    """
    Delivers the primary color volume primaries and white point using an
    explicitly enumerated named set.
@@ -8548,7 +8548,7 @@ class wp_image_description_info_v1:
    ...
 
   @staticmethod
-  def tf_named(tf: int) -> None:
+  def tf_named(tf: wp_color_manager_v1.transfer_function) -> None:
    """
    Delivers the transfer characteristic using an explicitly enumerated
    named function.
@@ -8703,7 +8703,7 @@ class wp_color_representation_manager_v1:
 
  class events:
   @staticmethod
-  def supported_alpha_mode(alpha_mode: int) -> None:
+  def supported_alpha_mode(alpha_mode: wp_color_representation_surface_v1.alpha_mode) -> None:
    """
    When this object is created, it shall immediately send this event once
    for each alpha mode the compositor supports.
@@ -8718,7 +8718,7 @@ class wp_color_representation_manager_v1:
    ...
 
   @staticmethod
-  def supported_coefficients_and_ranges(coefficients: int, range: int) -> None:
+  def supported_coefficients_and_ranges(coefficients: wp_color_representation_surface_v1.coefficients, range: wp_color_representation_surface_v1.range) -> None:
    """
    When this object is created, it shall immediately send this event once
    for each matrix coefficient and color range combination the compositor
@@ -8812,7 +8812,7 @@ class wp_color_representation_surface_v1:
   ...
 
  @staticmethod
- def set_alpha_mode(alpha_mode: int) -> None:
+ def set_alpha_mode(alpha_mode: wp_color_representation_surface_v1.alpha_mode) -> None:
   """
   If this protocol object is inert, the protocol error inert is raised.
 
@@ -8833,7 +8833,7 @@ class wp_color_representation_surface_v1:
   ...
 
  @staticmethod
- def set_coefficients_and_range(coefficients: int, range: int) -> None:
+ def set_coefficients_and_range(coefficients: wp_color_representation_surface_v1.coefficients, range: wp_color_representation_surface_v1.range) -> None:
   """
   If this protocol object is inert, the protocol error inert is raised.
 
@@ -8870,7 +8870,7 @@ class wp_color_representation_surface_v1:
   ...
 
  @staticmethod
- def set_chroma_location(chroma_location: int) -> None:
+ def set_chroma_location(chroma_location: wp_color_representation_surface_v1.chroma_location) -> None:
   """
   If this protocol object is inert, the protocol error inert is raised.
 
@@ -9069,7 +9069,7 @@ class wp_content_type_v1:
   ...
 
  @staticmethod
- def set_content_type(content_type: int) -> None:
+ def set_content_type(content_type: wp_content_type_v1.type) -> None:
   """
   Set the surface content type. This informs the compositor that the
   client believes it is displaying buffers matching this content type.
@@ -9198,7 +9198,7 @@ class wp_cursor_shape_device_v1:
   ...
 
  @staticmethod
- def set_shape(serial: int, shape: int) -> None:
+ def set_shape(serial: int, shape: wp_cursor_shape_device_v1.shape) -> None:
   """
   Sets the device cursor to the specified shape. The compositor will
   change the cursor image based on the specified shape.
@@ -9623,7 +9623,7 @@ class ext_background_effect_manager_v1:
 
  class events:
   @staticmethod
-  def capabilities(flags: int) -> None:
+  def capabilities(flags: ext_background_effect_manager_v1.capability) -> None:
    """
    Capabilities of the compositor
    """
@@ -10373,7 +10373,7 @@ class ext_image_copy_capture_manager_v1:
 
 
  @staticmethod
- def create_session(source: ext_image_capture_source_v1, options: int) -> ext_image_copy_capture_session_v1:
+ def create_session(source: ext_image_capture_source_v1, options: ext_image_copy_capture_manager_v1.options) -> ext_image_copy_capture_session_v1:
   """
   Create a capturing session for an image capture source.
 
@@ -10481,7 +10481,7 @@ class ext_image_copy_capture_session_v1:
    ...
 
   @staticmethod
-  def shm_format(format: int) -> None:
+  def shm_format(format: wl_shm.format) -> None:
    """
    Provides the format that must be used for shared-memory buffers.
 
@@ -10659,7 +10659,7 @@ class ext_image_copy_capture_frame_v1:
 
  class events:
   @staticmethod
-  def transform(transform: int) -> None:
+  def transform(transform: wl_output.transform) -> None:
    """
    This event is sent before the ready event and holds the transform that
    the compositor has applied to the buffer contents.
@@ -10723,7 +10723,7 @@ class ext_image_copy_capture_frame_v1:
    ...
 
   @staticmethod
-  def failed(reason: int) -> None:
+  def failed(reason: ext_image_copy_capture_frame_v1.failure_reason) -> None:
    """
    This event indicates that the attempted frame copy has failed.
 
@@ -11376,7 +11376,7 @@ class ext_workspace_group_handle_v1:
 
  class events:
   @staticmethod
-  def capabilities(capabilities: int) -> None:
+  def capabilities(capabilities: ext_workspace_group_handle_v1.group_capabilities) -> None:
    """
    This event advertises the capabilities supported by the compositor. If
    a capability isn't supported, clients should hide or disable the UI
@@ -11599,7 +11599,7 @@ class ext_workspace_handle_v1:
    ...
 
   @staticmethod
-  def state(state: int) -> None:
+  def state(state: ext_workspace_handle_v1.state) -> None:
    """
    This event is emitted immediately after the ext_workspace_handle_v1 is
    created and each time the workspace state changes, either because of a
@@ -11612,7 +11612,7 @@ class ext_workspace_handle_v1:
    ...
 
   @staticmethod
-  def capabilities(capabilities: int) -> None:
+  def capabilities(capabilities: ext_workspace_handle_v1.workspace_capabilities) -> None:
    """
    This event advertises the capabilities supported by the compositor. If
    a capability isn't supported, clients should hide or disable the UI
@@ -12352,7 +12352,7 @@ class wp_tearing_control_v1:
 
 
  @staticmethod
- def set_presentation_hint(hint: int) -> None:
+ def set_presentation_hint(hint: wp_tearing_control_v1.presentation_hint) -> None:
   """
   Set the presentation hint for the associated wl_surface. This state is
   double-buffered, see wl_surface.commit.
@@ -13223,7 +13223,7 @@ class zwp_fullscreen_shell_v1:
   ...
 
  @staticmethod
- def present_surface(surface: wl_surface, method: int, output: wl_output) -> None:
+ def present_surface(surface: wl_surface, method: zwp_fullscreen_shell_v1.present_method, output: wl_output) -> None:
   """
   Present a surface on the given output.
 
@@ -13303,7 +13303,7 @@ class zwp_fullscreen_shell_v1:
 
  class events:
   @staticmethod
-  def capability(capability: int) -> None:
+  def capability(capability: zwp_fullscreen_shell_v1.capability) -> None:
    """
    Advertises a single capability of the compositor.
 
@@ -14320,7 +14320,7 @@ class zwp_pointer_constraints_v1:
   ...
 
  @staticmethod
- def lock_pointer(surface: wl_surface, pointer: wl_pointer, region: wl_region, lifetime: int) -> zwp_locked_pointer_v1:
+ def lock_pointer(surface: wl_surface, pointer: wl_pointer, region: wl_region, lifetime: zwp_pointer_constraints_v1.lifetime) -> zwp_locked_pointer_v1:
   """
   The lock_pointer request lets the client request to disable movements of
   the virtual pointer (i.e. the cursor), effectively locking the pointer
@@ -14370,7 +14370,7 @@ class zwp_pointer_constraints_v1:
   ...
 
  @staticmethod
- def confine_pointer(surface: wl_surface, pointer: wl_pointer, region: wl_region, lifetime: int) -> zwp_confined_pointer_v1:
+ def confine_pointer(surface: wl_surface, pointer: wl_pointer, region: wl_region, lifetime: zwp_pointer_constraints_v1.lifetime) -> zwp_confined_pointer_v1:
   """
   The confine_pointer request lets the client request to confine the
   pointer cursor to a given region. This request may not take effect
@@ -15359,7 +15359,7 @@ class zwp_tablet_tool_v1:
 
  class events:
   @staticmethod
-  def type(tool_type: int) -> None:
+  def type(tool_type: zwp_tablet_tool_v1.type) -> None:
    """
    The tool type is the high-level type of the tool and usually decides
    the interaction expected from this tool.
@@ -15421,7 +15421,7 @@ class zwp_tablet_tool_v1:
    ...
 
   @staticmethod
-  def capability(capability: int) -> None:
+  def capability(capability: zwp_tablet_tool_v1.capability) -> None:
    """
    This event notifies the client of any capabilities of this tool,
    beyond the main set of x/y axes and tip up/down detection.
@@ -15658,7 +15658,7 @@ class zwp_tablet_tool_v1:
    ...
 
   @staticmethod
-  def button(serial: int, button: int, state: int) -> None:
+  def button(serial: int, button: int, state: zwp_tablet_tool_v1.button_state) -> None:
    """
    Sent whenever a button on the tool is pressed or released.
 
@@ -15931,7 +15931,7 @@ class zwp_text_input_v1:
   ...
 
  @staticmethod
- def set_content_type(hint: int, purpose: int) -> None:
+ def set_content_type(hint: zwp_text_input_v1.content_hint, purpose: zwp_text_input_v1.content_purpose) -> None:
   """
   Sets the content purpose and content hint. While the purpose is the
   basic purpose of an input field, the hint flags allow to modify some
@@ -16042,7 +16042,7 @@ class zwp_text_input_v1:
    ...
 
   @staticmethod
-  def preedit_styling(index: int, length: int, style: int) -> None:
+  def preedit_styling(index: int, length: int, style: zwp_text_input_v1.preedit_style) -> None:
    """
    Sets styling information on composing text. The style is applied for
    length bytes from index relative to the beginning of the composing
@@ -16139,7 +16139,7 @@ class zwp_text_input_v1:
    ...
 
   @staticmethod
-  def text_direction(serial: int, direction: int) -> None:
+  def text_direction(serial: int, direction: zwp_text_input_v1.text_direction) -> None:
    """
    Sets the text direction of input text.
 
@@ -16336,7 +16336,7 @@ class zwp_text_input_v3:
   ...
 
  @staticmethod
- def set_text_change_cause(cause: int) -> None:
+ def set_text_change_cause(cause: zwp_text_input_v3.change_cause) -> None:
   """
   Tells the compositor why the text surrounding the cursor changed.
 
@@ -16357,7 +16357,7 @@ class zwp_text_input_v3:
   ...
 
  @staticmethod
- def set_content_type(hint: int, purpose: int) -> None:
+ def set_content_type(hint: zwp_text_input_v3.content_hint, purpose: zwp_text_input_v3.content_purpose) -> None:
   """
   Sets the content purpose and content hint. While the purpose is the
   basic purpose of an input field, the hint flags allow to modify some of
@@ -16677,7 +16677,7 @@ class zxdg_toplevel_decoration_v1:
   ...
 
  @staticmethod
- def set_mode(mode: int) -> None:
+ def set_mode(mode: zxdg_toplevel_decoration_v1.mode) -> None:
   """
   Set the toplevel surface decoration mode. This informs the compositor
   that the client prefers the provided decoration mode.
@@ -16720,7 +16720,7 @@ class zxdg_toplevel_decoration_v1:
 
  class events:
   @staticmethod
-  def configure(mode: int) -> None:
+  def configure(mode: zxdg_toplevel_decoration_v1.mode) -> None:
    """
    The configure event configures the effective decoration mode. The
    configured state should not be applied immediately. Clients must send an
@@ -17573,7 +17573,7 @@ class zxdg_positioner_v6:
   ...
 
  @staticmethod
- def set_anchor(anchor: int) -> None:
+ def set_anchor(anchor: zxdg_positioner_v6.anchor) -> None:
   """
   Defines a set of edges for the anchor rectangle. These are used to
   derive an anchor point that the child surface will be positioned
@@ -17593,7 +17593,7 @@ class zxdg_positioner_v6:
   ...
 
  @staticmethod
- def set_gravity(gravity: int) -> None:
+ def set_gravity(gravity: zxdg_positioner_v6.gravity) -> None:
   """
   Defines in what direction a surface should be positioned, relative to
   the anchor point of the parent surface. If two orthogonal gravities are
@@ -18999,7 +18999,7 @@ class hyprland_toplevel_export_frame_v1:
 
  class events:
   @staticmethod
-  def buffer(format: int, width: int, height: int, stride: int) -> None:
+  def buffer(format: wl_shm.format, width: int, height: int, stride: int) -> None:
    """
    Provides information about wl_shm buffer parameters that need to be
    used for this frame. This event is sent once after the frame is created
@@ -19038,7 +19038,7 @@ class hyprland_toplevel_export_frame_v1:
    ...
 
   @staticmethod
-  def flags(flags: int) -> None:
+  def flags(flags: hyprland_toplevel_export_frame_v1.flags) -> None:
    """
    Provides flags about the frame. This event is sent once before the
    "ready" event.
@@ -19546,7 +19546,7 @@ class zwlr_export_dmabuf_frame_v1:
 
  class events:
   @staticmethod
-  def frame(width: int, height: int, offset_x: int, offset_y: int, buffer_flags: int, flags: int, format: int, mod_high: int, mod_low: int, num_objects: int) -> None:
+  def frame(width: int, height: int, offset_x: int, offset_y: int, buffer_flags: int, flags: zwlr_export_dmabuf_frame_v1.flags, format: int, mod_high: int, mod_low: int, num_objects: int) -> None:
    """
    Main event supplying the client with information about the frame. If the
    capture didn't fail, this event is always emitted first before any other
@@ -19615,7 +19615,7 @@ class zwlr_export_dmabuf_frame_v1:
    ...
 
   @staticmethod
-  def cancel(reason: int) -> None:
+  def cancel(reason: zwlr_export_dmabuf_frame_v1.cancel_reason) -> None:
    """
    If the capture failed or if the frame is no longer valid after the
    "frame" event has been emitted, this event will be used to inform the
@@ -20082,7 +20082,7 @@ class zwlr_layer_shell_v1:
 
 
  @staticmethod
- def get_layer_surface(surface: wl_surface, output: wl_output, layer: int, namespace: str) -> zwlr_layer_surface_v1:
+ def get_layer_surface(surface: wl_surface, output: wl_output, layer: zwlr_layer_shell_v1.layer, namespace: str) -> zwlr_layer_surface_v1:
   """
   Create a layer surface for an existing surface. This assigns the role of
   layer_surface, or raises a protocol error if another role is already
@@ -20186,7 +20186,7 @@ class zwlr_layer_surface_v1:
   ...
 
  @staticmethod
- def set_anchor(anchor: int) -> None:
+ def set_anchor(anchor: zwlr_layer_surface_v1.anchor) -> None:
   """
   Requests that the compositor anchor the surface to the specified edges
   and corners. If two orthogonal edges are specified (e.g. 'top' and
@@ -20253,7 +20253,7 @@ class zwlr_layer_surface_v1:
   ...
 
  @staticmethod
- def set_keyboard_interactivity(keyboard_interactivity: int) -> None:
+ def set_keyboard_interactivity(keyboard_interactivity: zwlr_layer_surface_v1.keyboard_interactivity) -> None:
   """
   Set how keyboard events are delivered to this surface. By default,
   layer shell surfaces do not receive keyboard events; this request can
@@ -20319,7 +20319,7 @@ class zwlr_layer_surface_v1:
   ...
 
  @staticmethod
- def set_layer(layer: int) -> None:
+ def set_layer(layer: zwlr_layer_shell_v1.layer) -> None:
   """
   Change the layer that the surface is rendered on.
 
@@ -20332,7 +20332,7 @@ class zwlr_layer_surface_v1:
   ...
 
  @staticmethod
- def set_exclusive_edge(edge: int) -> None:
+ def set_exclusive_edge(edge: zwlr_layer_surface_v1.anchor) -> None:
   """
   Requests an edge for the exclusive zone to apply. The exclusive
   edge will be automatically deduced from anchor points when possible,
@@ -20745,7 +20745,7 @@ class zwlr_output_head_v1:
    ...
 
   @staticmethod
-  def adaptive_sync(state: int) -> None:
+  def adaptive_sync(state: zwlr_output_head_v1.adaptive_sync_state) -> None:
    """
    This event describes whether adaptive sync is currently enabled for
    the head or not. Adaptive sync is also known as Variable Refresh
@@ -21032,7 +21032,7 @@ class zwlr_output_configuration_head_v1:
   ...
 
  @staticmethod
- def set_adaptive_sync(state: int) -> None:
+ def set_adaptive_sync(state: zwlr_output_head_v1.adaptive_sync_state) -> None:
   """
   This request enables/disables adaptive sync. Adaptive sync is also
   known as Variable Refresh Rate or VRR.
@@ -21088,7 +21088,7 @@ class zwlr_output_power_v1:
 
 
  @staticmethod
- def set_mode(mode: int) -> None:
+ def set_mode(mode: zwlr_output_power_v1.mode) -> None:
   """
   Set an output's power save mode to the given mode. The mode change
   is effective immediately. If the output does not support the given
@@ -21110,7 +21110,7 @@ class zwlr_output_power_v1:
 
  class events:
   @staticmethod
-  def mode(mode: int) -> None:
+  def mode(mode: zwlr_output_power_v1.mode) -> None:
    """
    Report the power management mode change of an output.
 
@@ -21255,7 +21255,7 @@ class zwlr_screencopy_frame_v1:
 
  class events:
   @staticmethod
-  def buffer(format: int, width: int, height: int, stride: int) -> None:
+  def buffer(format: wl_shm.format, width: int, height: int, stride: int) -> None:
    """
    Provides information about wl_shm buffer parameters that need to be
    used for this frame. This event is sent once after the frame is created
@@ -21271,7 +21271,7 @@ class zwlr_screencopy_frame_v1:
    ...
 
   @staticmethod
-  def flags(flags: int) -> None:
+  def flags(flags: zwlr_screencopy_frame_v1.flags) -> None:
    """
    Provides flags about the frame. This event is sent once before the
    "ready" event.
@@ -21411,7 +21411,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def button(time: int, button: int, state: int) -> None:
+ def button(time: int, button: int, state: wl_pointer.button_state) -> None:
   """
   A button was pressed or released.
 
@@ -21424,7 +21424,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def axis(time: int, axis: int, value: float) -> None:
+ def axis(time: int, axis: wl_pointer.axis, value: float) -> None:
   """
   Scroll and other axis requests.
 
@@ -21445,7 +21445,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def axis_source(axis_source: int) -> None:
+ def axis_source(axis_source: wl_pointer.axis_source) -> None:
   """
   Source information for scroll and other axis.
 
@@ -21456,7 +21456,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def axis_stop(time: int, axis: int) -> None:
+ def axis_stop(time: int, axis: wl_pointer.axis) -> None:
   """
   Stop notification for scroll and other axes.
 
@@ -21468,7 +21468,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def axis_discrete(time: int, axis: int, value: float, discrete: int) -> None:
+ def axis_discrete(time: int, axis: wl_pointer.axis, value: float, discrete: int) -> None:
   """
   Discrete step information for scroll and other axes.
 
