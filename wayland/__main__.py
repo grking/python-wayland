@@ -1,3 +1,6 @@
+# Copyright (c) 2024-2025 Graham R King
+# Licensed under the MIT License. See LICENSE file for details.
+
 from __future__ import annotations
 
 import argparse
