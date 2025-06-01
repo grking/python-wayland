@@ -1,4 +1,6 @@
+import os
 import struct
+import tempfile
 import unittest
 from unittest.mock import MagicMock, call, patch
 
@@ -14,15 +16,23 @@ class TestWaylandStateGetSocketPath(unittest.TestCase):
     @patch("os.getenv")
     def test_get_socket_path_success(self, mock_os_getenv):
         """Tests _get_socket_path with environment variables set."""
-        mock_os_getenv.side_effect = lambda key, default=None: {
-            "XDG_RUNTIME_DIR": "/run/user/1000",
-            "WAYLAND_DISPLAY": "wayland-1",
-        }.get(key, default)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with tempfile.NamedTemporaryFile(dir=temp_dir, delete=False) as temp_file:
+                temp_file_name = os.path.basename(temp_file.name)
+                temp_file_path = temp_file.name
 
-        path = WaylandState._get_socket_path()
-        assert path == "/run/user/1000/wayland-1"
-        mock_os_getenv.assert_any_call("XDG_RUNTIME_DIR")
-        mock_os_getenv.assert_any_call("WAYLAND_DISPLAY", "wayland-0")
+            assert os.path.exists(temp_file_path)
+
+            mock_os_getenv.side_effect = lambda key, default=None: {
+                "XDG_RUNTIME_DIR": temp_dir,
+                "WAYLAND_DISPLAY": temp_file_name,
+            }.get(key, default)
+
+            path = WaylandState._get_socket_path()
+            expected_path = os.path.join(temp_dir, temp_file_name)
+            assert path == expected_path
+            mock_os_getenv.assert_any_call("XDG_RUNTIME_DIR", "")
+            mock_os_getenv.assert_any_call("WAYLAND_DISPLAY", "wayland-0")
 
     @patch("os.getenv")
     def test_get_socket_path_default_display(self, mock_os_getenv):
@@ -32,8 +42,8 @@ class TestWaylandStateGetSocketPath(unittest.TestCase):
         }.get(key, default)
 
         path = WaylandState._get_socket_path()
-        assert path == "/tmp/runtime/wayland-0"
-        mock_os_getenv.assert_any_call("XDG_RUNTIME_DIR")
+        assert path == ""
+        mock_os_getenv.assert_any_call("XDG_RUNTIME_DIR", "")
         mock_os_getenv.assert_any_call("WAYLAND_DISPLAY", "wayland-0")
 
     @patch("os.getenv")
@@ -51,7 +61,7 @@ class TestWaylandStateGetSocketPath(unittest.TestCase):
 
         assert WaylandState._get_socket_path() == ""
 
-        calls = [call("XDG_RUNTIME_DIR"), call("WAYLAND_DISPLAY", "wayland-0")]
+        calls = [call("XDG_RUNTIME_DIR", ""), call("WAYLAND_DISPLAY", "wayland-0")]
         mock_os_getenv.assert_has_calls(calls, any_order=False)
 
 

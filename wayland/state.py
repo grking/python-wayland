@@ -62,10 +62,14 @@ class WaylandState:
 
     @staticmethod
     def _get_socket_path() -> str:
-        path = os.getenv("XDG_RUNTIME_DIR")
+        path = os.getenv("XDG_RUNTIME_DIR", "")
         display = os.getenv("WAYLAND_DISPLAY", "wayland-0")
-        if not path:
-            msg = "WARNING: Wayland is not active (XDG_RUNTIME_DIR environment variable not set)"
+        wayland_socket = os.path.join(str(path), str(display))
+        if not os.path.exists(wayland_socket):
+            msg = (
+                "WARNING: Wayland is not active "
+                "(XDG_RUNTIME_DIR/WAYLAND_DISPLAY = '{wayland_socket}')"
+            )
             log.warning(msg)
             return ""
         return f"{path}/{display}"
