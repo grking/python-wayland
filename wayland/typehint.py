@@ -132,6 +132,12 @@ class TypeHinter:
             arg["type"] = arg["interface"]
         elif arg["type"] == "string":
             arg["type"] = "str"
+        elif arg["type"] == "fixed":
+            arg["type"] = "float"
+        elif arg["type"] == "uint":
+            arg["type"] = "int"
+        elif arg["type"] == "array":
+            arg["type"] = "list"
         elif arg.get("enum"):
             enum_ref = arg["enum"]
             if "." in enum_ref:

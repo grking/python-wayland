@@ -65,7 +65,7 @@ class wl_display:
 
  class events:
   @staticmethod
-  def error(object_id: object, code: uint, message: str) -> None:
+  def error(object_id: object, code: int, message: str) -> None:
    """
    The error event is sent out when a fatal (non-recoverable)
    error has occurred.  The object_id argument is the object
@@ -84,7 +84,7 @@ class wl_display:
    ...
 
   @staticmethod
-  def delete_id(id: uint) -> None:
+  def delete_id(id: int) -> None:
    """
    This event is used internally by the object ID management
    logic. When a client deletes an object that it had created,
@@ -126,7 +126,7 @@ class wl_registry:
 
 
  @staticmethod
- def bind(name: uint, interface: str, version: uint, id: new_id) -> None:
+ def bind(name: int, interface: str, version: int, id: new_id) -> None:
   """
   Binds a new, client-created object to the server using the
   specified name as the identifier.
@@ -140,7 +140,7 @@ class wl_registry:
 
  class events:
   @staticmethod
-  def global_(name: uint, interface: str, version: uint) -> None:
+  def global_(name: int, interface: str, version: int) -> None:
    """
    Notify the client of global objects.
 
@@ -157,7 +157,7 @@ class wl_registry:
    ...
 
   @staticmethod
-  def global_remove(name: uint) -> None:
+  def global_remove(name: int) -> None:
    """
    Notify the client of removed global objects.
 
@@ -191,7 +191,7 @@ class wl_callback:
 
  class events:
   @staticmethod
-  def done(callback_data: uint) -> None:
+  def done(callback_data: int) -> None:
    """
    Notify the client when the related request is done.
 
@@ -248,7 +248,7 @@ class wl_shm_pool:
 
 
  @staticmethod
- def create_buffer(offset: int, width: int, height: int, stride: int, format: wl_shm.format) -> wl_buffer:
+ def create_buffer(offset: int, width: int, height: int, stride: int, format: int) -> wl_buffer:
   """
   Create a wl_buffer object from the pool.
 
@@ -486,7 +486,7 @@ class wl_shm:
 
  class events:
   @staticmethod
-  def format(format: wl_shm.format) -> None:
+  def format(format: int) -> None:
    """
    Informs the client about a valid pixel format that
    can be used for buffers. Known formats include
@@ -573,7 +573,7 @@ class wl_data_offer:
 
 
  @staticmethod
- def accept(serial: uint, mime_type: str) -> None:
+ def accept(serial: int, mime_type: str) -> None:
   """
   Indicate that the client can accept the given mime type, or
   NULL for not accepted.
@@ -653,7 +653,7 @@ class wl_data_offer:
   ...
 
  @staticmethod
- def set_actions(dnd_actions: wl_data_device_manager.dnd_action, preferred_action: wl_data_device_manager.dnd_action) -> None:
+ def set_actions(dnd_actions: int, preferred_action: int) -> None:
   """
   Sets the actions that the destination side client supports for
   this operation. This request may trigger the emission of
@@ -708,7 +708,7 @@ class wl_data_offer:
    ...
 
   @staticmethod
-  def source_actions(source_actions: wl_data_device_manager.dnd_action) -> None:
+  def source_actions(source_actions: int) -> None:
    """
    This event indicates the actions offered by the data source. It
    will be sent immediately after creating the wl_data_offer object,
@@ -722,7 +722,7 @@ class wl_data_offer:
    ...
 
   @staticmethod
-  def action(dnd_action: wl_data_device_manager.dnd_action) -> None:
+  def action(dnd_action: int) -> None:
    """
    This event indicates the action selected by the compositor after
    matching the source/destination side actions. Only one action (or
@@ -803,7 +803,7 @@ class wl_data_source:
   ...
 
  @staticmethod
- def set_actions(dnd_actions: wl_data_device_manager.dnd_action) -> None:
+ def set_actions(dnd_actions: int) -> None:
   """
   Sets the actions that the source side client supports for this
   operation. This request may trigger wl_data_source.action and
@@ -911,7 +911,7 @@ class wl_data_source:
    ...
 
   @staticmethod
-  def action(dnd_action: wl_data_device_manager.dnd_action) -> None:
+  def action(dnd_action: int) -> None:
    """
    This event indicates the action selected by the compositor after
    matching the source/destination side actions. Only one action (or
@@ -962,7 +962,7 @@ class wl_data_device:
 
 
  @staticmethod
- def start_drag(source: wl_data_source, origin: wl_surface, icon: wl_surface, serial: uint) -> None:
+ def start_drag(source: wl_data_source, origin: wl_surface, icon: wl_surface, serial: int) -> None:
   """
   This request asks the compositor to start a drag-and-drop
   operation on behalf of the client.
@@ -1004,7 +1004,7 @@ class wl_data_device:
   ...
 
  @staticmethod
- def set_selection(source: wl_data_source, serial: uint) -> None:
+ def set_selection(source: wl_data_source, serial: int) -> None:
   """
   This request asks the compositor to set the selection
   to the data from the source on behalf of the client.
@@ -1049,7 +1049,7 @@ class wl_data_device:
    ...
 
   @staticmethod
-  def enter(serial: uint, surface: wl_surface, x: fixed, y: fixed, id: wl_data_offer) -> None:
+  def enter(serial: int, surface: wl_surface, x: float, y: float, id: wl_data_offer) -> None:
    """
    This event is sent when an active drag-and-drop pointer enters
    a surface owned by the client.  The position of the pointer at
@@ -1077,7 +1077,7 @@ class wl_data_device:
    ...
 
   @staticmethod
-  def motion(time: uint, x: fixed, y: fixed) -> None:
+  def motion(time: int, x: float, y: float) -> None:
    """
    This event is sent when the drag-and-drop pointer moves within
    the currently focused surface. The new position of the pointer
@@ -1260,7 +1260,7 @@ class wl_shell_surface:
 
 
  @staticmethod
- def pong(serial: uint) -> None:
+ def pong(serial: int) -> None:
   """
   A client must respond to a ping event with a pong request or
   the client may be deemed unresponsive.
@@ -1272,7 +1272,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def move(seat: wl_seat, serial: uint) -> None:
+ def move(seat: wl_seat, serial: int) -> None:
   """
   Start a pointer-driven move of the surface.
 
@@ -1288,7 +1288,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def resize(seat: wl_seat, serial: uint, edges: wl_shell_surface.resize) -> None:
+ def resize(seat: wl_seat, serial: int, edges: int) -> None:
   """
   Start a pointer-driven resizing of the surface.
 
@@ -1315,7 +1315,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def set_transient(parent: wl_surface, x: int, y: int, flags: wl_shell_surface.transient) -> None:
+ def set_transient(parent: wl_surface, x: int, y: int, flags: int) -> None:
   """
   Map the surface relative to an existing surface.
 
@@ -1335,7 +1335,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def set_fullscreen(method: wl_shell_surface.fullscreen_method, framerate: uint, output: wl_output) -> None:
+ def set_fullscreen(method: int, framerate: int, output: wl_output) -> None:
   """
   Map the surface as a fullscreen surface.
 
@@ -1380,7 +1380,7 @@ class wl_shell_surface:
   ...
 
  @staticmethod
- def set_popup(seat: wl_seat, serial: uint, parent: wl_surface, x: int, y: int, flags: wl_shell_surface.transient) -> None:
+ def set_popup(seat: wl_seat, serial: int, parent: wl_surface, x: int, y: int, flags: int) -> None:
   """
   Map the surface as a popup.
 
@@ -1476,7 +1476,7 @@ class wl_shell_surface:
 
  class events:
   @staticmethod
-  def ping(serial: uint) -> None:
+  def ping(serial: int) -> None:
    """
    Ping a client to check if it is receiving events and sending
    requests. A client is expected to reply with a pong request.
@@ -1488,7 +1488,7 @@ class wl_shell_surface:
    ...
 
   @staticmethod
-  def configure(edges: wl_shell_surface.resize, width: int, height: int) -> None:
+  def configure(edges: int, width: int, height: int) -> None:
    """
    The configure event asks the client to resize its surface.
 
@@ -2038,7 +2038,7 @@ class wl_surface:
    ...
 
   @staticmethod
-  def preferred_buffer_transform(transform: wl_output.transform) -> None:
+  def preferred_buffer_transform(transform: int) -> None:
    """
    This event indicates the preferred buffer transform for this surface.
    It is sent whenever the compositor's preference changes.
@@ -2141,7 +2141,7 @@ class wl_seat:
 
  class events:
   @staticmethod
-  def capabilities(capabilities: wl_seat.capability) -> None:
+  def capabilities(capabilities: int) -> None:
    """
    This is sent on binding to the seat global or whenever a seat gains
    or loses the pointer, keyboard or touch capabilities.
@@ -2242,7 +2242,7 @@ class wl_pointer:
 
 
  @staticmethod
- def set_cursor(serial: uint, surface: wl_surface, hotspot_x: int, hotspot_y: int) -> None:
+ def set_cursor(serial: int, surface: wl_surface, hotspot_x: int, hotspot_y: int) -> None:
   """
   Set the pointer surface, i.e., the surface that contains the
   pointer image (cursor). This request gives the surface the role
@@ -2301,7 +2301,7 @@ class wl_pointer:
 
  class events:
   @staticmethod
-  def enter(serial: uint, surface: wl_surface, surface_x: fixed, surface_y: fixed) -> None:
+  def enter(serial: int, surface: wl_surface, surface_x: float, surface_y: float) -> None:
    """
    Notification that this seat's pointer is focused on a certain
    surface.
@@ -2320,7 +2320,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def leave(serial: uint, surface: wl_surface) -> None:
+  def leave(serial: int, surface: wl_surface) -> None:
    """
    Notification that this seat's pointer is no longer focused on
    a certain surface.
@@ -2336,7 +2336,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def motion(time: uint, surface_x: fixed, surface_y: fixed) -> None:
+  def motion(time: int, surface_x: float, surface_y: float) -> None:
    """
    Notification of pointer location change. The arguments
    surface_x and surface_y are the location relative to the
@@ -2351,7 +2351,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def button(serial: uint, time: uint, button: uint, state: wl_pointer.button_state) -> None:
+  def button(serial: int, time: int, button: int, state: int) -> None:
    """
    Mouse button click and release notifications.
 
@@ -2378,7 +2378,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def axis(time: uint, axis: wl_pointer.axis, value: fixed) -> None:
+  def axis(time: int, axis: int, value: float) -> None:
    """
    Scroll and other axis notifications.
 
@@ -2447,7 +2447,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def axis_source(axis_source: wl_pointer.axis_source) -> None:
+  def axis_source(axis_source: int) -> None:
    """
    Source information for scroll and other axes.
 
@@ -2482,7 +2482,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def axis_stop(time: uint, axis: wl_pointer.axis) -> None:
+  def axis_stop(time: int, axis: int) -> None:
    """
    Stop notification for scroll and other axes.
 
@@ -2507,7 +2507,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def axis_discrete(axis: wl_pointer.axis, discrete: int) -> None:
+  def axis_discrete(axis: int, discrete: int) -> None:
    """
    Discrete step information for scroll and other axes.
 
@@ -2548,7 +2548,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def axis_value120(axis: wl_pointer.axis, value120: int) -> None:
+  def axis_value120(axis: int, value120: int) -> None:
    """
    Discrete high-resolution scroll information.
 
@@ -2580,7 +2580,7 @@ class wl_pointer:
    ...
 
   @staticmethod
-  def axis_relative_direction(axis: wl_pointer.axis, direction: wl_pointer.axis_relative_direction) -> None:
+  def axis_relative_direction(axis: int, direction: int) -> None:
    """
    Relative directional information of the entity causing the axis
    motion.
@@ -2664,7 +2664,7 @@ class wl_keyboard:
 
  class events:
   @staticmethod
-  def keymap(format: wl_keyboard.keymap_format, fd: fd, size: uint) -> None:
+  def keymap(format: int, fd: fd, size: int) -> None:
    """
    This event provides a file descriptor to the client which can be
    memory-mapped in read-only mode to provide a keyboard mapping
@@ -2682,7 +2682,7 @@ class wl_keyboard:
    ...
 
   @staticmethod
-  def enter(serial: uint, surface: wl_surface, keys: array) -> None:
+  def enter(serial: int, surface: wl_surface, keys: list) -> None:
    """
    Notification that this seat's keyboard focus is on a certain
    surface.
@@ -2707,7 +2707,7 @@ class wl_keyboard:
    ...
 
   @staticmethod
-  def leave(serial: uint, surface: wl_surface) -> None:
+  def leave(serial: int, surface: wl_surface) -> None:
    """
    Notification that this seat's keyboard focus is no longer on
    a certain surface.
@@ -2728,7 +2728,7 @@ class wl_keyboard:
    ...
 
   @staticmethod
-  def key(serial: uint, time: uint, key: uint, state: wl_keyboard.key_state) -> None:
+  def key(serial: int, time: int, key: int, state: int) -> None:
    """
    A key was pressed or released.
    The time argument is a timestamp with millisecond
@@ -2764,7 +2764,7 @@ class wl_keyboard:
    ...
 
   @staticmethod
-  def modifiers(serial: uint, mods_depressed: uint, mods_latched: uint, mods_locked: uint, group: uint) -> None:
+  def modifiers(serial: int, mods_depressed: int, mods_latched: int, mods_locked: int, group: int) -> None:
    """
    Notifies clients that the modifier and/or group state has
    changed, and it should update its local state.
@@ -2838,7 +2838,7 @@ class wl_touch:
 
  class events:
   @staticmethod
-  def down(serial: uint, time: uint, surface: wl_surface, id: int, x: fixed, y: fixed) -> None:
+  def down(serial: int, time: int, surface: wl_surface, id: int, x: float, y: float) -> None:
    """
    A new touch point has appeared on the surface. This touch point is
    assigned a unique ID. Future events from this touch point reference
@@ -2857,7 +2857,7 @@ class wl_touch:
    ...
 
   @staticmethod
-  def up(serial: uint, time: uint, id: int) -> None:
+  def up(serial: int, time: int, id: int) -> None:
    """
    The touch point has disappeared. No further events will be sent for
    this touch point and the touch point's ID is released and may be
@@ -2872,7 +2872,7 @@ class wl_touch:
    ...
 
   @staticmethod
-  def motion(time: uint, id: int, x: fixed, y: fixed) -> None:
+  def motion(time: int, id: int, x: float, y: float) -> None:
    """
    A touch point has changed coordinates.
 
@@ -2916,7 +2916,7 @@ class wl_touch:
    ...
 
   @staticmethod
-  def shape(id: int, major: fixed, minor: fixed) -> None:
+  def shape(id: int, major: float, minor: float) -> None:
    """
    Sent when a touchpoint has changed its shape.
 
@@ -2953,7 +2953,7 @@ class wl_touch:
    ...
 
   @staticmethod
-  def orientation(id: int, orientation: fixed) -> None:
+  def orientation(id: int, orientation: float) -> None:
    """
    Sent when a touchpoint has changed its orientation.
 
@@ -3071,7 +3071,7 @@ class wl_output:
    ...
 
   @staticmethod
-  def mode(flags: wl_output.mode, width: int, height: int, refresh: int) -> None:
+  def mode(flags: int, width: int, height: int, refresh: int) -> None:
    """
    The mode event describes an available mode for the output.
 
@@ -3677,7 +3677,7 @@ class zwp_linux_dmabuf_v1:
 
  class events:
   @staticmethod
-  def format(format: uint) -> None:
+  def format(format: int) -> None:
    """
    This event advertises one buffer format that the server supports.
    All the supported formats are advertised once when the client
@@ -3698,7 +3698,7 @@ class zwp_linux_dmabuf_v1:
    ...
 
   @staticmethod
-  def modifier(format: uint, modifier_hi: uint, modifier_lo: uint) -> None:
+  def modifier(format: int, modifier_hi: int, modifier_lo: int) -> None:
    """
    This event advertises the formats that the server supports, along with
    the modifiers supported for each format. All the supported modifiers
@@ -3781,7 +3781,7 @@ class zwp_linux_buffer_params_v1:
   ...
 
  @staticmethod
- def add(fd: fd, plane_idx: uint, offset: uint, stride: uint, modifier_hi: uint, modifier_lo: uint) -> None:
+ def add(fd: fd, plane_idx: int, offset: int, stride: int, modifier_hi: int, modifier_lo: int) -> None:
   """
   This request adds one dmabuf to the set in this
   zwp_linux_buffer_params_v1.
@@ -3815,7 +3815,7 @@ class zwp_linux_buffer_params_v1:
   ...
 
  @staticmethod
- def create(width: int, height: int, format: uint, flags: zwp_linux_buffer_params_v1.flags) -> None:
+ def create(width: int, height: int, format: int, flags: int) -> None:
   """
   This asks for creation of a wl_buffer from the added dmabuf
   buffers. The wl_buffer is not created immediately but returned via
@@ -3887,7 +3887,7 @@ class zwp_linux_buffer_params_v1:
   ...
 
  @staticmethod
- def create_immed(width: int, height: int, format: uint, flags: zwp_linux_buffer_params_v1.flags) -> wl_buffer:
+ def create_immed(width: int, height: int, format: int, flags: int) -> wl_buffer:
   """
   This asks for immediate creation of a wl_buffer by importing the
   added dmabufs.
@@ -4012,7 +4012,7 @@ class zwp_linux_dmabuf_feedback_v1:
    ...
 
   @staticmethod
-  def format_table(fd: fd, size: uint) -> None:
+  def format_table(fd: fd, size: int) -> None:
    """
    This event provides a file descriptor which can be memory-mapped to
    access the format and modifier table.
@@ -4037,7 +4037,7 @@ class zwp_linux_dmabuf_feedback_v1:
    ...
 
   @staticmethod
-  def main_device(device: array) -> None:
+  def main_device(device: list) -> None:
    """
    This event advertises the main device that the server prefers to use
    when direct scan-out to the target device isn't possible. The
@@ -4081,7 +4081,7 @@ class zwp_linux_dmabuf_feedback_v1:
    ...
 
   @staticmethod
-  def tranche_target_device(device: array) -> None:
+  def tranche_target_device(device: list) -> None:
    """
    This event advertises the target device that the server prefers to use
    for a buffer created given this tranche. The advertised target device
@@ -4117,7 +4117,7 @@ class zwp_linux_dmabuf_feedback_v1:
    ...
 
   @staticmethod
-  def tranche_formats(indices: array) -> None:
+  def tranche_formats(indices: list) -> None:
    """
    This event advertises the format + modifier combinations that the
    compositor supports.
@@ -4151,7 +4151,7 @@ class zwp_linux_dmabuf_feedback_v1:
    ...
 
   @staticmethod
-  def tranche_flags(flags: zwp_linux_dmabuf_feedback_v1.tranche_flags) -> None:
+  def tranche_flags(flags: int) -> None:
    """
    This event sets tranche-specific flags.
 
@@ -4213,7 +4213,7 @@ class wp_presentation:
 
  class events:
   @staticmethod
-  def clock_id(clk_id: uint) -> None:
+  def clock_id(clk_id: int) -> None:
    """
    This event tells the client in which clock domain the
    compositor interprets the timestamps used by the presentation
@@ -4295,7 +4295,7 @@ class wp_presentation_feedback:
    ...
 
   @staticmethod
-  def presented(tv_sec_hi: uint, tv_sec_lo: uint, tv_nsec: uint, refresh: uint, seq_hi: uint, seq_lo: uint, flags: wp_presentation_feedback.kind) -> None:
+  def presented(tv_sec_hi: int, tv_sec_lo: int, tv_nsec: int, refresh: int, seq_hi: int, seq_lo: int, flags: int) -> None:
    """
    The associated content update was displayed to the user at the
    indicated time (tv_sec_hi/lo, tv_nsec). For the interpretation of
@@ -4520,7 +4520,7 @@ class zwp_tablet_tool_v2:
 
 
  @staticmethod
- def set_cursor(serial: uint, surface: wl_surface, hotspot_x: int, hotspot_y: int) -> None:
+ def set_cursor(serial: int, surface: wl_surface, hotspot_x: int, hotspot_y: int) -> None:
   """
   Sets the surface of the cursor used for this tool on the given
   tablet. This request only takes effect if the tool is in proximity
@@ -4571,7 +4571,7 @@ class zwp_tablet_tool_v2:
 
  class events:
   @staticmethod
-  def type(tool_type: zwp_tablet_tool_v2.type) -> None:
+  def type(tool_type: int) -> None:
    """
    The tool type is the high-level type of the tool and usually decides
    the interaction expected from this tool.
@@ -4586,7 +4586,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def hardware_serial(hardware_serial_hi: uint, hardware_serial_lo: uint) -> None:
+  def hardware_serial(hardware_serial_hi: int, hardware_serial_lo: int) -> None:
    """
    If the physical tool can be identified by a unique 64-bit serial
    number, this event notifies the client of this serial number.
@@ -4612,7 +4612,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def hardware_id_wacom(hardware_id_hi: uint, hardware_id_lo: uint) -> None:
+  def hardware_id_wacom(hardware_id_hi: int, hardware_id_lo: int) -> None:
    """
    This event notifies the client of a hardware id available on this tool.
 
@@ -4633,7 +4633,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def capability(capability: zwp_tablet_tool_v2.capability) -> None:
+  def capability(capability: int) -> None:
    """
    This event notifies the client of any capabilities of this tool,
    beyond the main set of x/y axes and tip up/down detection.
@@ -4681,7 +4681,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def proximity_in(serial: uint, tablet: zwp_tablet_v2, surface: wl_surface) -> None:
+  def proximity_in(serial: int, tablet: zwp_tablet_v2, surface: wl_surface) -> None:
    """
    Notification that this tool is focused on a certain surface.
 
@@ -4720,7 +4720,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def down(serial: uint) -> None:
+  def down(serial: int) -> None:
    """
    Sent whenever the tablet tool comes in contact with the surface of the
    tablet.
@@ -4762,7 +4762,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def motion(x: fixed, y: fixed) -> None:
+  def motion(x: float, y: float) -> None:
    """
    Sent whenever a tablet tool moves.
 
@@ -4774,7 +4774,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def pressure(pressure: uint) -> None:
+  def pressure(pressure: int) -> None:
    """
    Sent whenever the pressure axis on a tool changes. The value of this
    event is normalized to a value between 0 and 65535.
@@ -4789,7 +4789,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def distance(distance: uint) -> None:
+  def distance(distance: int) -> None:
    """
    Sent whenever the distance axis on a tool changes. The value of this
    event is normalized to a value between 0 and 65535.
@@ -4804,7 +4804,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def tilt(tilt_x: fixed, tilt_y: fixed) -> None:
+  def tilt(tilt_x: float, tilt_y: float) -> None:
    """
    Sent whenever one or both of the tilt axes on a tool change. Each tilt
    value is in degrees, relative to the z-axis of the tablet.
@@ -4819,7 +4819,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def rotation(degrees: fixed) -> None:
+  def rotation(degrees: float) -> None:
    """
    Sent whenever the z-rotation axis on the tool changes. The
    rotation value is in degrees clockwise from the tool's
@@ -4847,7 +4847,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def wheel(degrees: fixed, clicks: int) -> None:
+  def wheel(degrees: float, clicks: int) -> None:
    """
    Sent whenever the wheel on the tool emits an event. This event
    contains two values for the same axis change. The degrees value is
@@ -4870,7 +4870,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def button(serial: uint, button: uint, state: zwp_tablet_tool_v2.button_state) -> None:
+  def button(serial: int, button: int, state: int) -> None:
    """
    Sent whenever a button on the tool is pressed or released.
 
@@ -4887,7 +4887,7 @@ class zwp_tablet_tool_v2:
    ...
 
   @staticmethod
-  def frame(time: uint) -> None:
+  def frame(time: int) -> None:
    """
    Marks the end of a series of axis and/or button updates from the
    tablet. The Wayland protocol requires axis updates to be sent
@@ -4948,7 +4948,7 @@ class zwp_tablet_v2:
    ...
 
   @staticmethod
-  def id(vid: uint, pid: uint) -> None:
+  def id(vid: int, pid: int) -> None:
    """
    The vendor and product IDs for the tablet device.
 
@@ -5018,7 +5018,7 @@ class zwp_tablet_v2:
    ...
 
   @staticmethod
-  def bustype(bustype: zwp_tablet_v2.bustype) -> None:
+  def bustype(bustype: int) -> None:
    """
    The bustype argument is one of the BUS_ defines in the Linux kernel's
    linux/input.h
@@ -5051,7 +5051,7 @@ class zwp_tablet_pad_ring_v2:
 
 
  @staticmethod
- def set_feedback(description: str, serial: uint) -> None:
+ def set_feedback(description: str, serial: int) -> None:
   """
   Request that the compositor use the provided feedback string
   associated with this ring. This request should be issued immediately
@@ -5090,7 +5090,7 @@ class zwp_tablet_pad_ring_v2:
 
  class events:
   @staticmethod
-  def source(source: zwp_tablet_pad_ring_v2.source) -> None:
+  def source(source: int) -> None:
    """
    Source information for ring events.
 
@@ -5112,7 +5112,7 @@ class zwp_tablet_pad_ring_v2:
    ...
 
   @staticmethod
-  def angle(degrees: fixed) -> None:
+  def angle(degrees: float) -> None:
    """
    Sent whenever the angle on a ring changes.
 
@@ -5143,7 +5143,7 @@ class zwp_tablet_pad_ring_v2:
    ...
 
   @staticmethod
-  def frame(time: uint) -> None:
+  def frame(time: int) -> None:
    """
    Indicates the end of a set of ring events that logically belong
    together. A client is expected to accumulate the data in all events
@@ -5181,7 +5181,7 @@ class zwp_tablet_pad_strip_v2:
 
 
  @staticmethod
- def set_feedback(description: str, serial: uint) -> None:
+ def set_feedback(description: str, serial: int) -> None:
   """
   Requests the compositor to use the provided feedback string
   associated with this strip. This request should be issued immediately
@@ -5220,7 +5220,7 @@ class zwp_tablet_pad_strip_v2:
 
  class events:
   @staticmethod
-  def source(source: zwp_tablet_pad_strip_v2.source) -> None:
+  def source(source: int) -> None:
    """
    Source information for strip events.
 
@@ -5242,7 +5242,7 @@ class zwp_tablet_pad_strip_v2:
    ...
 
   @staticmethod
-  def position(position: uint) -> None:
+  def position(position: int) -> None:
    """
    Sent whenever the position on a strip changes.
 
@@ -5274,7 +5274,7 @@ class zwp_tablet_pad_strip_v2:
    ...
 
   @staticmethod
-  def frame(time: uint) -> None:
+  def frame(time: int) -> None:
    """
    Indicates the end of a set of events that represent one logical
    hardware strip event. A client is expected to accumulate the data
@@ -5336,7 +5336,7 @@ class zwp_tablet_pad_group_v2:
 
  class events:
   @staticmethod
-  def buttons(buttons: array) -> None:
+  def buttons(buttons: list) -> None:
    """
    Sent on wp_tablet_pad_group initialization to announce the available
    buttons in the group. Button indices start at 0, a button may only be
@@ -5382,7 +5382,7 @@ class zwp_tablet_pad_group_v2:
    ...
 
   @staticmethod
-  def modes(modes: uint) -> None:
+  def modes(modes: int) -> None:
    """
    Sent on wp_tablet_pad_group initialization to announce that the pad
    group may switch between modes. A client may use a mode to store a
@@ -5415,7 +5415,7 @@ class zwp_tablet_pad_group_v2:
    ...
 
   @staticmethod
-  def mode_switch(time: uint, serial: uint, mode: uint) -> None:
+  def mode_switch(time: int, serial: int, mode: int) -> None:
    """
    Notification that the mode was switched.
 
@@ -5498,7 +5498,7 @@ class zwp_tablet_pad_v2:
 
 
  @staticmethod
- def set_feedback(button: uint, description: str, serial: uint) -> None:
+ def set_feedback(button: int, description: str, serial: int) -> None:
   """
   Requests the compositor to use the provided feedback string
   associated with this button. This request should be issued immediately
@@ -5576,7 +5576,7 @@ class zwp_tablet_pad_v2:
    ...
 
   @staticmethod
-  def buttons(buttons: uint) -> None:
+  def buttons(buttons: int) -> None:
    """
    Sent on wp_tablet_pad initialization to announce the available
    buttons.
@@ -5602,7 +5602,7 @@ class zwp_tablet_pad_v2:
    ...
 
   @staticmethod
-  def button(time: uint, button: uint, state: zwp_tablet_pad_v2.button_state) -> None:
+  def button(time: int, button: int, state: int) -> None:
    """
    Sent whenever the physical state of a button changes.
 
@@ -5614,7 +5614,7 @@ class zwp_tablet_pad_v2:
    ...
 
   @staticmethod
-  def enter(serial: uint, tablet: zwp_tablet_v2, surface: wl_surface) -> None:
+  def enter(serial: int, tablet: zwp_tablet_v2, surface: wl_surface) -> None:
    """
    Notification that this pad is focused on the specified surface.
 
@@ -5627,7 +5627,7 @@ class zwp_tablet_pad_v2:
    ...
 
   @staticmethod
-  def leave(serial: uint, surface: wl_surface) -> None:
+  def leave(serial: int, surface: wl_surface) -> None:
    """
    Notification that this pad is no longer focused on the specified
    surface.
@@ -5664,7 +5664,7 @@ class zwp_tablet_pad_dial_v2:
 
 
  @staticmethod
- def set_feedback(description: str, serial: uint) -> None:
+ def set_feedback(description: str, serial: int) -> None:
   """
   Requests the compositor to use the provided feedback string
   associated with this dial. This request should be issued immediately
@@ -5723,7 +5723,7 @@ class zwp_tablet_pad_dial_v2:
    ...
 
   @staticmethod
-  def frame(time: uint) -> None:
+  def frame(time: int) -> None:
    """
    Indicates the end of a set of events that represent one logical
    hardware dial event. A client is expected to accumulate the data
@@ -5863,7 +5863,7 @@ class wp_viewport:
   ...
 
  @staticmethod
- def set_source(x: fixed, y: fixed, width: fixed, height: fixed) -> None:
+ def set_source(x: float, y: float, width: float, height: float) -> None:
   """
   Set the source rectangle of the associated wl_surface. See
   wp_viewport for the description, and relation to the wl_buffer
@@ -5976,7 +5976,7 @@ class xdg_wm_base:
   ...
 
  @staticmethod
- def pong(serial: uint) -> None:
+ def pong(serial: int) -> None:
   """
   A client must respond to a ping event with a pong request or
   the client may be deemed unresponsive. See xdg_wm_base.ping
@@ -5990,7 +5990,7 @@ class xdg_wm_base:
 
  class events:
   @staticmethod
-  def ping(serial: uint) -> None:
+  def ping(serial: int) -> None:
    """
    The ping event asks the client if it's still alive. Pass the
    serial specified in the event back to the compositor by sending
@@ -6123,7 +6123,7 @@ class xdg_positioner:
   ...
 
  @staticmethod
- def set_anchor(anchor: xdg_positioner.anchor) -> None:
+ def set_anchor(anchor: int) -> None:
   """
   Defines the anchor point for the anchor rectangle. The specified anchor
   is used derive an anchor point that the child surface will be
@@ -6139,7 +6139,7 @@ class xdg_positioner:
   ...
 
  @staticmethod
- def set_gravity(gravity: xdg_positioner.gravity) -> None:
+ def set_gravity(gravity: int) -> None:
   """
   Defines in what direction a surface should be positioned, relative to
   the anchor point of the parent surface. If a corner gravity is
@@ -6156,7 +6156,7 @@ class xdg_positioner:
   ...
 
  @staticmethod
- def set_constraint_adjustment(constraint_adjustment: xdg_positioner.constraint_adjustment) -> None:
+ def set_constraint_adjustment(constraint_adjustment: int) -> None:
   """
   Specify how the window should be positioned if the originally intended
   position caused the surface to be constrained, meaning at least
@@ -6232,7 +6232,7 @@ class xdg_positioner:
   ...
 
  @staticmethod
- def set_parent_configure(serial: uint) -> None:
+ def set_parent_configure(serial: int) -> None:
   """
   Set the serial of an xdg_surface.configure event this positioner will be
   used in response to. The compositor may use this information together
@@ -6396,7 +6396,7 @@ class xdg_surface:
   ...
 
  @staticmethod
- def ack_configure(serial: uint) -> None:
+ def ack_configure(serial: int) -> None:
   """
   When a configure event is received, if a client commits the
   surface in response to the configure event, then the client
@@ -6439,7 +6439,7 @@ class xdg_surface:
 
  class events:
   @staticmethod
-  def configure(serial: uint) -> None:
+  def configure(serial: int) -> None:
    """
    The configure event marks the end of a configure sequence. A configure
    sequence is a set of one or more events configuring the state of the
@@ -6613,7 +6613,7 @@ class xdg_toplevel:
   ...
 
  @staticmethod
- def show_window_menu(seat: wl_seat, serial: uint, x: int, y: int) -> None:
+ def show_window_menu(seat: wl_seat, serial: int, x: int, y: int) -> None:
   """
   Clients implementing client-side decorations might want to show
   a context menu when right-clicking on the decorations, giving the
@@ -6638,7 +6638,7 @@ class xdg_toplevel:
   ...
 
  @staticmethod
- def move(seat: wl_seat, serial: uint) -> None:
+ def move(seat: wl_seat, serial: int) -> None:
   """
   Start an interactive, user-driven move of the surface.
 
@@ -6665,7 +6665,7 @@ class xdg_toplevel:
   ...
 
  @staticmethod
- def resize(seat: wl_seat, serial: uint, edges: xdg_toplevel.resize_edge) -> None:
+ def resize(seat: wl_seat, serial: int, edges: int) -> None:
   """
   Start a user-driven, interactive resize of the surface.
 
@@ -6912,7 +6912,7 @@ class xdg_toplevel:
 
  class events:
   @staticmethod
-  def configure(width: int, height: int, states: array) -> None:
+  def configure(width: int, height: int, states: list) -> None:
    """
    This configure event asks the client to resize its toplevel surface or
    to change its state. The configured state should not be applied
@@ -6975,7 +6975,7 @@ class xdg_toplevel:
    ...
 
   @staticmethod
-  def wm_capabilities(capabilities: array) -> None:
+  def wm_capabilities(capabilities: list) -> None:
    """
    This event advertises the capabilities supported by the compositor. If
    a capability isn't supported, clients should hide or disable the UI
@@ -7051,7 +7051,7 @@ class xdg_popup:
   ...
 
  @staticmethod
- def grab(seat: wl_seat, serial: uint) -> None:
+ def grab(seat: wl_seat, serial: int) -> None:
   """
   This request makes the created popup take an explicit grab. An explicit
   grab will be dismissed when the user dismisses the popup, or when the
@@ -7099,7 +7099,7 @@ class xdg_popup:
   ...
 
  @staticmethod
- def reposition(positioner: xdg_positioner, token: uint) -> None:
+ def reposition(positioner: xdg_positioner, token: int) -> None:
   """
   Reposition an already-mapped popup. The popup will be placed given the
   details in the passed xdg_positioner object, and a
@@ -7168,7 +7168,7 @@ class xdg_popup:
    ...
 
   @staticmethod
-  def repositioned(token: uint) -> None:
+  def repositioned(token: int) -> None:
    """
    The repositioned event is sent as part of a popup configuration
    sequence, together with xdg_popup.configure and lastly
@@ -7260,7 +7260,7 @@ class wp_alpha_modifier_surface_v1:
   ...
 
  @staticmethod
- def set_multiplier(factor: uint) -> None:
+ def set_multiplier(factor: int) -> None:
   """
   Sets the alpha multiplier for the surface. The alpha multiplier is
   double-buffered state, see wl_surface.commit for details.
@@ -7492,7 +7492,7 @@ class wp_color_manager_v1:
 
  class events:
   @staticmethod
-  def supported_intent(render_intent: wp_color_manager_v1.render_intent) -> None:
+  def supported_intent(render_intent: int) -> None:
    """
    When this object is created, it shall immediately send this event once
    for each rendering intent the compositor supports.
@@ -7504,7 +7504,7 @@ class wp_color_manager_v1:
    ...
 
   @staticmethod
-  def supported_feature(feature: wp_color_manager_v1.feature) -> None:
+  def supported_feature(feature: int) -> None:
    """
    When this object is created, it shall immediately send this event once
    for each compositor supported feature listed in the enumeration.
@@ -7516,7 +7516,7 @@ class wp_color_manager_v1:
    ...
 
   @staticmethod
-  def supported_tf_named(tf: wp_color_manager_v1.transfer_function) -> None:
+  def supported_tf_named(tf: int) -> None:
    """
    When this object is created, it shall immediately send this event once
    for each named transfer function the compositor supports with the
@@ -7529,7 +7529,7 @@ class wp_color_manager_v1:
    ...
 
   @staticmethod
-  def supported_primaries_named(primaries: wp_color_manager_v1.primaries) -> None:
+  def supported_primaries_named(primaries: int) -> None:
    """
    When this object is created, it shall immediately send this event once
    for each named set of primaries the compositor supports with the
@@ -7656,7 +7656,7 @@ class wp_color_management_surface_v1:
   ...
 
  @staticmethod
- def set_image_description(image_description: wp_image_description_v1, render_intent: wp_color_manager_v1.render_intent) -> None:
+ def set_image_description(image_description: wp_image_description_v1, render_intent: int) -> None:
   """
   If this protocol object is inert, the protocol error inert is raised.
 
@@ -7802,7 +7802,7 @@ class wp_color_management_surface_feedback_v1:
 
  class events:
   @staticmethod
-  def preferred_changed(identity: uint) -> None:
+  def preferred_changed(identity: int) -> None:
    """
    The preferred image description is the one which likely has the most
    performance and/or quality benefits for the compositor if used by the
@@ -7885,7 +7885,7 @@ class wp_image_description_creator_icc_v1:
   ...
 
  @staticmethod
- def set_icc_file(icc_profile: fd, offset: uint, length: uint) -> None:
+ def set_icc_file(icc_profile: fd, offset: int, length: int) -> None:
   """
   Sets the ICC profile file to be used as the basis of the image
   description.
@@ -8016,7 +8016,7 @@ class wp_image_description_creator_params_v1:
   ...
 
  @staticmethod
- def set_tf_named(tf: wp_color_manager_v1.transfer_function) -> None:
+ def set_tf_named(tf: int) -> None:
   """
   Sets the transfer characteristic using explicitly enumerated named
   functions.
@@ -8038,7 +8038,7 @@ class wp_image_description_creator_params_v1:
   ...
 
  @staticmethod
- def set_tf_power(eexp: uint) -> None:
+ def set_tf_power(eexp: int) -> None:
   """
   Sets the color component transfer characteristic to a power curve with
   the given exponent. Negative values are handled by mirroring the
@@ -8069,7 +8069,7 @@ class wp_image_description_creator_params_v1:
   ...
 
  @staticmethod
- def set_primaries_named(primaries: wp_color_manager_v1.primaries) -> None:
+ def set_primaries_named(primaries: int) -> None:
   """
   Sets the color primaries and white point using explicitly named sets.
   This describes the primary color volume which is the basis for color
@@ -8119,7 +8119,7 @@ class wp_image_description_creator_params_v1:
   ...
 
  @staticmethod
- def set_luminances(min_lum: uint, max_lum: uint, reference_lum: uint) -> None:
+ def set_luminances(min_lum: int, max_lum: int, reference_lum: int) -> None:
   """
   Sets the primary color volume luminance range and the reference white
   luminance level. These values include the minimum display emission
@@ -8243,7 +8243,7 @@ class wp_image_description_creator_params_v1:
   ...
 
  @staticmethod
- def set_mastering_luminance(min_lum: uint, max_lum: uint) -> None:
+ def set_mastering_luminance(min_lum: int, max_lum: int) -> None:
   """
   Sets the luminance range that was used during the content mastering
   process as the minimum and maximum absolute luminance L. These values
@@ -8287,7 +8287,7 @@ class wp_image_description_creator_params_v1:
   ...
 
  @staticmethod
- def set_max_cll(max_cll: uint) -> None:
+ def set_max_cll(max_cll: int) -> None:
   """
   Sets the maximum content light level (max_cll) as defined by CTA-861-H.
 
@@ -8300,7 +8300,7 @@ class wp_image_description_creator_params_v1:
   ...
 
  @staticmethod
- def set_max_fall(max_fall: uint) -> None:
+ def set_max_fall(max_fall: int) -> None:
   """
   Sets the maximum frame-average light level (max_fall) as defined by
   CTA-861-H.
@@ -8381,7 +8381,7 @@ class wp_image_description_v1:
 
  class events:
   @staticmethod
-  def failed(cause: wp_image_description_v1.cause, msg: str) -> None:
+  def failed(cause: int, msg: str) -> None:
    """
    If creating a wp_image_description_v1 object fails for a reason that is
    not defined as a protocol error, this event is sent.
@@ -8402,7 +8402,7 @@ class wp_image_description_v1:
    ...
 
   @staticmethod
-  def ready(identity: uint) -> None:
+  def ready(identity: int) -> None:
    """
    Once this event has been sent, the wp_image_description_v1 object is
    deemed "ready". Ready objects can be used to send requests and can be
@@ -8478,7 +8478,7 @@ class wp_image_description_info_v1:
    ...
 
   @staticmethod
-  def icc_file(icc: fd, icc_size: uint) -> None:
+  def icc_file(icc: fd, icc_size: int) -> None:
    """
    The icc argument provides a file descriptor to the client which may be
    memory-mapped to provide the ICC profile matching the image description.
@@ -8519,7 +8519,7 @@ class wp_image_description_info_v1:
    ...
 
   @staticmethod
-  def primaries_named(primaries: wp_color_manager_v1.primaries) -> None:
+  def primaries_named(primaries: int) -> None:
    """
    Delivers the primary color volume primaries and white point using an
    explicitly enumerated named set.
@@ -8531,7 +8531,7 @@ class wp_image_description_info_v1:
    ...
 
   @staticmethod
-  def tf_power(eexp: uint) -> None:
+  def tf_power(eexp: int) -> None:
    """
    The color component transfer characteristic of this image description is
    a pure power curve. This event provides the exponent of the power
@@ -8548,7 +8548,7 @@ class wp_image_description_info_v1:
    ...
 
   @staticmethod
-  def tf_named(tf: wp_color_manager_v1.transfer_function) -> None:
+  def tf_named(tf: int) -> None:
    """
    Delivers the transfer characteristic using an explicitly enumerated
    named function.
@@ -8560,7 +8560,7 @@ class wp_image_description_info_v1:
    ...
 
   @staticmethod
-  def luminances(min_lum: uint, max_lum: uint, reference_lum: uint) -> None:
+  def luminances(min_lum: int, max_lum: int, reference_lum: int) -> None:
    """
    Delivers the primary color volume luminance range and the reference
    white luminance level. These values include the minimum display emission
@@ -8608,7 +8608,7 @@ class wp_image_description_info_v1:
    ...
 
   @staticmethod
-  def target_luminance(min_lum: uint, max_lum: uint) -> None:
+  def target_luminance(min_lum: int, max_lum: int) -> None:
    """
    Provides the luminance range that the image description is targeting as
    the minimum and maximum absolute luminance L. These values include the
@@ -8631,7 +8631,7 @@ class wp_image_description_info_v1:
    ...
 
   @staticmethod
-  def target_max_cll(max_cll: uint) -> None:
+  def target_max_cll(max_cll: int) -> None:
    """
    Provides the targeted max_cll of the image description. max_cll is
    defined by CTA-861-H.
@@ -8646,7 +8646,7 @@ class wp_image_description_info_v1:
    ...
 
   @staticmethod
-  def target_max_fall(max_fall: uint) -> None:
+  def target_max_fall(max_fall: int) -> None:
    """
    Provides the targeted max_fall of the image description. max_fall is
    defined by CTA-861-H.
@@ -8703,7 +8703,7 @@ class wp_color_representation_manager_v1:
 
  class events:
   @staticmethod
-  def supported_alpha_mode(alpha_mode: wp_color_representation_surface_v1.alpha_mode) -> None:
+  def supported_alpha_mode(alpha_mode: int) -> None:
    """
    When this object is created, it shall immediately send this event once
    for each alpha mode the compositor supports.
@@ -8718,7 +8718,7 @@ class wp_color_representation_manager_v1:
    ...
 
   @staticmethod
-  def supported_coefficients_and_ranges(coefficients: wp_color_representation_surface_v1.coefficients, range: wp_color_representation_surface_v1.range) -> None:
+  def supported_coefficients_and_ranges(coefficients: int, range: int) -> None:
    """
    When this object is created, it shall immediately send this event once
    for each matrix coefficient and color range combination the compositor
@@ -8812,7 +8812,7 @@ class wp_color_representation_surface_v1:
   ...
 
  @staticmethod
- def set_alpha_mode(alpha_mode: wp_color_representation_surface_v1.alpha_mode) -> None:
+ def set_alpha_mode(alpha_mode: int) -> None:
   """
   If this protocol object is inert, the protocol error inert is raised.
 
@@ -8833,7 +8833,7 @@ class wp_color_representation_surface_v1:
   ...
 
  @staticmethod
- def set_coefficients_and_range(coefficients: wp_color_representation_surface_v1.coefficients, range: wp_color_representation_surface_v1.range) -> None:
+ def set_coefficients_and_range(coefficients: int, range: int) -> None:
   """
   If this protocol object is inert, the protocol error inert is raised.
 
@@ -8870,7 +8870,7 @@ class wp_color_representation_surface_v1:
   ...
 
  @staticmethod
- def set_chroma_location(chroma_location: wp_color_representation_surface_v1.chroma_location) -> None:
+ def set_chroma_location(chroma_location: int) -> None:
   """
   If this protocol object is inert, the protocol error inert is raised.
 
@@ -8962,7 +8962,7 @@ class wp_commit_timer_v1:
 
 
  @staticmethod
- def set_timestamp(tv_sec_hi: uint, tv_sec_lo: uint, tv_nsec: uint) -> None:
+ def set_timestamp(tv_sec_hi: int, tv_sec_lo: int, tv_nsec: int) -> None:
   """
   Provide a timing constraint for a surface content update.
 
@@ -9069,7 +9069,7 @@ class wp_content_type_v1:
   ...
 
  @staticmethod
- def set_content_type(content_type: wp_content_type_v1.type) -> None:
+ def set_content_type(content_type: int) -> None:
   """
   Set the surface content type. This informs the compositor that the
   client believes it is displaying buffers matching this content type.
@@ -9198,7 +9198,7 @@ class wp_cursor_shape_device_v1:
   ...
 
  @staticmethod
- def set_shape(serial: uint, shape: wp_cursor_shape_device_v1.shape) -> None:
+ def set_shape(serial: int, shape: int) -> None:
   """
   Sets the device cursor to the specified shape. The compositor will
   change the cursor image based on the specified shape.
@@ -9409,7 +9409,7 @@ class wp_drm_lease_connector_v1:
    ...
 
   @staticmethod
-  def connector_id(connector_id: uint) -> None:
+  def connector_id(connector_id: int) -> None:
    """
    The compositor sends this event once the connector is created to
    indicate the DRM object ID which represents the underlying connector
@@ -9623,7 +9623,7 @@ class ext_background_effect_manager_v1:
 
  class events:
   @staticmethod
-  def capabilities(flags: ext_background_effect_manager_v1.capability) -> None:
+  def capabilities(flags: int) -> None:
    """
    Capabilities of the compositor
    """
@@ -10166,7 +10166,7 @@ class ext_idle_notifier_v1:
   ...
 
  @staticmethod
- def get_idle_notification(timeout: uint, seat: wl_seat) -> ext_idle_notification_v1:
+ def get_idle_notification(timeout: int, seat: wl_seat) -> ext_idle_notification_v1:
   """
   Create a new idle notification object.
 
@@ -10187,7 +10187,7 @@ class ext_idle_notifier_v1:
   ...
 
  @staticmethod
- def get_input_idle_notification(timeout: uint, seat: wl_seat) -> ext_idle_notification_v1:
+ def get_input_idle_notification(timeout: int, seat: wl_seat) -> ext_idle_notification_v1:
   """
   Create a new idle notification object to track input from the
   user, such as keyboard and mouse movement. Because this object is
@@ -10373,7 +10373,7 @@ class ext_image_copy_capture_manager_v1:
 
 
  @staticmethod
- def create_session(source: ext_image_capture_source_v1, options: ext_image_copy_capture_manager_v1.options) -> ext_image_copy_capture_session_v1:
+ def create_session(source: ext_image_capture_source_v1, options: int) -> ext_image_copy_capture_session_v1:
   """
   Create a capturing session for an image capture source.
 
@@ -10467,7 +10467,7 @@ class ext_image_copy_capture_session_v1:
 
  class events:
   @staticmethod
-  def buffer_size(width: uint, height: uint) -> None:
+  def buffer_size(width: int, height: int) -> None:
    """
    Provides the dimensions of the source image in buffer pixel coordinates.
 
@@ -10481,7 +10481,7 @@ class ext_image_copy_capture_session_v1:
    ...
 
   @staticmethod
-  def shm_format(format: wl_shm.format) -> None:
+  def shm_format(format: int) -> None:
    """
    Provides the format that must be used for shared-memory buffers.
 
@@ -10495,7 +10495,7 @@ class ext_image_copy_capture_session_v1:
    ...
 
   @staticmethod
-  def dmabuf_device(device: array) -> None:
+  def dmabuf_device(device: list) -> None:
    """
    This event advertises the device buffers must be allocated on for
    dma-buf buffers.
@@ -10512,7 +10512,7 @@ class ext_image_copy_capture_session_v1:
    ...
 
   @staticmethod
-  def dmabuf_format(format: uint, modifiers: array) -> None:
+  def dmabuf_format(format: int, modifiers: list) -> None:
    """
    Provides the format that must be used for dma-buf buffers.
 
@@ -10659,7 +10659,7 @@ class ext_image_copy_capture_frame_v1:
 
  class events:
   @staticmethod
-  def transform(transform: wl_output.transform) -> None:
+  def transform(transform: int) -> None:
    """
    This event is sent before the ready event and holds the transform that
    the compositor has applied to the buffer contents.
@@ -10689,7 +10689,7 @@ class ext_image_copy_capture_frame_v1:
    ...
 
   @staticmethod
-  def presentation_time(tv_sec_hi: uint, tv_sec_lo: uint, tv_nsec: uint) -> None:
+  def presentation_time(tv_sec_hi: int, tv_sec_lo: int, tv_nsec: int) -> None:
    """
    This event indicates the time at which the frame is presented to the
    output in system monotonic time. This event is sent before the ready
@@ -10723,7 +10723,7 @@ class ext_image_copy_capture_frame_v1:
    ...
 
   @staticmethod
-  def failed(reason: ext_image_copy_capture_frame_v1.failure_reason) -> None:
+  def failed(reason: int) -> None:
    """
    This event indicates that the attempted frame copy has failed.
 
@@ -11089,7 +11089,7 @@ class ext_session_lock_surface_v1:
   ...
 
  @staticmethod
- def ack_configure(serial: uint) -> None:
+ def ack_configure(serial: int) -> None:
   """
   When a configure event is received, if a client commits the surface
   in response to the configure event, then the client must make an
@@ -11124,7 +11124,7 @@ class ext_session_lock_surface_v1:
 
  class events:
   @staticmethod
-  def configure(serial: uint, width: uint, height: uint) -> None:
+  def configure(serial: int, width: int, height: int) -> None:
    """
    This event is sent once on binding the interface and may be sent again
    at the compositor's discretion, for example if output geometry changes.
@@ -11193,7 +11193,7 @@ class ext_transient_seat_v1:
 
  class events:
   @staticmethod
-  def ready(global_name: uint) -> None:
+  def ready(global_name: int) -> None:
    """
    This event advertises the global name for the wl_seat to be used with
    wl_registry_bind.
@@ -11376,7 +11376,7 @@ class ext_workspace_group_handle_v1:
 
  class events:
   @staticmethod
-  def capabilities(capabilities: ext_workspace_group_handle_v1.group_capabilities) -> None:
+  def capabilities(capabilities: int) -> None:
    """
    This event advertises the capabilities supported by the compositor. If
    a capability isn't supported, clients should hide or disable the UI
@@ -11574,7 +11574,7 @@ class ext_workspace_handle_v1:
    ...
 
   @staticmethod
-  def coordinates(coordinates: array) -> None:
+  def coordinates(coordinates: list) -> None:
    """
    This event is used to organize workspaces into an N-dimensional grid
    within a workspace group, and if supported, is emitted immediately after
@@ -11599,7 +11599,7 @@ class ext_workspace_handle_v1:
    ...
 
   @staticmethod
-  def state(state: ext_workspace_handle_v1.state) -> None:
+  def state(state: int) -> None:
    """
    This event is emitted immediately after the ext_workspace_handle_v1 is
    created and each time the workspace state changes, either because of a
@@ -11612,7 +11612,7 @@ class ext_workspace_handle_v1:
    ...
 
   @staticmethod
-  def capabilities(capabilities: ext_workspace_handle_v1.workspace_capabilities) -> None:
+  def capabilities(capabilities: int) -> None:
    """
    This event advertises the capabilities supported by the compositor. If
    a capability isn't supported, clients should hide or disable the UI
@@ -11829,7 +11829,7 @@ class wp_fractional_scale_v1:
 
  class events:
   @staticmethod
-  def preferred_scale(scale: uint) -> None:
+  def preferred_scale(scale: int) -> None:
    """
    Notification of a new preferred scale for this surface that the
    compositor suggests that the client should use.
@@ -11979,7 +11979,7 @@ class wp_linux_drm_syncobj_surface_v1:
   ...
 
  @staticmethod
- def set_acquire_point(timeline: wp_linux_drm_syncobj_timeline_v1, point_hi: uint, point_lo: uint) -> None:
+ def set_acquire_point(timeline: wp_linux_drm_syncobj_timeline_v1, point_hi: int, point_lo: int) -> None:
   """
   Set the timeline point that must be signalled before the compositor may
   sample from the buffer attached with wl_surface.attach.
@@ -12012,7 +12012,7 @@ class wp_linux_drm_syncobj_surface_v1:
   ...
 
  @staticmethod
- def set_release_point(timeline: wp_linux_drm_syncobj_timeline_v1, point_hi: uint, point_lo: uint) -> None:
+ def set_release_point(timeline: wp_linux_drm_syncobj_timeline_v1, point_hi: int, point_lo: int) -> None:
   """
   Set the timeline point that must be signalled by the compositor when it
   has finished its usage of the buffer attached with wl_surface.attach
@@ -12261,7 +12261,7 @@ class wp_single_pixel_buffer_manager_v1:
   ...
 
  @staticmethod
- def create_u32_rgba_buffer(r: uint, g: uint, b: uint, a: uint) -> wl_buffer:
+ def create_u32_rgba_buffer(r: int, g: int, b: int, a: int) -> wl_buffer:
   """
   Create a single-pixel buffer from four 32-bit RGBA values.
 
@@ -12352,7 +12352,7 @@ class wp_tearing_control_v1:
 
 
  @staticmethod
- def set_presentation_hint(hint: wp_tearing_control_v1.presentation_hint) -> None:
+ def set_presentation_hint(hint: int) -> None:
   """
   Set the presentation hint for the associated wl_surface. This state is
   double-buffered, see wl_surface.commit.
@@ -12448,7 +12448,7 @@ class xdg_activation_token_v1:
 
 
  @staticmethod
- def set_serial(serial: uint, seat: wl_seat) -> None:
+ def set_serial(serial: int, seat: wl_seat) -> None:
   """
   Provides information about the seat and serial event that requested the
   token.
@@ -13112,7 +13112,7 @@ class xwayland_surface_v1:
 
 
  @staticmethod
- def set_serial(serial_lo: uint, serial_hi: uint) -> None:
+ def set_serial(serial_lo: int, serial_hi: int) -> None:
   """
   Associates an Xwayland window to a wl_surface.
   The association state is double-buffered, see wl_surface.commit.
@@ -13223,7 +13223,7 @@ class zwp_fullscreen_shell_v1:
   ...
 
  @staticmethod
- def present_surface(surface: wl_surface, method: zwp_fullscreen_shell_v1.present_method, output: wl_output) -> None:
+ def present_surface(surface: wl_surface, method: int, output: wl_output) -> None:
   """
   Present a surface on the given output.
 
@@ -13303,7 +13303,7 @@ class zwp_fullscreen_shell_v1:
 
  class events:
   @staticmethod
-  def capability(capability: zwp_fullscreen_shell_v1.capability) -> None:
+  def capability(capability: int) -> None:
    """
    Advertises a single capability of the compositor.
 
@@ -13473,7 +13473,7 @@ class zwp_input_method_context_v1:
   ...
 
  @staticmethod
- def commit_string(serial: uint, text: str) -> None:
+ def commit_string(serial: int, text: str) -> None:
   """
   Send the commit string text for insertion to the application.
 
@@ -13492,7 +13492,7 @@ class zwp_input_method_context_v1:
   ...
 
  @staticmethod
- def preedit_string(serial: uint, text: str, commit: str) -> None:
+ def preedit_string(serial: int, text: str, commit: str) -> None:
   """
   Send the pre-edit string text to the application text input.
 
@@ -13509,7 +13509,7 @@ class zwp_input_method_context_v1:
   ...
 
  @staticmethod
- def preedit_styling(index: uint, length: uint, style: uint) -> None:
+ def preedit_styling(index: int, length: int, style: int) -> None:
   """
   Set the styling information on composing text. The style is applied for
   length in bytes from index relative to the beginning of
@@ -13535,7 +13535,7 @@ class zwp_input_method_context_v1:
   ...
 
  @staticmethod
- def delete_surrounding_text(index: int, length: uint) -> None:
+ def delete_surrounding_text(index: int, length: int) -> None:
   """
   Remove the surrounding text.
 
@@ -13563,7 +13563,7 @@ class zwp_input_method_context_v1:
   ...
 
  @staticmethod
- def modifiers_map(map: array) -> None:
+ def modifiers_map(map: list) -> None:
   """
 
   """
@@ -13571,7 +13571,7 @@ class zwp_input_method_context_v1:
   ...
 
  @staticmethod
- def keysym(serial: uint, time: uint, sym: uint, state: uint, modifiers: uint) -> None:
+ def keysym(serial: int, time: int, sym: int, state: int, modifiers: int) -> None:
   """
   Notify when a key event was sent. Key events should not be used for
   normal text input operations, which should be done with commit_string,
@@ -13599,7 +13599,7 @@ class zwp_input_method_context_v1:
   ...
 
  @staticmethod
- def key(serial: uint, time: uint, key: uint, state: uint) -> None:
+ def key(serial: int, time: int, key: int, state: int) -> None:
   """
   Forward a wl_keyboard::key event to the client that was not processed
   by the input method itself. Should be used when filtering key events
@@ -13618,7 +13618,7 @@ class zwp_input_method_context_v1:
   ...
 
  @staticmethod
- def modifiers(serial: uint, mods_depressed: uint, mods_latched: uint, mods_locked: uint, group: uint) -> None:
+ def modifiers(serial: int, mods_depressed: int, mods_latched: int, mods_locked: int, group: int) -> None:
   """
   Forward a wl_keyboard::modifiers event to the client that was not
   processed by the input method itself.  Should be used when filtering
@@ -13636,7 +13636,7 @@ class zwp_input_method_context_v1:
   ...
 
  @staticmethod
- def language(serial: uint, language: str) -> None:
+ def language(serial: int, language: str) -> None:
   """
 
   Args:
@@ -13646,7 +13646,7 @@ class zwp_input_method_context_v1:
   ...
 
  @staticmethod
- def text_direction(serial: uint, direction: uint) -> None:
+ def text_direction(serial: int, direction: int) -> None:
   """
 
   Args:
@@ -13657,7 +13657,7 @@ class zwp_input_method_context_v1:
 
  class events:
   @staticmethod
-  def surrounding_text(text: str, cursor: uint, anchor: uint) -> None:
+  def surrounding_text(text: str, cursor: int, anchor: int) -> None:
    """
    The plain surrounding text around the input position. Cursor is the
    position in bytes within the surrounding text relative to the beginning
@@ -13677,7 +13677,7 @@ class zwp_input_method_context_v1:
    ...
 
   @staticmethod
-  def content_type(hint: uint, purpose: uint) -> None:
+  def content_type(hint: int, purpose: int) -> None:
    """
 
    """
@@ -13685,7 +13685,7 @@ class zwp_input_method_context_v1:
    ...
 
   @staticmethod
-  def invoke_action(button: uint, index: uint) -> None:
+  def invoke_action(button: int, index: int) -> None:
    """
 
    """
@@ -13693,7 +13693,7 @@ class zwp_input_method_context_v1:
    ...
 
   @staticmethod
-  def commit_state(serial: uint) -> None:
+  def commit_state(serial: int) -> None:
    """
 
    Args:
@@ -13772,7 +13772,7 @@ class zwp_input_panel_surface_v1:
 
 
  @staticmethod
- def set_toplevel(output: wl_output, position: uint) -> None:
+ def set_toplevel(output: wl_output, position: int) -> None:
   """
   Set the input_panel_surface type to keyboard.
 
@@ -13896,7 +13896,7 @@ class zwp_input_timestamps_v1:
 
  class events:
   @staticmethod
-  def timestamp(tv_sec_hi: uint, tv_sec_lo: uint, tv_nsec: uint) -> None:
+  def timestamp(tv_sec_hi: int, tv_sec_lo: int, tv_nsec: int) -> None:
    """
    The timestamp event is associated with the first subsequent input event
    carrying a timestamp which belongs to the set of input events this
@@ -14320,7 +14320,7 @@ class zwp_pointer_constraints_v1:
   ...
 
  @staticmethod
- def lock_pointer(surface: wl_surface, pointer: wl_pointer, region: wl_region, lifetime: zwp_pointer_constraints_v1.lifetime) -> zwp_locked_pointer_v1:
+ def lock_pointer(surface: wl_surface, pointer: wl_pointer, region: wl_region, lifetime: int) -> zwp_locked_pointer_v1:
   """
   The lock_pointer request lets the client request to disable movements of
   the virtual pointer (i.e. the cursor), effectively locking the pointer
@@ -14370,7 +14370,7 @@ class zwp_pointer_constraints_v1:
   ...
 
  @staticmethod
- def confine_pointer(surface: wl_surface, pointer: wl_pointer, region: wl_region, lifetime: zwp_pointer_constraints_v1.lifetime) -> zwp_confined_pointer_v1:
+ def confine_pointer(surface: wl_surface, pointer: wl_pointer, region: wl_region, lifetime: int) -> zwp_confined_pointer_v1:
   """
   The confine_pointer request lets the client request to confine the
   pointer cursor to a given region. This request may not take effect
@@ -14442,7 +14442,7 @@ class zwp_locked_pointer_v1:
   ...
 
  @staticmethod
- def set_cursor_position_hint(surface_x: fixed, surface_y: fixed) -> None:
+ def set_cursor_position_hint(surface_x: float, surface_y: float) -> None:
   """
   Set the cursor position hint relative to the top left corner of the
   surface.
@@ -14678,7 +14678,7 @@ class zwp_pointer_gesture_swipe_v1:
 
  class events:
   @staticmethod
-  def begin(serial: uint, time: uint, surface: wl_surface, fingers: uint) -> None:
+  def begin(serial: int, time: int, surface: wl_surface, fingers: int) -> None:
    """
    This event is sent when a multi-finger swipe gesture is detected
    on the device.
@@ -14691,7 +14691,7 @@ class zwp_pointer_gesture_swipe_v1:
    ...
 
   @staticmethod
-  def update(time: uint, dx: fixed, dy: fixed) -> None:
+  def update(time: int, dx: float, dy: float) -> None:
    """
    This event is sent when a multi-finger swipe gesture changes the
    position of the logical center.
@@ -14708,7 +14708,7 @@ class zwp_pointer_gesture_swipe_v1:
    ...
 
   @staticmethod
-  def end(serial: uint, time: uint, cancelled: int) -> None:
+  def end(serial: int, time: int, cancelled: int) -> None:
    """
    This event is sent when a multi-finger swipe gesture ceases to
    be valid. This may happen when one or more fingers are lifted or
@@ -14757,7 +14757,7 @@ class zwp_pointer_gesture_pinch_v1:
 
  class events:
   @staticmethod
-  def begin(serial: uint, time: uint, surface: wl_surface, fingers: uint) -> None:
+  def begin(serial: int, time: int, surface: wl_surface, fingers: int) -> None:
    """
    This event is sent when a multi-finger pinch gesture is detected
    on the device.
@@ -14770,7 +14770,7 @@ class zwp_pointer_gesture_pinch_v1:
    ...
 
   @staticmethod
-  def update(time: uint, dx: fixed, dy: fixed, scale: fixed, rotation: fixed) -> None:
+  def update(time: int, dx: float, dy: float, scale: float, rotation: float) -> None:
    """
    This event is sent when a multi-finger pinch gesture changes the
    position of the logical center, the rotation or the relative scale.
@@ -14796,7 +14796,7 @@ class zwp_pointer_gesture_pinch_v1:
    ...
 
   @staticmethod
-  def end(serial: uint, time: uint, cancelled: int) -> None:
+  def end(serial: int, time: int, cancelled: int) -> None:
    """
    This event is sent when a multi-finger pinch gesture ceases to
    be valid. This may happen when one or more fingers are lifted or
@@ -14847,7 +14847,7 @@ class zwp_pointer_gesture_hold_v1:
 
  class events:
   @staticmethod
-  def begin(serial: uint, time: uint, surface: wl_surface, fingers: uint) -> None:
+  def begin(serial: int, time: int, surface: wl_surface, fingers: int) -> None:
    """
    This event is sent when a hold gesture is detected on the device.
 
@@ -14859,7 +14859,7 @@ class zwp_pointer_gesture_hold_v1:
    ...
 
   @staticmethod
-  def end(serial: uint, time: uint, cancelled: int) -> None:
+  def end(serial: int, time: int, cancelled: int) -> None:
    """
    This event is sent when a hold gesture ceases to
    be valid. This may happen when the holding fingers are lifted or
@@ -14928,7 +14928,7 @@ class zwp_primary_selection_device_v1:
 
 
  @staticmethod
- def set_selection(source: zwp_primary_selection_source_v1, serial: uint) -> None:
+ def set_selection(source: zwp_primary_selection_source_v1, serial: int) -> None:
   """
   Replaces the current selection. The previous owner of the primary
   selection will receive a wp_primary_selection_source.cancelled event.
@@ -15124,7 +15124,7 @@ class zwp_relative_pointer_v1:
 
  class events:
   @staticmethod
-  def relative_motion(utime_hi: uint, utime_lo: uint, dx: fixed, dy: fixed, dx_unaccel: fixed, dy_unaccel: fixed) -> None:
+  def relative_motion(utime_hi: int, utime_lo: int, dx: float, dy: float, dx_unaccel: float, dy_unaccel: float) -> None:
    """
    Relative x/y pointer motion from the pointer of the seat associated with
    this object.
@@ -15306,7 +15306,7 @@ class zwp_tablet_tool_v1:
 
 
  @staticmethod
- def set_cursor(serial: uint, surface: wl_surface, hotspot_x: int, hotspot_y: int) -> None:
+ def set_cursor(serial: int, surface: wl_surface, hotspot_x: int, hotspot_y: int) -> None:
   """
   Sets the surface of the cursor used for this tool on the given
   tablet. This request only takes effect if the tool is in proximity
@@ -15359,7 +15359,7 @@ class zwp_tablet_tool_v1:
 
  class events:
   @staticmethod
-  def type(tool_type: zwp_tablet_tool_v1.type) -> None:
+  def type(tool_type: int) -> None:
    """
    The tool type is the high-level type of the tool and usually decides
    the interaction expected from this tool.
@@ -15374,7 +15374,7 @@ class zwp_tablet_tool_v1:
    ...
 
   @staticmethod
-  def hardware_serial(hardware_serial_hi: uint, hardware_serial_lo: uint) -> None:
+  def hardware_serial(hardware_serial_hi: int, hardware_serial_lo: int) -> None:
    """
    If the physical tool can be identified by a unique 64-bit serial
    number, this event notifies the client of this serial number.
@@ -15400,7 +15400,7 @@ class zwp_tablet_tool_v1:
    ...
 
   @staticmethod
-  def hardware_id_wacom(hardware_id_hi: uint, hardware_id_lo: uint) -> None:
+  def hardware_id_wacom(hardware_id_hi: int, hardware_id_lo: int) -> None:
    """
    This event notifies the client of a hardware id available on this tool.
 
@@ -15421,7 +15421,7 @@ class zwp_tablet_tool_v1:
    ...
 
   @staticmethod
-  def capability(capability: zwp_tablet_tool_v1.capability) -> None:
+  def capability(capability: int) -> None:
    """
    This event notifies the client of any capabilities of this tool,
    beyond the main set of x/y axes and tip up/down detection.
@@ -15469,7 +15469,7 @@ class zwp_tablet_tool_v1:
    ...
 
   @staticmethod
-  def proximity_in(serial: uint, tablet: zwp_tablet_v1, surface: wl_surface) -> None:
+  def proximity_in(serial: int, tablet: zwp_tablet_v1, surface: wl_surface) -> None:
    """
    Notification that this tool is focused on a certain surface.
 
@@ -15508,7 +15508,7 @@ class zwp_tablet_tool_v1:
    ...
 
   @staticmethod
-  def down(serial: uint) -> None:
+  def down(serial: int) -> None:
    """
    Sent whenever the tablet tool comes in contact with the surface of the
    tablet.
@@ -15550,7 +15550,7 @@ class zwp_tablet_tool_v1:
    ...
 
   @staticmethod
-  def motion(x: fixed, y: fixed) -> None:
+  def motion(x: float, y: float) -> None:
    """
    Sent whenever a tablet tool moves.
 
@@ -15562,7 +15562,7 @@ class zwp_tablet_tool_v1:
    ...
 
   @staticmethod
-  def pressure(pressure: uint) -> None:
+  def pressure(pressure: int) -> None:
    """
    Sent whenever the pressure axis on a tool changes. The value of this
    event is normalized to a value between 0 and 65535.
@@ -15577,7 +15577,7 @@ class zwp_tablet_tool_v1:
    ...
 
   @staticmethod
-  def distance(distance: uint) -> None:
+  def distance(distance: int) -> None:
    """
    Sent whenever the distance axis on a tool changes. The value of this
    event is normalized to a value between 0 and 65535.
@@ -15658,7 +15658,7 @@ class zwp_tablet_tool_v1:
    ...
 
   @staticmethod
-  def button(serial: uint, button: uint, state: zwp_tablet_tool_v1.button_state) -> None:
+  def button(serial: int, button: int, state: int) -> None:
    """
    Sent whenever a button on the tool is pressed or released.
 
@@ -15675,7 +15675,7 @@ class zwp_tablet_tool_v1:
    ...
 
   @staticmethod
-  def frame(time: uint) -> None:
+  def frame(time: int) -> None:
    """
    Marks the end of a series of axis and/or button updates from the
    tablet. The Wayland protocol requires axis updates to be sent
@@ -15725,7 +15725,7 @@ class zwp_tablet_v1:
    ...
 
   @staticmethod
-  def id(vid: uint, pid: uint) -> None:
+  def id(vid: int, pid: int) -> None:
    """
    This event is sent in the initial burst of events before the
    wp_tablet.done event.
@@ -15919,7 +15919,7 @@ class zwp_text_input_v1:
   ...
 
  @staticmethod
- def set_surrounding_text(text: str, cursor: uint, anchor: uint) -> None:
+ def set_surrounding_text(text: str, cursor: int, anchor: int) -> None:
   """
   Sets the plain surrounding text around the input position. Text is
   UTF-8 encoded. Cursor is the byte offset within the
@@ -15931,7 +15931,7 @@ class zwp_text_input_v1:
   ...
 
  @staticmethod
- def set_content_type(hint: zwp_text_input_v1.content_hint, purpose: zwp_text_input_v1.content_purpose) -> None:
+ def set_content_type(hint: int, purpose: int) -> None:
   """
   Sets the content purpose and content hint. While the purpose is the
   basic purpose of an input field, the hint flags allow to modify some
@@ -15967,7 +15967,7 @@ class zwp_text_input_v1:
   ...
 
  @staticmethod
- def commit_state(serial: uint) -> None:
+ def commit_state(serial: int) -> None:
   """
 
   Args:
@@ -15977,7 +15977,7 @@ class zwp_text_input_v1:
   ...
 
  @staticmethod
- def invoke_action(button: uint, index: uint) -> None:
+ def invoke_action(button: int, index: int) -> None:
   """
 
   """
@@ -16005,7 +16005,7 @@ class zwp_text_input_v1:
    ...
 
   @staticmethod
-  def modifiers_map(map: array) -> None:
+  def modifiers_map(map: list) -> None:
    """
    Transfer an array of 0-terminated modifier names. The position in
    the array is the index of the modifier as used in the modifiers
@@ -16015,7 +16015,7 @@ class zwp_text_input_v1:
    ...
 
   @staticmethod
-  def input_panel_state(state: uint) -> None:
+  def input_panel_state(state: int) -> None:
    """
    Notify when the visibility state of the input panel changed.
    """
@@ -16023,7 +16023,7 @@ class zwp_text_input_v1:
    ...
 
   @staticmethod
-  def preedit_string(serial: uint, text: str, commit: str) -> None:
+  def preedit_string(serial: int, text: str, commit: str) -> None:
    """
    Notify when a new composing text (pre-edit) should be set around the
    current cursor position. Any previously set composing text should
@@ -16042,7 +16042,7 @@ class zwp_text_input_v1:
    ...
 
   @staticmethod
-  def preedit_styling(index: uint, length: uint, style: zwp_text_input_v1.preedit_style) -> None:
+  def preedit_styling(index: int, length: int, style: int) -> None:
    """
    Sets styling information on composing text. The style is applied for
    length bytes from index relative to the beginning of the composing
@@ -16068,7 +16068,7 @@ class zwp_text_input_v1:
    ...
 
   @staticmethod
-  def commit_string(serial: uint, text: str) -> None:
+  def commit_string(serial: int, text: str) -> None:
    """
    Notify when text should be inserted into the editor widget. The text to
    commit could be either just a single character after a key press or the
@@ -16096,7 +16096,7 @@ class zwp_text_input_v1:
    ...
 
   @staticmethod
-  def delete_surrounding_text(index: int, length: uint) -> None:
+  def delete_surrounding_text(index: int, length: int) -> None:
    """
    Notify when the text around the current cursor position should be
    deleted.
@@ -16111,7 +16111,7 @@ class zwp_text_input_v1:
    ...
 
   @staticmethod
-  def keysym(serial: uint, time: uint, sym: uint, state: uint, modifiers: uint) -> None:
+  def keysym(serial: int, time: int, sym: int, state: int, modifiers: int) -> None:
    """
    Notify when a key event was sent. Key events should not be used
    for normal text input operations, which should be done with
@@ -16127,7 +16127,7 @@ class zwp_text_input_v1:
    ...
 
   @staticmethod
-  def language(serial: uint, language: str) -> None:
+  def language(serial: int, language: str) -> None:
    """
    Sets the language of the input text. The "language" argument is an
    RFC-3066 format language tag.
@@ -16139,7 +16139,7 @@ class zwp_text_input_v1:
    ...
 
   @staticmethod
-  def text_direction(serial: uint, direction: zwp_text_input_v1.text_direction) -> None:
+  def text_direction(serial: int, direction: int) -> None:
    """
    Sets the text direction of input text.
 
@@ -16336,7 +16336,7 @@ class zwp_text_input_v3:
   ...
 
  @staticmethod
- def set_text_change_cause(cause: zwp_text_input_v3.change_cause) -> None:
+ def set_text_change_cause(cause: int) -> None:
   """
   Tells the compositor why the text surrounding the cursor changed.
 
@@ -16357,7 +16357,7 @@ class zwp_text_input_v3:
   ...
 
  @staticmethod
- def set_content_type(hint: zwp_text_input_v3.content_hint, purpose: zwp_text_input_v3.content_purpose) -> None:
+ def set_content_type(hint: int, purpose: int) -> None:
   """
   Sets the content purpose and content hint. While the purpose is the
   basic purpose of an input field, the hint flags allow to modify some of
@@ -16503,7 +16503,7 @@ class zwp_text_input_v3:
    ...
 
   @staticmethod
-  def delete_surrounding_text(before_length: uint, after_length: uint) -> None:
+  def delete_surrounding_text(before_length: int, after_length: int) -> None:
    """
    Notify when the text around the current cursor position should be
    deleted.
@@ -16528,7 +16528,7 @@ class zwp_text_input_v3:
    ...
 
   @staticmethod
-  def done(serial: uint) -> None:
+  def done(serial: int) -> None:
    """
    Instruct the application to apply changes to state requested by the
    preedit_string, commit_string and delete_surrounding_text events. The
@@ -16677,7 +16677,7 @@ class zxdg_toplevel_decoration_v1:
   ...
 
  @staticmethod
- def set_mode(mode: zxdg_toplevel_decoration_v1.mode) -> None:
+ def set_mode(mode: int) -> None:
   """
   Set the toplevel surface decoration mode. This informs the compositor
   that the client prefers the provided decoration mode.
@@ -16720,7 +16720,7 @@ class zxdg_toplevel_decoration_v1:
 
  class events:
   @staticmethod
-  def configure(mode: zxdg_toplevel_decoration_v1.mode) -> None:
+  def configure(mode: int) -> None:
    """
    The configure event configures the effective decoration mode. The
    configured state should not be applied immediately. Clients must send an
@@ -17313,7 +17313,7 @@ class xdg_shell:
   ...
 
  @staticmethod
- def get_xdg_popup(surface: wl_surface, parent: wl_surface, seat: wl_seat, serial: uint, x: int, y: int) -> xdg_popup:
+ def get_xdg_popup(surface: wl_surface, parent: wl_surface, seat: wl_seat, serial: int, x: int, y: int) -> xdg_popup:
   """
   This creates an xdg_popup for the given surface and gives it the
   xdg_popup role. A wl_surface can only be given an xdg_popup role
@@ -17338,7 +17338,7 @@ class xdg_shell:
   ...
 
  @staticmethod
- def pong(serial: uint) -> None:
+ def pong(serial: int) -> None:
   """
   A client must respond to a ping event with a pong request or
   the client may be deemed unresponsive.
@@ -17351,7 +17351,7 @@ class xdg_shell:
 
  class events:
   @staticmethod
-  def ping(serial: uint) -> None:
+  def ping(serial: int) -> None:
    """
    The ping event asks the client if it's still alive. Pass the
    serial specified in the event back to the compositor by sending
@@ -17437,7 +17437,7 @@ class zxdg_shell_v6:
   ...
 
  @staticmethod
- def pong(serial: uint) -> None:
+ def pong(serial: int) -> None:
   """
   A client must respond to a ping event with a pong request or
   the client may be deemed unresponsive. See xdg_shell.ping.
@@ -17450,7 +17450,7 @@ class zxdg_shell_v6:
 
  class events:
   @staticmethod
-  def ping(serial: uint) -> None:
+  def ping(serial: int) -> None:
    """
    The ping event asks the client if it's still alive. Pass the
    serial specified in the event back to the compositor by sending
@@ -17573,7 +17573,7 @@ class zxdg_positioner_v6:
   ...
 
  @staticmethod
- def set_anchor(anchor: zxdg_positioner_v6.anchor) -> None:
+ def set_anchor(anchor: int) -> None:
   """
   Defines a set of edges for the anchor rectangle. These are used to
   derive an anchor point that the child surface will be positioned
@@ -17593,7 +17593,7 @@ class zxdg_positioner_v6:
   ...
 
  @staticmethod
- def set_gravity(gravity: zxdg_positioner_v6.gravity) -> None:
+ def set_gravity(gravity: int) -> None:
   """
   Defines in what direction a surface should be positioned, relative to
   the anchor point of the parent surface. If two orthogonal gravities are
@@ -17612,7 +17612,7 @@ class zxdg_positioner_v6:
   ...
 
  @staticmethod
- def set_constraint_adjustment(constraint_adjustment: uint) -> None:
+ def set_constraint_adjustment(constraint_adjustment: int) -> None:
   """
   Specify how the window should be positioned if the originally intended
   position caused the surface to be constrained, meaning at least
@@ -17772,7 +17772,7 @@ class zxdg_surface_v6:
   ...
 
  @staticmethod
- def ack_configure(serial: uint) -> None:
+ def ack_configure(serial: int) -> None:
   """
   When a configure event is received, if a client commits the
   	surface in response to the configure event, then the client
@@ -17805,7 +17805,7 @@ class zxdg_surface_v6:
 
  class events:
   @staticmethod
-  def configure(serial: uint) -> None:
+  def configure(serial: int) -> None:
    """
    The configure event marks the end of a configure sequence. A configure
    sequence is a set of one or more events configuring the state of the
@@ -17926,7 +17926,7 @@ class zxdg_toplevel_v6:
   ...
 
  @staticmethod
- def show_window_menu(seat: wl_seat, serial: uint, x: int, y: int) -> None:
+ def show_window_menu(seat: wl_seat, serial: int, x: int, y: int) -> None:
   """
   Clients implementing client-side decorations might want to show
   a context menu when right-clicking on the decorations, giving the
@@ -17950,7 +17950,7 @@ class zxdg_toplevel_v6:
   ...
 
  @staticmethod
- def move(seat: wl_seat, serial: uint) -> None:
+ def move(seat: wl_seat, serial: int) -> None:
   """
   Start an interactive, user-driven move of the surface.
 
@@ -17977,7 +17977,7 @@ class zxdg_toplevel_v6:
   ...
 
  @staticmethod
- def resize(seat: wl_seat, serial: uint, edges: uint) -> None:
+ def resize(seat: wl_seat, serial: int, edges: int) -> None:
   """
   Start a user-driven, interactive resize of the surface.
 
@@ -18196,7 +18196,7 @@ class zxdg_toplevel_v6:
 
  class events:
   @staticmethod
-  def configure(width: int, height: int, states: array) -> None:
+  def configure(width: int, height: int, states: list) -> None:
    """
    This configure event asks the client to resize its toplevel surface or
    to change its state. The configured state should not be applied
@@ -18292,7 +18292,7 @@ class zxdg_popup_v6:
   ...
 
  @staticmethod
- def grab(seat: wl_seat, serial: uint) -> None:
+ def grab(seat: wl_seat, serial: int) -> None:
   """
   This request makes the created popup take an explicit grab. An explicit
   grab will be dismissed when the user dismisses the popup, or when the
@@ -18455,7 +18455,7 @@ class hyprland_ctm_control_manager_v1:
 
 
  @staticmethod
- def set_ctm_for_output(output: wl_output, mat0: fixed, mat1: fixed, mat2: fixed, mat3: fixed, mat4: fixed, mat5: fixed, mat6: fixed, mat7: fixed, mat8: fixed) -> None:
+ def set_ctm_for_output(output: wl_output, mat0: float, mat1: float, mat2: float, mat3: float, mat4: float, mat5: float, mat6: float, mat7: float, mat8: float) -> None:
   """
   Set a CTM for a wl_output.
 
@@ -18674,7 +18674,7 @@ class hyprland_global_shortcut_v1:
 
  class events:
   @staticmethod
-  def pressed(tv_sec_hi: uint, tv_sec_lo: uint, tv_nsec: uint) -> None:
+  def pressed(tv_sec_hi: int, tv_sec_lo: int, tv_nsec: int) -> None:
    """
    The keystroke was pressed.
 
@@ -18689,7 +18689,7 @@ class hyprland_global_shortcut_v1:
    ...
 
   @staticmethod
-  def released(tv_sec_hi: uint, tv_sec_lo: uint, tv_nsec: uint) -> None:
+  def released(tv_sec_hi: int, tv_sec_lo: int, tv_nsec: int) -> None:
    """
    The keystroke was released.
 
@@ -18837,7 +18837,7 @@ class hyprland_surface_v1:
 
 
  @staticmethod
- def set_opacity(opacity: fixed) -> None:
+ def set_opacity(opacity: float) -> None:
   """
   Sets a multiplier for the overall opacity of the surface.
   This multiplier applies to visual effects such as blur behind the surface
@@ -18895,7 +18895,7 @@ class hyprland_toplevel_export_manager_v1:
 
 
  @staticmethod
- def capture_toplevel(overlay_cursor: int, handle: uint) -> hyprland_toplevel_export_frame_v1:
+ def capture_toplevel(overlay_cursor: int, handle: int) -> hyprland_toplevel_export_frame_v1:
   """
   Capture the next frame of a toplevel. (window)
 
@@ -18999,7 +18999,7 @@ class hyprland_toplevel_export_frame_v1:
 
  class events:
   @staticmethod
-  def buffer(format: wl_shm.format, width: uint, height: uint, stride: uint) -> None:
+  def buffer(format: int, width: int, height: int, stride: int) -> None:
    """
    Provides information about wl_shm buffer parameters that need to be
    used for this frame. This event is sent once after the frame is created
@@ -19015,7 +19015,7 @@ class hyprland_toplevel_export_frame_v1:
    ...
 
   @staticmethod
-  def damage(x: uint, y: uint, width: uint, height: uint) -> None:
+  def damage(x: int, y: int, width: int, height: int) -> None:
    """
    This event is sent right before the ready event when ignore_damage was
    not set. It may be generated multiple times for each copy
@@ -19038,7 +19038,7 @@ class hyprland_toplevel_export_frame_v1:
    ...
 
   @staticmethod
-  def flags(flags: hyprland_toplevel_export_frame_v1.flags) -> None:
+  def flags(flags: int) -> None:
    """
    Provides flags about the frame. This event is sent once before the
    "ready" event.
@@ -19050,7 +19050,7 @@ class hyprland_toplevel_export_frame_v1:
    ...
 
   @staticmethod
-  def ready(tv_sec_hi: uint, tv_sec_lo: uint, tv_nsec: uint) -> None:
+  def ready(tv_sec_hi: int, tv_sec_lo: int, tv_nsec: int) -> None:
    """
    Called as soon as the frame is copied, indicating it is available
    for reading. This event includes the time at which presentation happened
@@ -19084,7 +19084,7 @@ class hyprland_toplevel_export_frame_v1:
    ...
 
   @staticmethod
-  def linux_dmabuf(format: uint, width: uint, height: uint) -> None:
+  def linux_dmabuf(format: int, width: int, height: int) -> None:
    """
    Provides information about linux-dmabuf buffer parameters that need to
    be used for this frame. This event is sent once after the frame is
@@ -19177,7 +19177,7 @@ class hyprland_toplevel_window_mapping_handle_v1:
 
  class events:
   @staticmethod
-  def window_address(address_hi: uint, address: uint) -> None:
+  def window_address(address_hi: int, address: int) -> None:
    """
    The full 64bit window address. The `address` field contains the lower 32 bits whilst the
    `address_hi` contains the upper 32 bits
@@ -19546,7 +19546,7 @@ class zwlr_export_dmabuf_frame_v1:
 
  class events:
   @staticmethod
-  def frame(width: uint, height: uint, offset_x: uint, offset_y: uint, buffer_flags: uint, flags: zwlr_export_dmabuf_frame_v1.flags, format: uint, mod_high: uint, mod_low: uint, num_objects: uint) -> None:
+  def frame(width: int, height: int, offset_x: int, offset_y: int, buffer_flags: int, flags: int, format: int, mod_high: int, mod_low: int, num_objects: int) -> None:
    """
    Main event supplying the client with information about the frame. If the
    capture didn't fail, this event is always emitted first before any other
@@ -19571,7 +19571,7 @@ class zwlr_export_dmabuf_frame_v1:
    ...
 
   @staticmethod
-  def object(index: uint, fd: fd, size: uint, offset: uint, stride: uint, plane_index: uint) -> None:
+  def object(index: int, fd: fd, size: int, offset: int, stride: int, plane_index: int) -> None:
    """
    Event which serves to supply the client with the file descriptors
    containing the data for each object.
@@ -19591,7 +19591,7 @@ class zwlr_export_dmabuf_frame_v1:
    ...
 
   @staticmethod
-  def ready(tv_sec_hi: uint, tv_sec_lo: uint, tv_nsec: uint) -> None:
+  def ready(tv_sec_hi: int, tv_sec_lo: int, tv_nsec: int) -> None:
    """
    This event is sent as soon as the frame is presented, indicating it is
    available for reading. This event includes the time at which
@@ -19615,7 +19615,7 @@ class zwlr_export_dmabuf_frame_v1:
    ...
 
   @staticmethod
-  def cancel(reason: zwlr_export_dmabuf_frame_v1.cancel_reason) -> None:
+  def cancel(reason: int) -> None:
    """
    If the capture failed or if the frame is no longer valid after the
    "frame" event has been emitted, this event will be used to inform the
@@ -19855,7 +19855,7 @@ class zwlr_foreign_toplevel_handle_v1:
    ...
 
   @staticmethod
-  def state(state: array) -> None:
+  def state(state: list) -> None:
    """
    This event is emitted immediately after the zlw_foreign_toplevel_handle_v1
    is created and each time the toplevel state changes, either because of a
@@ -19975,7 +19975,7 @@ class zwlr_gamma_control_v1:
 
  class events:
   @staticmethod
-  def gamma_size(size: uint) -> None:
+  def gamma_size(size: int) -> None:
    """
    Advertise the size of each gamma ramp.
 
@@ -20082,7 +20082,7 @@ class zwlr_layer_shell_v1:
 
 
  @staticmethod
- def get_layer_surface(surface: wl_surface, output: wl_output, layer: zwlr_layer_shell_v1.layer, namespace: str) -> zwlr_layer_surface_v1:
+ def get_layer_surface(surface: wl_surface, output: wl_output, layer: int, namespace: str) -> zwlr_layer_surface_v1:
   """
   Create a layer surface for an existing surface. This assigns the role of
   layer_surface, or raises a protocol error if another role is already
@@ -20169,7 +20169,7 @@ class zwlr_layer_surface_v1:
 
 
  @staticmethod
- def set_size(width: uint, height: uint) -> None:
+ def set_size(width: int, height: int) -> None:
   """
   Sets the size of the surface in surface-local coordinates. The
   compositor will display the surface centered with respect to its
@@ -20186,7 +20186,7 @@ class zwlr_layer_surface_v1:
   ...
 
  @staticmethod
- def set_anchor(anchor: zwlr_layer_surface_v1.anchor) -> None:
+ def set_anchor(anchor: int) -> None:
   """
   Requests that the compositor anchor the surface to the specified edges
   and corners. If two orthogonal edges are specified (e.g. 'top' and
@@ -20253,7 +20253,7 @@ class zwlr_layer_surface_v1:
   ...
 
  @staticmethod
- def set_keyboard_interactivity(keyboard_interactivity: zwlr_layer_surface_v1.keyboard_interactivity) -> None:
+ def set_keyboard_interactivity(keyboard_interactivity: int) -> None:
   """
   Set how keyboard events are delivered to this surface. By default,
   layer shell surfaces do not receive keyboard events; this request can
@@ -20286,7 +20286,7 @@ class zwlr_layer_surface_v1:
   ...
 
  @staticmethod
- def ack_configure(serial: uint) -> None:
+ def ack_configure(serial: int) -> None:
   """
   When a configure event is received, if a client commits the
   surface in response to the configure event, then the client
@@ -20319,7 +20319,7 @@ class zwlr_layer_surface_v1:
   ...
 
  @staticmethod
- def set_layer(layer: zwlr_layer_shell_v1.layer) -> None:
+ def set_layer(layer: int) -> None:
   """
   Change the layer that the surface is rendered on.
 
@@ -20332,7 +20332,7 @@ class zwlr_layer_surface_v1:
   ...
 
  @staticmethod
- def set_exclusive_edge(edge: zwlr_layer_surface_v1.anchor) -> None:
+ def set_exclusive_edge(edge: int) -> None:
   """
   Requests an edge for the exclusive zone to apply. The exclusive
   edge will be automatically deduced from anchor points when possible,
@@ -20348,7 +20348,7 @@ class zwlr_layer_surface_v1:
 
  class events:
   @staticmethod
-  def configure(serial: uint, width: uint, height: uint) -> None:
+  def configure(serial: int, width: int, height: int) -> None:
    """
    The configure event asks the client to resize its surface.
 
@@ -20421,7 +20421,7 @@ class zwlr_output_manager_v1:
 
 
  @staticmethod
- def create_configuration(serial: uint) -> zwlr_output_configuration_v1:
+ def create_configuration(serial: int) -> zwlr_output_configuration_v1:
   """
   Create a new output configuration object. This allows to update head
   properties.
@@ -20456,7 +20456,7 @@ class zwlr_output_manager_v1:
    ...
 
   @staticmethod
-  def done(serial: uint) -> None:
+  def done(serial: int) -> None:
    """
    This event is sent after all information has been sent after binding to
    the output manager object and after any subsequent changes. This applies
@@ -20641,7 +20641,7 @@ class zwlr_output_head_v1:
    ...
 
   @staticmethod
-  def scale(scale: fixed) -> None:
+  def scale(scale: float) -> None:
    """
    This events describes the scale of the head in the global compositor
    space. It is only sent if the output is enabled.
@@ -20745,7 +20745,7 @@ class zwlr_output_head_v1:
    ...
 
   @staticmethod
-  def adaptive_sync(state: zwlr_output_head_v1.adaptive_sync_state) -> None:
+  def adaptive_sync(state: int) -> None:
    """
    This event describes whether adaptive sync is currently enabled for
    the head or not. Adaptive sync is also known as Variable Refresh
@@ -21024,7 +21024,7 @@ class zwlr_output_configuration_head_v1:
   ...
 
  @staticmethod
- def set_scale(scale: fixed) -> None:
+ def set_scale(scale: float) -> None:
   """
   This request sets the head's scale.
   """
@@ -21032,7 +21032,7 @@ class zwlr_output_configuration_head_v1:
   ...
 
  @staticmethod
- def set_adaptive_sync(state: zwlr_output_head_v1.adaptive_sync_state) -> None:
+ def set_adaptive_sync(state: int) -> None:
   """
   This request enables/disables adaptive sync. Adaptive sync is also
   known as Variable Refresh Rate or VRR.
@@ -21088,7 +21088,7 @@ class zwlr_output_power_v1:
 
 
  @staticmethod
- def set_mode(mode: zwlr_output_power_v1.mode) -> None:
+ def set_mode(mode: int) -> None:
   """
   Set an output's power save mode to the given mode. The mode change
   is effective immediately. If the output does not support the given
@@ -21110,7 +21110,7 @@ class zwlr_output_power_v1:
 
  class events:
   @staticmethod
-  def mode(mode: zwlr_output_power_v1.mode) -> None:
+  def mode(mode: int) -> None:
    """
    Report the power management mode change of an output.
 
@@ -21255,7 +21255,7 @@ class zwlr_screencopy_frame_v1:
 
  class events:
   @staticmethod
-  def buffer(format: wl_shm.format, width: uint, height: uint, stride: uint) -> None:
+  def buffer(format: int, width: int, height: int, stride: int) -> None:
    """
    Provides information about wl_shm buffer parameters that need to be
    used for this frame. This event is sent once after the frame is created
@@ -21271,7 +21271,7 @@ class zwlr_screencopy_frame_v1:
    ...
 
   @staticmethod
-  def flags(flags: zwlr_screencopy_frame_v1.flags) -> None:
+  def flags(flags: int) -> None:
    """
    Provides flags about the frame. This event is sent once before the
    "ready" event.
@@ -21283,7 +21283,7 @@ class zwlr_screencopy_frame_v1:
    ...
 
   @staticmethod
-  def ready(tv_sec_hi: uint, tv_sec_lo: uint, tv_nsec: uint) -> None:
+  def ready(tv_sec_hi: int, tv_sec_lo: int, tv_nsec: int) -> None:
    """
    Called as soon as the frame is copied, indicating it is available
    for reading. This event includes the time at which the presentation took place.
@@ -21316,7 +21316,7 @@ class zwlr_screencopy_frame_v1:
    ...
 
   @staticmethod
-  def damage(x: uint, y: uint, width: uint, height: uint) -> None:
+  def damage(x: int, y: int, width: int, height: int) -> None:
    """
    This event is sent right before the ready event when copy_with_damage is
    requested. It may be generated multiple times for each copy_with_damage
@@ -21339,7 +21339,7 @@ class zwlr_screencopy_frame_v1:
    ...
 
   @staticmethod
-  def linux_dmabuf(format: uint, width: uint, height: uint) -> None:
+  def linux_dmabuf(format: int, width: int, height: int) -> None:
    """
    Provides information about linux-dmabuf buffer parameters that need to
    be used for this frame. This event is sent once after the frame is
@@ -21378,7 +21378,7 @@ class zwlr_virtual_pointer_v1:
 
 
  @staticmethod
- def motion(time: uint, dx: fixed, dy: fixed) -> None:
+ def motion(time: int, dx: float, dy: float) -> None:
   """
   The pointer has moved by a relative amount to the previous request.
 
@@ -21393,7 +21393,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def motion_absolute(time: uint, x: uint, y: uint, x_extent: uint, y_extent: uint) -> None:
+ def motion_absolute(time: int, x: int, y: int, x_extent: int, y_extent: int) -> None:
   """
   The pointer has moved in an absolute coordinate frame.
 
@@ -21411,7 +21411,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def button(time: uint, button: uint, state: wl_pointer.button_state) -> None:
+ def button(time: int, button: int, state: int) -> None:
   """
   A button was pressed or released.
 
@@ -21424,7 +21424,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def axis(time: uint, axis: wl_pointer.axis, value: fixed) -> None:
+ def axis(time: int, axis: int, value: float) -> None:
   """
   Scroll and other axis requests.
 
@@ -21445,7 +21445,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def axis_source(axis_source: wl_pointer.axis_source) -> None:
+ def axis_source(axis_source: int) -> None:
   """
   Source information for scroll and other axis.
 
@@ -21456,7 +21456,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def axis_stop(time: uint, axis: wl_pointer.axis) -> None:
+ def axis_stop(time: int, axis: int) -> None:
   """
   Stop notification for scroll and other axes.
 
@@ -21468,7 +21468,7 @@ class zwlr_virtual_pointer_v1:
   ...
 
  @staticmethod
- def axis_discrete(time: uint, axis: wl_pointer.axis, value: fixed, discrete: int) -> None:
+ def axis_discrete(time: int, axis: int, value: float, discrete: int) -> None:
   """
   Discrete step information for scroll and other axes.
 
