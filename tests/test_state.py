@@ -49,10 +49,7 @@ class TestWaylandStateGetSocketPath(unittest.TestCase):
 
         mock_os_getenv.side_effect = side_effect_no_xdg
 
-        with pytest.raises(
-            ValueError, match="XDG_RUNTIME_DIR environment variable not set."
-        ):
-            WaylandState._get_socket_path()
+        assert WaylandState._get_socket_path() == ""
 
         calls = [call("XDG_RUNTIME_DIR"), call("WAYLAND_DISPLAY", "wayland-0")]
         mock_os_getenv.assert_has_calls(calls, any_order=False)
