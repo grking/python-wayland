@@ -140,6 +140,7 @@ extend-select = ["C901"]
 line-length = 88
 exclude = [
   "wayland/__init__.pyi",
+  "examples/",
 ]
 
 [tool.pylint]

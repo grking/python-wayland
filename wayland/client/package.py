@@ -45,7 +45,7 @@ def get_package_version() -> str:
             capture_output=True,
             text=True,
             check=True,
-            cwd=get_package_root()
+            cwd=get_package_root(),
         )
         commit = result.stdout.strip()
 
