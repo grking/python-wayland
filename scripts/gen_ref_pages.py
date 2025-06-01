@@ -22,9 +22,6 @@ for interface in WAYLAND_INTERFACES:
         print("      members_order: source", file=f)
         print("      heading_level: 2", file=f)
 
-    # Optionally set the edit path for the generated file
-    mkdocs_gen_files.set_edit_path(filename, f"wayland/{interface}.py")
-
 # Generate a summary page
 with mkdocs_gen_files.open("wayland/index.md", "w") as f:
     print("# Wayland Interface Reference\n", file=f)
@@ -45,6 +42,3 @@ if changelog_path.exists():
     # Create it in the docs
     with mkdocs_gen_files.open("changelog.md", "w") as f:
         f.write(changelog_content)
-
-    # Set edit path to the actual file
-    mkdocs_gen_files.set_edit_path("changelog.md", "CHANGELOG.md")

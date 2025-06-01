@@ -3,6 +3,7 @@ site_description: A Python implementation of the Wayland protocol client API
 repo_url: https://github.com/grking/python-wayland
 site_dir: site
 repo_name: grking/python-wayland
+edit_uri: ""
 
 nav:
   - Getting Started:
@@ -21,13 +22,15 @@ nav:
     - Changelog: changelog.md
     - Github Project: https://github.com/grking/python-wayland
 
+watch:
+  - docs
+  - wayland/__init__.pyi
+
 theme:
   name: material
   custom_dir: docs/.overrides
   features:
   - announce.dismiss
-  - content.action.edit
-  - content.action.view
   - content.code.annotate
   - content.code.copy
   - content.tooltips
@@ -84,7 +87,7 @@ plugins:
     default_handler: python
     handlers:
       python:
-        paths: [wayland, docs/snippets]
+        paths: ["."]
         inventories:
         - https://docs.python.org/3/objects.inv
         options:
