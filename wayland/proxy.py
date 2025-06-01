@@ -322,8 +322,6 @@ class Proxy:
                 self.dispatch_timeout = types.MethodType(dispatch_timeout, self)
 
                 self.object_id, _ = self._state.new_object(self)
-                self.dispatch = None
-                self.dispatch_pending = None
 
             # Bind requests and events
             self.events = Proxy.Events()
@@ -423,6 +421,7 @@ class Proxy:
                 time.sleep(1 / MAX_EVENT_RESOLUTION)
             if time.time() > max_time:
                 break
+        return have_events
 
     @classmethod
     def _dispatch(cls):
