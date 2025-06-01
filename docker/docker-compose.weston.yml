@@ -1,0 +1,26 @@
+# docker/docker-compose.weston.yml
+name: python-wayland-test-weston
+
+services:
+  # base weston service
+  env-weston-base:
+    extends:
+      file: docker-compose.yml
+      service: wayland-base
+    depends_on:
+      - base
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.weston
+    image: python-wayland:weston
+    command: ["weston"]
+
+  # GUI weston (nested in Wayland)
+  env-weston-gui:
+    extends: env-weston-base
+    command: ["weston", "-c", "/home/user/.config/weston/weston.ini"]
+
+  # Shell
+  env-weston-shell:
+    extends: env-weston-base
+    command: "/bin/bash"

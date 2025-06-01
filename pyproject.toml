@@ -79,6 +79,23 @@ serve = "mkdocs serve"
 update = "python -m wayland --download"
 update-local = "python -m wayland"
 
+[tool.hatch.envs.default.scripts]
+
+docker-build = """
+  docker compose -f docker/docker-compose.yml build base &&
+  docker compose -f docker/docker-compose.yml -f docker/docker-compose.sway.yml build &&
+  docker compose -f docker/docker-compose.yml -f docker/docker-compose.weston.yml build
+"""
+docker-stop = """
+  docker compose -f docker/docker-compose.yml down -v &&
+  docker compose -f docker/docker-compose.yml -f docker/docker-compose.weston.yml down -v &&
+  docker compose -f docker/docker-compose.yml -f docker/docker-compose.sway.yml down -v
+"""
+
+docker-sway = "docker compose -f docker/docker-compose.yml -f docker/docker-compose.sway.yml run --rm env-sway-gui"
+docker-sway-shell = "docker compose -f docker/docker-compose.yml -f docker/docker-compose.sway.yml run --rm env-sway-shell"
+docker-weston = "docker compose -f docker/docker-compose.yml -f docker/docker-compose.weston.yml run --rm env-weston-gui"
+docker-weston-shell = "docker compose -f docker/docker-compose.yml -f docker/docker-compose.weston.yml run --rm env-weston-shell"
 
 [build-system]
 requires = ["hatchling"]

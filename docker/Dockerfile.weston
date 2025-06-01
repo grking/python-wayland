@@ -1,0 +1,26 @@
+# docker/Dockerfile.weston
+FROM python-wayland:base AS wayland-weston
+
+USER root
+
+RUN pacman -S --noconfirm \
+    weston \
+    foot \
+    && pacman -Scc --noconfirm
+
+USER user
+WORKDIR /home/user
+
+# Create Weston-specific config directories
+RUN mkdir -p /home/user/.config/foot
+RUN mkdir -p /home/user/.config/weston
+
+# Copy configs with correct ownership
+COPY --chown=user:user docker/configs/foot_config /home/user/.config/foot/foot.ini
+COPY --chown=user:user docker/configs/weston_config /home/user/.config/weston/weston.ini
+COPY --chown=user:user docker/configs/startup.sh /home/user/
+COPY --chown=user:user docker/configs/weston.sh /home/user/weston.sh
+RUN chmod +x /home/user/startup.sh
+RUN chmod +x /home/user/weston.sh
+
+CMD ["weston"]

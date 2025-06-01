@@ -1,0 +1,31 @@
+# docker/docker-compose.yml
+name: python-wayland-test-base
+
+services:
+  base:
+    image: python-wayland:base
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.base
+    command: echo "Base image built"
+
+  # Base service with common Wayland settings
+  wayland-base:
+    image: python-wayland:base
+    environment:
+      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY}
+      - XDG_RUNTIME_DIR=/tmp/runtime-dir 
+      - DISPLAY=${DISPLAY}
+      - WLR_BACKENDS=wayland
+      - WLR_WL_OUTPUTS=1
+      - WLR_NO_HARDWARE_CURSORS=1
+    volumes:
+      - ..:/home/user/python-wayland
+      - ${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}:/tmp/runtime-dir/${WAYLAND_DISPLAY}
+    privileged: true
+    devices:
+      - /dev/dri:/dev/dri
+      - /dev/input:/dev/input  
+    stdin_open: true
+    tty: true
+    command: echo "This is a base service"
