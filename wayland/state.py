@@ -49,7 +49,10 @@ class WaylandState:
     def __init__(self, *, disable_event_dispatch_thread=False):
         self._thread = None
         self._socket_path = self._get_socket_path()
-        self._socket = UnixSocketConnection(self._socket_path)
+        if self._socket_path:
+            self._socket = UnixSocketConnection(self._socket_path)
+        else:
+            self._socket = None
         self._next_object_id = 1
         self._object_id_to_instance: dict[int, Any] = {}
         self._instance_to_object_id: dict[Any, int] = {}
@@ -62,8 +65,9 @@ class WaylandState:
         path = os.getenv("XDG_RUNTIME_DIR")
         display = os.getenv("WAYLAND_DISPLAY", "wayland-0")
         if not path:
-            msg = "XDG_RUNTIME_DIR environment variable not set."
-            raise ValueError(msg)
+            msg = "WARNING: Wayland is not active (XDG_RUNTIME_DIR environment variable not set)"
+            log.warning(msg)
+            return ""
         return f"{path}/{display}"
 
     def new_object(self, object_reference: Any) -> tuple[int, Any]:
@@ -142,6 +146,8 @@ class WaylandState:
         self._thread.start()
 
     def _send(self, message: bytes, ancillary: Any = None) -> None:
+        if not self._socket:
+            return
         self._debug_packet(message, ancillary)
         if ancillary:
             self._socket.sendmsg([message], ancillary)
@@ -165,6 +171,8 @@ class WaylandState:
         self._send(header + packet, ancillary)
 
     def get_next_message(self) -> bool:
+        if not self._socket:
+            return False
         packet = self._socket.get_next_message()
         if not packet:
             return False

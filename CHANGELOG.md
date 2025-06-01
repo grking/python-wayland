@@ -3,6 +3,7 @@
 ### v1.0.0 (XXth June 2025)
 - Event dispatching changed to more closely align with the pattern in `libwayland-client`, using dispatch and dispatch_pending for blocking and non-blocking event dispatching. (see the below breaking API changes)
 - Event handling changed to correctly support asynchronous event processing across multiple threads, rather than the previous synchronous, single threaded event queue.
+- The library now initialises in the same way when imported, regardless of if Wayland is running or not.
 - All non-wayland protocol functionality introduced by `python-wayland` moved to the namespace `wayland.client`
 - The `wayland` package namespace cleaned up so it only contains wayland interfaces and the `client` module.
 - Comprehensive documentation added, including full Wayland protocol documentation.

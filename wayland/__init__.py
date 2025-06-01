@@ -23,14 +23,12 @@
 
 from os import getenv as __getenv
 
+from wayland import client as client  # noqa: PLC0414
+
 # Wayland methods are injected into the package global scope
 # so, for example, "wayland.wl_display" just works. This is
 # purely syntactic sugar for library callers.
-if __getenv("WAYLAND_INITIALISE", "").lower() != "false" and (
-    __getenv("WAYLAND_INITIALISE", "").lower() == "true"
-    or "wayland" in __getenv("WAYLAND_DISPLAY", "").lower()
-    or "wayland" in __getenv("XDG_SESSION_TYPE", "").lower()
-):
+if __getenv("WAYLAND_INITIALISE", "").lower() != "false":
     from wayland.proxy import Proxy
 
     __dynamic_object = Proxy.DynamicObject
