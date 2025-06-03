@@ -8,7 +8,9 @@ from wayland import client as client  # noqa: PLC0414
 # Wayland methods are injected into the package global scope
 # so, for example, "wayland.wl_display" just works. This is
 # purely syntactic sugar for library callers.
-if __getenv("WAYLAND_INITIALISE", "").lower() != "false":
+if __getenv("WAYLAND_INITIALISE", "").lower() != "false" and not hasattr(
+    globals(), "wl_display"
+):
     from wayland.proxy import Proxy
 
     __dynamic_object = Proxy.DynamicObject
