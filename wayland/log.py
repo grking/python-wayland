@@ -8,7 +8,7 @@ import os
 from typing import Any
 
 # Custom log levels
-CUSTOM_LEVELS = {"PROTOCOL": 7, "EVENT": 8, "REQUEST": 9}
+CUSTOM_LEVELS = {"PROTOCOL": 7}
 
 for name, level in CUSTOM_LEVELS.items():
     logging.addLevelName(level, name)
@@ -28,12 +28,6 @@ class WaylandLogger(logging.Logger):
 
     def protocol(self, msg: str, *args: Any, **kwargs: Any) -> None:
         self._log_if_enabled(CUSTOM_LEVELS["PROTOCOL"], msg, *args, **kwargs)
-
-    def event(self, msg: str, *args: Any, **kwargs: Any) -> None:
-        self._log_if_enabled(CUSTOM_LEVELS["EVENT"], msg, *args, **kwargs)
-
-    def request(self, msg: str, *args: Any, **kwargs: Any) -> None:
-        self._log_if_enabled(CUSTOM_LEVELS["REQUEST"], msg, *args, **kwargs)
 
     def toggle_level(self, level_name: str, enable: bool) -> None:
         self._enabled_flags[level_name.lower()] = enable

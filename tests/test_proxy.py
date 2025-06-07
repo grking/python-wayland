@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from wayland.debugger import Debugger
 from wayland.proxy import Proxy
 from wayland.state import WaylandState
 
@@ -17,6 +18,7 @@ class TestProxyRequest(unittest.TestCase):
         self.mock_parent_proxy._name = "test_interface"
         self.mock_parent_proxy.object_id = 123
         self.mock_parent_proxy._scope = {}
+        self.mock_parent_proxy._debugger = MagicMock(spec=Debugger)
 
     def test_pack_argument_uint(self):
         """
@@ -431,6 +433,7 @@ class TestProxyEvent(unittest.TestCase):
         self.mock_parent_proxy = MagicMock(spec=Proxy.DynamicObject)
         self.mock_parent_proxy._name = "test_event_interface"
         self.mock_parent_proxy.object_id = 789
+        self.mock_parent_proxy._debugger = MagicMock(spec=Debugger)
 
         self.event_args_def_uint = [{"name": "data", "type": "uint"}]
         self.event_opcode = 0
@@ -734,7 +737,7 @@ class TestProxyEvent(unittest.TestCase):
             6,
         )
 
-        test_array_data = b"\x01\x02\x03\x04\x05"
+        test_array_data = b"\x01\x02\x03\x04"
         packed_len = struct.pack("I", len(test_array_data))
         padding_len = ((len(test_array_data) + 3) & ~3) - len(test_array_data)
         padded_array_data = test_array_data + (b"\x00" * padding_len)
@@ -745,9 +748,16 @@ class TestProxyEvent(unittest.TestCase):
             packet, "array", get_fd=None, enum_type=None
         )
 
-        assert unpacked_value == (
-            test_array_data[:-1] if len(test_array_data) > 0 else b""
-        )
+        expected_elements = len(test_array_data) // 4
+        if expected_elements > 0:
+            expected_value = list(
+                struct.unpack(
+                    f"{expected_elements}I", test_array_data[: expected_elements * 4]
+                )
+            )
+        else:
+            expected_value = []
+        assert unpacked_value == expected_value
         assert remaining_packet == b"trailing_array_data"
 
     def test_event_call_invokes_handlers_with_unpacked_array(self):
@@ -771,9 +781,15 @@ class TestProxyEvent(unittest.TestCase):
         proxy_event_array(packet_data, mock_get_fd)
         Proxy._dispatch_timeout(0.2)
 
-        expected_unpacked_array = (
-            test_byte_array[:-1] if len(test_byte_array) > 0 else b""
-        )
+        expected_elements = len(test_byte_array) // 4
+        if expected_elements > 0:
+            expected_unpacked_array = list(
+                struct.unpack(
+                    f"{expected_elements}I", test_byte_array[: expected_elements * 4]
+                )
+            )
+        else:
+            expected_unpacked_array = []
         mock_handler.assert_called_once_with(serial_data=expected_unpacked_array)
         mock_get_fd.assert_not_called()
 

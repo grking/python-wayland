@@ -1,10 +1,13 @@
 # API Documentation
 
-The basic purpose of `python-wayland` is to provide an implementation of the Wayland protocol and allow interaction with Wayland objects.
+All the Wayland interfaces are available in the [`wayland` namespace.](../wayland/index.md)
 
-This section documents the additional functionality that `python-wayland` provides, functionality that is not part of the low-level Wayland protocol. This functionality falls into two categories:
+`wayland.client` provides additional functionality that is not part of the low-level Wayland protocol. Helper or convenience functions to assist with developing using `python-wayland`.
 
-1. Helper or convenience functions to assist using the library.
-1. Semi-internal functions which assist whilst developing the library.
+## Wayland Protocol Debugger
 
-There is almost certainly nothing of interest here currently. It is planned that additional helper functionality be added to the library to assist with actually creating GUI applications, at least, assist with the setup process to create actual windows and surfaces so a GUI could be painted by the client application.
+The most useful feature is the Wayland protocol debugger. This allows you to monitor all requests and events between your application and the Wayland compositor.
+
+![Wayland debugger interface](../assets/images/wayland-debugger.png)
+
+This is easy to use in your application. See the [documentation here](client.md#wayland.client.start_debug_server).

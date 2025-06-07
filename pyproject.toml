@@ -43,6 +43,18 @@ extra-args = [
     "-q"
 ]
 
+[project.optional-dependencies]
+debugger = [
+    "textual",
+]
+
+[tool.hatch.envs.default]
+dependencies = [
+  "lxml",
+  "textual",
+  "textual-dev"
+]
+
 [tool.hatch.envs.wayland]
 extra-dependencies = [
   "mypy",

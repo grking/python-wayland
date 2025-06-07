@@ -14,8 +14,23 @@ from typing import ClassVar
 
 from wayland.client.package import get_package_root
 from wayland.constants import MAX_EVENT_RESOLUTION
+from wayland.debugger import Debugger
 from wayland.log import log
 from wayland.state import WaylandState
+
+# Global reference to active proxy instance
+_active_proxy = None
+
+
+def _set_active_proxy(proxy):
+    """Set the active proxy instance for inspection."""
+    global _active_proxy  # noqa: PLW0603
+    _active_proxy = proxy
+
+
+def _get_active_proxy():
+    """Get the active proxy instance."""
+    return _active_proxy
 
 
 class Proxy:
@@ -33,6 +48,9 @@ class Proxy:
             self.event = False
             self.parent = parent
             self.state = state
+            self.kwargs = {}
+            self.packet = b""
+            self._debugger = Debugger()
 
         @classmethod
         def _pad(cls, data):
@@ -47,10 +65,10 @@ class Proxy:
             args = list(args)
 
             # Read some properties from the class to which this request is bound
-            parent_interface = self.parent._name
             object_id = self.parent.object_id
             scope = self.parent._scope
 
+            kwargs = {}
             packet = b""
             values = []
             interface = None
@@ -75,6 +93,8 @@ class Proxy:
                     # A normal argument, just grab the value
                     value = args.pop(0)
 
+                kwargs[arg["name"]] = value
+
                 # Pack the argument
                 packet, value = self._pack_argument(packet, arg["type"], value)
                 ancillary = self._handle_fd_argument(arg["type"], value, ancillary)
@@ -82,9 +102,9 @@ class Proxy:
                 # Debug info
                 values.append(self._format_debug_arg(value, arg["type"]))
 
-            log.request(
-                f"{parent_interface}#{object_id}.{self.name}({', '.join(values)})"
-            )
+            self.kwargs = kwargs.copy()
+            self.packet = packet
+            self._debugger.log(self)
 
             # Send the wayland request
             self.state.send_wayland_message(object_id, self.opcode, packet, ancillary)
@@ -136,12 +156,38 @@ class Proxy:
         def __init__(self, parent, name, args, opcode):
             self.name = name
             self.parent = parent
-            self.event_args = args
             self.opcode = opcode
-            self.event = False
+            self.event_args = args
             self.event = True
             self._lock = threading.Lock()
             self._event_handlers = {}
+            self._debugger = Debugger()
+            self.kwargs = {}
+            self.packet = b""
+
+        def _transform_args(self, packet, get_fd):
+            kwargs = {}
+            self.packet = packet
+            for arg in self.event_args:
+                arg_type = arg["type"]
+                enum_type = arg.get("enum")
+                # Get the value
+                packet, value = self._unpack_argument(
+                    packet, arg_type, get_fd, enum_type
+                )
+                # Save the argument value
+                kwargs[arg["name"]] = value
+
+                # For new_id on events, pass the interface as an argument to the event handler too
+                if arg_type == "new_id" and arg.get("interface"):
+                    # Get the interface name
+                    interface = arg.get("interface")
+                    # Save the argument
+                    kwargs["interface"] = interface
+                    # TODO: we don't expand object id to an actual object instance
+                    msg = "No events like this to test yet"
+                    raise NotImplementedError(msg)
+            return kwargs
 
         def _thread_id(self):
             tid = threading.current_thread().native_id
@@ -174,39 +220,10 @@ class Proxy:
             # This event has been triggered, let our event listeners
             # know about it. In fact, don't, but queue up the notifications
             # for when each thread is ready.
+            kwargs = self._transform_args(packet, get_fd)
+            self.kwargs = kwargs
 
-            # Read some properties from the class to which this event is bound
-            parent_interface = self.parent._name
-            object_id = self.parent.object_id
-
-            kwargs = {}
-            for arg in self.event_args:
-                arg_type = arg["type"]
-                enum_type = arg.get("enum")
-                # Get the value
-                packet, value = self._unpack_argument(
-                    packet, arg_type, get_fd, enum_type
-                )
-                # Save the argument
-                kwargs[arg["name"]] = value
-
-                # For new_id on events, pass the interface as an argument to the event handler too
-                if arg_type == "new_id" and arg.get("interface"):
-                    # Get the interface name
-                    interface = arg.get("interface")
-                    # Save the argument
-                    kwargs["interface"] = interface
-                    # TODO: we don't expand object id to an actual object instance
-                    msg = "No events like this to test yet"
-                    raise NotImplementedError(msg)
-
-            values = []
-            for k, v in kwargs.items():
-                values.append(f"{k} = {v}")
-
-            log.event(
-                f"{parent_interface}#{object_id}.{self.name}({', '.join(values)})"
-            )
+            self._debugger.log(self)
 
             # Put this event callback in each threads queue
             with self._lock:
@@ -252,8 +269,15 @@ class Proxy:
                 (length,) = struct.unpack_from("I", packet)
                 packet = packet[4:]
                 padded_length = (length + 3) & ~3
-                (value,) = struct.unpack_from(f"{padded_length}s", packet)
-                value = value[: length - 1]
+                if length > 0:
+                    # Read the raw array data
+                    (array_data,) = struct.unpack_from(f"{padded_length}s", packet)
+                    # Convert bytes to list of integers
+                    num_elements = length // 4
+                    value = list(struct.unpack(f"{num_elements}I", array_data[:length]))
+                else:
+                    value = []
+
                 read = padded_length
             elif arg_type == "fixed":
                 (value,) = struct.unpack_from("I", packet)

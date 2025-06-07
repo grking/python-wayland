@@ -4,6 +4,8 @@
 from os import getenv
 from typing import TYPE_CHECKING
 
+from wayland.debugger import Debugger
+
 if TYPE_CHECKING:
     from wayland.proxy import Proxy as Proxy  # noqa: PLC0414
 
@@ -49,6 +51,48 @@ def is_wayland() -> bool:
         "wayland" in getenv("WAYLAND_DISPLAY", "").lower()
         or "wayland" in getenv("XDG_SESSION_TYPE", "").lower()
     )
+
+
+def start_debug_server() -> str:
+    """Enable the Wayland protocol debugging service.
+
+    You can debug the requests and events between your application
+    and the Wayland compositor easily using the debugger
+    included with `python-wayland`.
+
+    Simply enable debugging in your application and then
+    use the stand-alone debugger to monitor Wayland messages
+    as your application is running.
+
+    Step 1: To enable protocol debugging in your application
+    call `start_debug_server`. This call returns immediately.
+
+    ```python
+    wayland.client.start_debug_server()
+    ```
+
+    Step 2: Run your application and then start the protocol debugger:
+
+    ```bash
+    python -m wayland.client.debug
+    ```
+
+    This will start the terminal protocol debugger:
+
+    ![Wayland debugger interface](../assets/images/wayland-debugger.png)
+
+    You could also connect to your application directly using the file socket
+    that `start_debug_server` opened with a utility such as `socat`:
+
+    ```bash
+    socat - ABSTRACT-CONNECT:python-wayland-debug
+    ```
+
+    Returns:
+        The name of the abstract file socket on which the server is listening.
+    """
+    debug = Debugger()
+    return debug.start_debug_server()
 
 
 __all__ = ["get_wayland_proxy", "is_wayland"]
