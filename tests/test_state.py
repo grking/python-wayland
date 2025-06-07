@@ -372,7 +372,7 @@ class TestWaylandState(unittest.TestCase):
         ) as mock_oid_to_event_none:
             assert self.state.get_next_message()
             mock_oid_to_event_none.assert_called_once_with(object_id, event_opcode)
-            mock_log_object_gnm.event.assert_called_once_with(
+            mock_log_object_gnm.warning.assert_called_once_with(
                 f"Unhandled event {object_id}#{event_opcode}"
             )
 

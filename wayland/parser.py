@@ -329,7 +329,9 @@ class WaylandParser:
         description_node = node.find("description")
         description = self.get_description(description_node)
 
-        signature_args_str = ", ".join(f'{x["name"]}: {x.get("type","")}' for x in args)
+        signature_args_str = ", ".join(
+            f"{x['name']}: {x.get('type', '')}" for x in args
+        )
         signature = f"{interface_name}.{object_name}({signature_args_str})"
 
         wayland_object.update(

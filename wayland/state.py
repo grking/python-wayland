@@ -169,7 +169,7 @@ class WaylandState:
             event(packet, self._socket.get_next_fd)
             return True
 
-        log.event(f"Unhandled event {wayland_object}#{opcode}")
+        log.warning(f"Unhandled event {wayland_object}#{opcode}")
         return True
 
     def _process_messages(self) -> None:

@@ -18,6 +18,11 @@ if __getenv("WAYLAND_INITIALISE", "").lower() != "false" and not hasattr(
     __proxy = Proxy()
     __proxy.initialise(globals())
 
+    # Store reference for inspection module
+    from wayland.proxy import _set_active_proxy
+
+    _set_active_proxy(__proxy)
+
     # Clean up namespace - keep only dynamic objects,
     # dunder methods, and "client"
     __keys_to_delete = []
