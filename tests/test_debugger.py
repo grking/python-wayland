@@ -254,9 +254,9 @@ class TestDebugger(unittest.TestCase):
         # Mock a Proxy.Event like object
         mock_proxy_event = MagicMock()
         mock_proxy_event.event = True  # Key differentiator for event
-        mock_proxy_event.parent._name = "wl_keyboard"
+        mock_proxy_event.interface = "wl_keyboard"
         mock_proxy_event.name = "key"
-        mock_proxy_event.parent.object_id = 123
+        mock_proxy_event.object_id = 123
         mock_proxy_event.kwargs = {"keycode": 1}
         mock_proxy_event.opcode = 2
         mock_proxy_event.packet = b"key_event_packet"
@@ -298,9 +298,9 @@ class TestDebugger(unittest.TestCase):
         # Mock a Proxy.Request like object
         mock_proxy_request = MagicMock()
         mock_proxy_request.event = False  # Key differentiator for request
-        mock_proxy_request.parent._name = "wl_surface"
+        mock_proxy_request.interface = "wl_surface"
         mock_proxy_request.name = "commit"
-        mock_proxy_request.parent.object_id = 456
+        mock_proxy_request.object_id = 456
         mock_proxy_request.kwargs = {}
         mock_proxy_request.opcode = 3
         mock_proxy_request.packet = b"commit_request_packet"
@@ -331,9 +331,9 @@ class TestDebugger(unittest.TestCase):
                 # Mock Proxy.Event
                 mock_proxy_event = MagicMock()
                 mock_proxy_event.event = True
-                mock_proxy_event.parent._name = f"if_evt_{thread_id}"
+                mock_proxy_event.interface = f"if_evt_{thread_id}"
                 mock_proxy_event.name = f"evt_{i}"
-                mock_proxy_event.parent.object_id = i
+                mock_proxy_event.object_id = i
                 mock_proxy_event.kwargs = {}
                 mock_proxy_event.opcode = 0
                 mock_proxy_event.packet = b""
@@ -342,9 +342,9 @@ class TestDebugger(unittest.TestCase):
                 # Mock Proxy.Request
                 mock_proxy_request = MagicMock()
                 mock_proxy_request.event = False
-                mock_proxy_request.parent._name = f"if_req_{thread_id}"
+                mock_proxy_request.interface = f"if_req_{thread_id}"
                 mock_proxy_request.name = f"req_{i}"
-                mock_proxy_request.parent.object_id = i + 1000
+                mock_proxy_request.object_id = i + 1000
                 mock_proxy_request.kwargs = {}
                 mock_proxy_request.opcode = 1
                 mock_proxy_request.packet = b""
@@ -373,9 +373,9 @@ class TestDebugger(unittest.TestCase):
         def _create_mock_proxy_msg(name_suffix, *, is_event=True):
             mock_msg = MagicMock()
             mock_msg.event = is_event
-            mock_msg.parent._name = "interface"
+            mock_msg.interface = "interface"
             mock_msg.name = f"method_{name_suffix}"
-            mock_msg.parent.object_id = 1
+            mock_msg.object_id = 1
             mock_msg.kwargs = {}
             mock_msg.opcode = 0
             mock_msg.packet = b""
@@ -438,9 +438,9 @@ class TestDebugger(unittest.TestCase):
         def _create_mock_proxy_msg(name_suffix, *, is_event=True, obj_id_offset=0):
             mock_msg = MagicMock()
             mock_msg.event = is_event
-            mock_msg.parent._name = "interface"
+            mock_msg.interface = "interface"
             mock_msg.name = f"method_{name_suffix}"
-            mock_msg.parent.object_id = 1 + obj_id_offset
+            mock_msg.object_id = 1 + obj_id_offset
             mock_msg.kwargs = {}
             mock_msg.opcode = 0
             mock_msg.packet = b""
@@ -473,9 +473,9 @@ class TestDebugger(unittest.TestCase):
         def _create_mock_proxy_msg(name_suffix, *, is_event=True, obj_id_offset=0):
             mock_msg = MagicMock()
             mock_msg.event = is_event
-            mock_msg.parent._name = "interface"
+            mock_msg.interface = "interface"
             mock_msg.name = f"method_{name_suffix}"
-            mock_msg.parent.object_id = 1 + obj_id_offset
+            mock_msg.object_id = 1 + obj_id_offset
             mock_msg.kwargs = {}
             mock_msg.opcode = 0
             mock_msg.packet = b""
@@ -512,9 +512,9 @@ class TestDebugger(unittest.TestCase):
         def _create_mock_proxy_msg(name_suffix, *, is_event=True):
             mock_msg = MagicMock()
             mock_msg.event = is_event
-            mock_msg.parent._name = "interface"
+            mock_msg.interface = "interface"
             mock_msg.name = f"method_{name_suffix}"
-            mock_msg.parent.object_id = 1
+            mock_msg.object_id = 1
             mock_msg.kwargs = {}
             mock_msg.opcode = 0
             mock_msg.packet = b""
@@ -543,9 +543,9 @@ class TestDebugger(unittest.TestCase):
         def _create_mock_proxy_msg(name_suffix, *, is_event=True, obj_id=0):
             mock_msg = MagicMock()
             mock_msg.event = is_event
-            mock_msg.parent._name = "interface"
+            mock_msg.interface = "interface"
             mock_msg.name = f"method_{name_suffix}"
-            mock_msg.parent.object_id = obj_id
+            mock_msg.object_id = obj_id
             mock_msg.kwargs = {}
             mock_msg.opcode = 0
             mock_msg.packet = b""
@@ -589,9 +589,9 @@ class TestDebugger(unittest.TestCase):
         def _create_mock_proxy_msg(name_suffix, *, is_event=True):
             mock_msg = MagicMock()
             mock_msg.event = is_event
-            mock_msg.parent._name = "interface"
+            mock_msg.interface = "interface"
             mock_msg.name = f"method_{name_suffix}"
-            mock_msg.parent.object_id = 1
+            mock_msg.object_id = 1
             mock_msg.kwargs = {}
             mock_msg.opcode = 0
             mock_msg.packet = b""
@@ -617,9 +617,9 @@ class TestDebugger(unittest.TestCase):
         def _create_mock_proxy_msg(name_suffix, *, is_event=True):
             mock_msg = MagicMock()
             mock_msg.event = is_event
-            mock_msg.parent._name = "interface"
+            mock_msg.interface = "interface"
             mock_msg.name = f"method_{name_suffix}"
-            mock_msg.parent.object_id = 1
+            mock_msg.object_id = 1
             mock_msg.kwargs = {}
             mock_msg.opcode = 0
             mock_msg.packet = b""
@@ -654,9 +654,9 @@ class TestDebugger(unittest.TestCase):
         def _create_mock_proxy_msg(name_suffix, *, is_event=True, obj_id=0):
             mock_msg = MagicMock()
             mock_msg.event = is_event
-            mock_msg.parent._name = "interface"
+            mock_msg.interface = "interface"
             mock_msg.name = f"method_{name_suffix}"
-            mock_msg.parent.object_id = obj_id
+            mock_msg.object_id = obj_id
             mock_msg.kwargs = {}
             mock_msg.opcode = 0
             mock_msg.packet = b""

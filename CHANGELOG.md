@@ -1,15 +1,19 @@
 # Changelog
 
-## v1.0.0 (XXth June 2025)
+## DEVELOPMENT VERSION
 
-### Added
-- Added the Wayland protocol debugger.
-- Added [online documentation](https://python-wayland.org)
+This version replaces the previous experiments with a more formal Wayland class library and stable API. It introduces a more typical design pattern and behaviour, with more explicit and predictable Pythonic usage and less implicit magic. 
 
-### Breaking Changes
-- The non-Wayland parts of the package and API were slightly restructured to provide a cleaner base on which to add additional features.
+### Major Changes
+
+* Now exposes a Wayland class library (rather than a library of magic instances).
+
+- Introduces a Wayland protocol debugger. A terminal application providing a TUI to intercept and analyse Wayland protocol messages between your application and the Wayland compositor.
+- Comprehensive [online documentation](https://python-wayland.org) is now available.
+
+### Other API Changes
 - All non-Wayland protocol APIs are now in `wayland.client`
-- `wayland.process_messages()` removed. Use dispatch below.
+- `wayland.process_messages()` removed. Use dispatch*
 - `wayland.initialise()` replaced with `wayland.client.get_wayland_proxy()`
 - `wayland.get_package_root()` replaced with `wayland.client.package.get_package_root()`
 - `wayland.is_wayland` replaced with `wayland.client.is_wayland()`
@@ -18,9 +22,10 @@
 - [`wayland.wl_display.dispatch_timeout()`](https://python-wayland.org/wayland/wl_display/#wayland.wl_display.dispatch_timeout) added.
 - [`wayland.wl_display.dispatch_pending()`](https://python-wayland.org/wayland/wl_display/#wayland.wl_display.dispatch_pending) added.
 
-### Other Changes
-- Optimisations for Wayland event handling.
-- Type hinting now uses the correct python-wayland types.
+### General Changes
+- No connection is made to the Wayland compositor until either explicitly requested or a method that sends a Wayland message is used.
+- Internal Wayland event processing has been improved. There are now multiple event queues with automatic creation of per-thread queues.
+- Type hinting now uses the correct `python-wayland` types.
 - Type hinting uses less magic to increase compatibility with IDEs.
 - Type hint docs cleaned up with better formatting.
 - Type hints now have argument descriptions included.

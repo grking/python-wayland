@@ -95,4 +95,60 @@ def start_debug_server() -> str:
     return debug.start_debug_server()
 
 
-__all__ = ["get_wayland_proxy", "is_wayland"]
+# Simple decorator function
+def wayland_class(interface_name):
+    """
+    A decorator to register a custom class to be used anytime
+    Wayland objects of a specific interface are created.
+
+    Whenever any instance of the given Wayland interface is created
+    an instance of the registered custom class will be created in
+    place of the default class.
+
+    Examples:
+        Register our own class `MyRegistry` to be instantiated
+        whenever a `wl_registry` object is created:
+
+        @wayland_class('wl_registry')
+        class MyRegistry(wayland.Wl_registry): ...
+
+    See also `register_factory` for an explicit method of
+    class registration.
+    """
+    from wayland.proxy import Proxy
+
+    def decorator(cls):
+        proxy = Proxy()
+        proxy.register_factory(interface_name, cls)
+        return cls
+
+    return decorator
+
+
+# Module-level function for clean API
+def register_factory(interface_name: str, custom_class):
+    """
+    Register a custom class to be used anytime Wayland objects of a
+    specific interface are created.
+
+    Whenever any instance of the given Wayland interface is created
+    an instance of the registered custom class will be created in
+    place of the default class.
+
+    See also the decorator `@wayland_class`, which provides
+    another way to register custom classes.
+
+    Args:
+        interface_name: The wayland interface name (e.g., 'wl_registry')
+        custom_class: The custom class to use for this interface
+
+    Usage:
+        wayland.register_factory('wl_registry', MyRegistry)
+    """
+    from wayland.proxy import Proxy
+
+    proxy = Proxy()
+    return proxy.register_factory(interface_name, custom_class)
+
+
+__all__ = ["get_wayland_proxy", "is_wayland", "start_debug_server"]

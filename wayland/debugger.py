@@ -304,9 +304,9 @@ class Debugger:
             None,
             msgtype,
             signature,
-            msg.parent._name,  # noqa: SLF001
+            msg.interface,
             msg.name,
-            msg.parent.object_id,
+            msg.object_id,
             msg.kwargs,
             msg.opcode,
             msg.packet,
