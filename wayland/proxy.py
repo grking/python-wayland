@@ -12,42 +12,52 @@ from enum import Enum, IntFlag
 from queue import Empty, SimpleQueue
 from typing import ClassVar
 
+from wayland.baseobject import WaylandObject
 from wayland.client.package import get_package_root
 from wayland.constants import MAX_EVENT_RESOLUTION
 from wayland.debugger import Debugger
 from wayland.log import log
 from wayland.state import WaylandState
 
-# Global reference to active proxy instance
-_active_proxy = None
-
-
-def _set_active_proxy(proxy):
-    """Set the active proxy instance for inspection."""
-    global _active_proxy  # noqa: PLW0603
-    _active_proxy = proxy
-
-
-def _get_active_proxy():
-    """Get the active proxy instance."""
-    return _active_proxy
-
 
 class Proxy:
+    _instance = None
+    _lock = threading.Lock()
+    _initialised = False
+
+    def __new__(cls, *args, **kwargs):  # noqa
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+        return cls._instance
+
     # A single shared collection of queues for output events
     # queued per thread
     _event_queues: ClassVar[dict] = {}
     _event_lock = threading.Lock()
 
     class Request:
-        def __init__(self, parent, name, args, opcode, state):
+        def __init__(
+            self,
+            *,
+            name=None,
+            args=None,
+            opcode=None,
+            state=None,
+            scope=None,
+            object_id=None,
+            interface=None,
+        ):
             self.name = name
+            self.interface = (interface,)
             self.request_args = args
             self.opcode = opcode
             self.request = True
             self.event = False
-            self.parent = parent
+            self.object_id = object_id
             self.state = state
+            self.scope = scope
             self.kwargs = {}
             self.packet = b""
             self._debugger = Debugger()
@@ -65,8 +75,8 @@ class Proxy:
             args = list(args)
 
             # Read some properties from the class to which this request is bound
-            object_id = self.parent.object_id
-            scope = self.parent._scope
+            object_id = self.object_id
+            scope = self.scope
 
             kwargs = {}
             packet = b""
@@ -85,9 +95,9 @@ class Proxy:
                         interface = arg.get("interface")
 
                     # Create a new object to return as
-                    new_object_id, new_object = self.state.new_object(scope[interface])
-                    return_value = new_object_id
-                    value = new_object_id
+                    new_object = self.state.new_object(scope[interface])
+                    return_value = new_object.object_id
+                    value = new_object.object_id
 
                 else:
                     # A normal argument, just grab the value
@@ -96,11 +106,11 @@ class Proxy:
                 kwargs[arg["name"]] = value
 
                 # Pack the argument
-                packet, value = self._pack_argument(packet, arg["type"], value)
-                ancillary = self._handle_fd_argument(arg["type"], value, ancillary)
+                packet, value = self.__pack_argument(packet, arg["type"], value)
+                ancillary = self.__handle_fd_argument(arg["type"], value, ancillary)
 
                 # Debug info
-                values.append(self._format_debug_arg(value, arg["type"]))
+                values.append(self.__format_debug_arg(value, arg["type"]))
 
             self.kwargs = kwargs.copy()
             self.packet = packet
@@ -113,7 +123,7 @@ class Proxy:
                 return_value = self.state.object_id_to_object_reference(return_value)
             return return_value
 
-        def _pack_argument(self, packet, arg_type, value):
+        def __pack_argument(self, packet, arg_type, value):
             if arg_type in ("new_id", "uint"):
                 if isinstance(value, Enum):
                     packet += struct.pack("I", value.value)
@@ -137,14 +147,14 @@ class Proxy:
 
             return packet, value
 
-        def _handle_fd_argument(self, arg_type, value, ancillary):
+        def __handle_fd_argument(self, arg_type, value, ancillary):
             if arg_type == "fd":
                 ancillary = [
                     (socket.SOL_SOCKET, socket.SCM_RIGHTS, struct.pack("I", value))
                 ]
             return ancillary
 
-        def _format_debug_arg(self, value, arg_type):
+        def __format_debug_arg(self, value, arg_type):
             if arg_type == "object" and isinstance(value, object):
                 return f"{value._name}#{value.object_id}"
             return str(value)
@@ -153,10 +163,21 @@ class Proxy:
         pass
 
     class Event:
-        def __init__(self, parent, name, args, opcode):
+        def __init__(
+            self,
+            *,
+            name=None,
+            args=None,
+            opcode=None,
+            properties=None,
+            interface=None,
+            object_id=None,
+        ):
             self.name = name
-            self.parent = parent
+            self.interface = interface
+            self.properties = properties
             self.opcode = opcode
+            self.object_id = object_id
             self.event_args = args
             self.event = True
             self._lock = threading.Lock()
@@ -165,14 +186,14 @@ class Proxy:
             self.kwargs = {}
             self.packet = b""
 
-        def _transform_args(self, packet, get_fd):
+        def __transform_args(self, packet, get_fd):
             kwargs = {}
             self.packet = packet
             for arg in self.event_args:
                 arg_type = arg["type"]
                 enum_type = arg.get("enum")
                 # Get the value
-                packet, value = self._unpack_argument(
+                packet, value = self.__unpack_argument(
                     packet, arg_type, get_fd, enum_type
                 )
                 # Save the argument value
@@ -189,7 +210,7 @@ class Proxy:
                     raise NotImplementedError(msg)
             return kwargs
 
-        def _thread_id(self):
+        def __thread_id(self):
             tid = threading.current_thread().native_id
             # Ensure we are setup for this thread
             with self._lock:
@@ -203,14 +224,14 @@ class Proxy:
         def __iadd__(self, handler):
             """Registers a new handler to be called when the event is triggered."""
             if callable(handler):
-                tid = self._thread_id()
+                tid = self.__thread_id()
                 with self._lock:
                     self._event_handlers[tid].append(handler)
             return self
 
         def __isub__(self, handler):
             """Unregisters an existing handler."""
-            tid = self._thread_id()
+            tid = self.__thread_id()
             with self._lock:
                 if handler in self._event_handlers[tid]:
                     self._event_handlers[tid].remove(handler)
@@ -220,7 +241,7 @@ class Proxy:
             # This event has been triggered, let our event listeners
             # know about it. In fact, don't, but queue up the notifications
             # for when each thread is ready.
-            kwargs = self._transform_args(packet, get_fd)
+            kwargs = self.__transform_args(packet, get_fd)
             self.kwargs = kwargs
 
             self._debugger.log(self)
@@ -233,8 +254,8 @@ class Proxy:
                             # Store method ptr, args
                             Proxy._queue_event(thread_id, handler, kwargs)
 
-        def _int_to_enum(self, enum_name, value):
-            for attr_name, attr_type in self.parent.__dict__.items():
+        def __int_to_enum(self, enum_name, value):
+            for attr_name, attr_type in self.properties:
                 if (
                     isinstance(attr_type, type)
                     and issubclass(attr_type, Enum)
@@ -243,11 +264,11 @@ class Proxy:
                     return attr_type(value)
             return value
 
-        def _unpack_argument(self, packet, arg_type, get_fd, enum_type):
+        def __unpack_argument(self, packet, arg_type, get_fd, enum_type):
             read = 0
             if enum_type is not None:
                 (value,) = struct.unpack_from("I", packet)
-                value = self._int_to_enum(enum_type, value)
+                value = self.__int_to_enum(enum_type, value)
                 read = 4
             elif arg_type in ("new_id", "uint", "object"):
                 (value,) = struct.unpack_from("I", packet)
@@ -293,57 +314,134 @@ class Proxy:
     class DynamicObject:
         @property
         def object_id(self):
-            return self._object_id
+            return self.__object_id
 
         @object_id.setter
         def object_id(self, value):
-            self._object_id = value
-            log.protocol(f"{self._name} assigned object_id {self._object_id}")
+            self.__object_id = value
+            log.protocol(f"{self.__name} assigned object_id {self.__object_id}")
 
-        def __init__(self, name, scope, requests, events, enums, state):
-            self._name = name
-            self._scope = scope
-            self._state = state
-            self._requests = requests
-            self._events = events
-            self._enums = enums
-            self._object_id = 0
-            # Special wayland case, the global singleton interface
+        def __new__(cls, *args, **kwargs):  # noqa
+            return super().__new__(cls)
+
+        def __init__(
+            self,
+            name=None,
+            scope=None,
+            requests=None,
+            events=None,
+            enums=None,
+            state=None,
+        ):
+            # If called with no arguments or minimal arguments, use smart construction
+            if name is None:
+                self.__smart_init()
+                return
+
+            # Normal construction with all arguments
+            self.__name = name
+            self.__interface = name
+            self.__scope = scope
+            self.__state = state
+            self.__requests = requests or []
+            self.__events = events or []
+            self.__enums = enums or []
+            self.__object_id = 0
+
+            # Allocate an object id
+            self.__state.allocate_new_object_id(self)
+
+            # Special wayland case of object 1
             if name == "wl_display":
-
-                def dispatch(self):
-                    return Proxy._dispatch()
-
-                def dispatch_pending(self):
-                    return Proxy._dispatch_pending()
-
-                def dispatch_timeout(self, timeout_in_seconds):
-                    return Proxy._dispatch_timeout(timeout_in_seconds)
-
-                # Bind these dynamic methods
-                self.dispatch = types.MethodType(dispatch, self)
-                self.dispatch_pending = types.MethodType(dispatch_pending, self)
-                self.dispatch_timeout = types.MethodType(dispatch_timeout, self)
-
-                self.object_id, _ = self._state.new_object(self)
+                self.__setup_display_methods()
 
             # Bind requests and events
             self.events = Proxy.Events()
-            self._bind_requests(requests)
-            self._bind_events(events)
-            self._bind_enums(enums)
+            self.__bind_requests(self.__requests)
+            self.__bind_events(self.__events)
+            self.__bind_enums(self.__enums)
 
-        def copy(self):
-            return self.__class__(
-                self._name,
-                self._scope,
-                self._requests,
-                self._events,
-                self._enums,
-                self._state,
+            # Auto-register event handlers after everything is set up
+            self.__register_event_handlers()
+
+        def __smart_init(self):
+            """Initialise using the proxy context"""
+            proxy = Proxy()
+
+            # Get the class name from the class hierarchy
+            class_name = None
+            for cls in self.__class__.__mro__:
+                if cls.__name__ in proxy._dynamic_classes:
+                    class_name = cls.__name__
+                    break
+
+            if class_name is None:
+                msg = f"Could not determine wayland class name for {self.__class__.__name__}"
+                raise RuntimeError(msg)
+
+            # Get the protocol details from the proxy
+            details = proxy._get_class_details(class_name)
+
+            # Initialise with proper arguments
+            Proxy.DynamicObject.__init__(
+                self,
+                class_name,
+                proxy.scope,
+                details.get("requests", []),
+                details.get("events", []),
+                details.get("enums", []),
+                proxy.state,
             )
 
-        def _bind_requests(self, requests):
+        def __setup_display_methods(self):
+            """Setup special methods for wl_display"""
+
+            def dispatch(self):
+                return Proxy._dispatch()
+
+            def dispatch_pending(self):
+                return Proxy._dispatch_pending()
+
+            def dispatch_timeout(self, timeout_in_seconds):
+                return Proxy._dispatch_timeout(timeout_in_seconds)
+
+            # Bind these dynamic methods
+            self.dispatch = types.MethodType(dispatch, self)
+            self.dispatch_pending = types.MethodType(dispatch_pending, self)
+            self.dispatch_timeout = types.MethodType(dispatch_timeout, self)
+
+        def __register_event_handlers(self):
+            """Automatically register methods matching on_<event_name> pattern"""
+            for attr_name in dir(self):
+                if attr_name.startswith("on_"):
+                    method = getattr(self, attr_name)
+                    if callable(method):
+                        event_name = attr_name[3:]  # Remove 'on_' prefix
+
+                        # Handle both 'on_event' and 'on_event_' patterns
+                        if event_name.endswith("_"):
+                            event_name = event_name[:-1]
+
+                        # Check if this event exists
+                        if hasattr(self.events, event_name):
+                            event = getattr(self.events, event_name)
+                            event += method
+                            log.debug(
+                                f"Auto-registered {attr_name} for {self.__name}.{event_name}"
+                            )
+                        elif hasattr(self.events, event_name + "_"):
+                            # Handle keyword collision cases
+                            event = getattr(self.events, event_name + "_")
+                            event += method
+                            log.debug(
+                                f"Auto-registered {attr_name} for {self.__name}.{event_name}_"
+                            )
+                        else:
+                            log.warning(
+                                f"Method {attr_name} found but no matching event '{event_name}' in {self.__name}"
+                            )
+
+        def __bind_requests(self, requests):
             for request in requests:
                 # Avoid python keyword naming collisions
                 attr_name = request["name"]
@@ -352,12 +450,18 @@ class Proxy:
 
                 # Create a new request
                 request_obj = Proxy.Request(
-                    self, attr_name, request["args"], request["opcode"], self._state
+                    name=attr_name,
+                    interface=self.__name,
+                    args=request["args"],
+                    opcode=request["opcode"],
+                    state=self.__state,
+                    scope=self.__scope,
+                    object_id=self.object_id,
                 )
                 # Set the request with the correct binding
                 setattr(self, attr_name, request_obj)
 
-        def _bind_events(self, events):
+        def __bind_events(self, events):
             for event in events:
                 # Avoid python keyword naming collisions
                 attr_name = event["name"]
@@ -365,11 +469,18 @@ class Proxy:
                     attr_name += "_"
 
                 # Create a new event
-                event_obj = Proxy.Event(self, attr_name, event["args"], event["opcode"])
+                event_obj = Proxy.Event(
+                    name=attr_name,
+                    interface=self.__interface,
+                    object_id=self.__object_id,
+                    args=event["args"],
+                    opcode=event["opcode"],
+                    properties=self.__dict__.items(),
+                )
                 # Set the event with the correct binding
                 setattr(self.events, attr_name, event_obj)
 
-        def _bind_enums(self, enums):
+        def __bind_enums(self, enums):
             for enum in enums:
                 # Avoid python keyword naming collisions
                 attr_name = enum["name"]
@@ -393,8 +504,20 @@ class Proxy:
     # Proxy class methods
 
     def __init__(self):
-        self.state = WaylandState()
-        self.scope = None
+        if self._initialised:
+            return
+
+        with self._lock:
+            if self._initialised:
+                return
+
+            self.state = WaylandState(self)
+            self.scope = None
+            self._dynamic_classes = {}
+            self._class_details = {}
+            self._custom_factories = {}
+
+            self._initialised = True
 
     def __getitem__(self, key):
         if hasattr(self, key):
@@ -405,6 +528,28 @@ class Proxy:
 
         msg = f"'{key}' not found"
         raise KeyError(msg)
+
+    def register_factory(self, interface_name, custom_class):
+        """Register a custom class to be used when creating objects of a specific interface"""
+        self._custom_factories[interface_name] = custom_class
+        log.debug(
+            f"Registered custom factory for {interface_name}: {custom_class.__name__}"
+        )
+        return custom_class
+
+    def _create_object_instance(self, interface_name, *args, **kwargs):
+        """Create an object instance, using custom factory if registered"""
+        if interface_name in self._custom_factories:
+            # Use the custom class
+            custom_class = self._custom_factories[interface_name]
+            return custom_class(*args, **kwargs)
+        # Use the standard dynamic class
+        standard_class = self._dynamic_classes[interface_name]
+        return standard_class(*args, **kwargs)
+
+    def _get_class_details(self, class_name):
+        """Get the original protocol details for a class"""
+        return self._class_details.get(class_name, {})
 
     @classmethod
     def _queue_event(cls, thread_id, func_ptr, kwargs):
@@ -485,19 +630,31 @@ class Proxy:
             return False
 
         for class_name, details in structure.items():
-            # Process requests
-            requests = details.get("requests", [])
-            events = details.get("events", [])
-            enums = details.get("enums", [])
-            dynamic_class = type(class_name, (Proxy.DynamicObject,), {})
-            instance = dynamic_class(
-                class_name, self.scope, requests, events, enums, self.state
+            # Store the details for later use
+            self._class_details[class_name] = details
+
+            class_variables = {
+                # "version": details.get("version", 1),
+            }
+
+            # Create the dynamic class
+            dynamic_class = type(
+                class_name,
+                (
+                    WaylandObject,
+                    Proxy.DynamicObject,
+                ),
+                class_variables,
             )
-            # Inject instance into scope
+
+            # Save the class
+            self._dynamic_classes[class_name] = dynamic_class
+
+            # Inject class into scope
             if isinstance(self.scope, dict):
-                self.scope[class_name] = instance
+                self.scope[class_name] = dynamic_class
             else:
-                setattr(self.scope, class_name, instance)
+                setattr(self.scope, class_name, dynamic_class)
 
         # initialised ok
         return True

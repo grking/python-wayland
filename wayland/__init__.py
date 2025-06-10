@@ -5,32 +5,28 @@ from os import getenv as __getenv
 
 from wayland import client as client  # noqa: PLC0414
 
-# Wayland methods are injected into the package global scope
-# so, for example, "wayland.wl_display" just works. This is
-# purely syntactic sugar for library callers.
+# Wayland classes are injected into the package scope.
 if __getenv("WAYLAND_INITIALISE", "").lower() != "false" and not hasattr(
     globals(), "wl_display"
 ):
+    from wayland.baseobject import WaylandObject
     from wayland.proxy import Proxy
 
     __dynamic_object = Proxy.DynamicObject
-
     __proxy = Proxy()
     __proxy.initialise(globals())
 
-    # Store reference for inspection module
-    from wayland.proxy import _set_active_proxy
-
-    _set_active_proxy(__proxy)
-
-    # Clean up namespace - keep only dynamic objects,
+    # Clean up namespace - keep only dynamic classes,
     # dunder methods, and "client"
     __keys_to_delete = []
     for __key in list(globals().keys()):
         if (
             (not __key.startswith("__"))
             and __key != "client"
-            and not isinstance(globals()[__key], __dynamic_object)
+            and not (
+                isinstance(globals()[__key], type)
+                and issubclass(globals()[__key], WaylandObject)
+            )
         ):
             __keys_to_delete.append(__key)
 
