@@ -4,6 +4,9 @@
 
 A pure Python implementation of the Wayland protocol, from scratch, with no external run-time dependencies. The Wayland C client libraries are not required.
 
+> [!WARNING]
+> The development version is in the middle of significant redesign and refactor. See [CHANGELOG.md](CHANGELOG.md) for details.
+
 ## Features
 
 * Includes support for all standard Wayland protocols and extensions from Hyprland and wlroots.

@@ -2,7 +2,10 @@
 
 ## DEVELOPMENT VERSION
 
-This version replaces the previous experiments with a more formal Wayland class library and stable API. It introduces a more typical design pattern and behaviour, with more explicit and predictable Pythonic usage and less implicit magic. 
+> [!WARNING]
+> The development version is in the middle of significant redesign and refactor.
+
+This version replaces the previous experiments with a more formal Wayland class library and stable API. It introduces a more typical design pattern and behaviour, with more explicit and predictable Pythonic usage and less implicit magic.
 
 ### Major Changes
 
