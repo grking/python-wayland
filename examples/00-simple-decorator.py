@@ -1,5 +1,4 @@
 # Print a list of Wayland global interfaces
-# Class factory registration with decorator
 import wayland
 from wayland.client import wayland_class
 
@@ -8,7 +7,7 @@ from wayland.client import wayland_class
 class Registry(wayland.wl_registry):
 
     def on_global(self, name, interface, version):
-        print(interface)
+        print(f"{interface} (version {version})")
 
 
 if __name__ == "__main__":

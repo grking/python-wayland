@@ -1,12 +1,15 @@
 # Copyright (c) 2024-2025 Graham R King
 # Licensed under the MIT License. See LICENSE file for details.
 
+from __future__ import annotations
+
 from os import getenv
 from typing import TYPE_CHECKING
 
 from wayland.debugger import Debugger
 
 if TYPE_CHECKING:
+    from wayland.baseobject import WaylandObject
     from wayland.proxy import Proxy as Proxy  # noqa: PLC0414
 
 
@@ -126,7 +129,7 @@ def wayland_class(interface_name):
 
 
 # Module-level function for clean API
-def register_factory(interface_name: str, custom_class):
+def register_factory(interface_name: str, custom_class: type[WaylandObject]):
     """
     Register a custom class to be used anytime Wayland objects of a
     specific interface are created.

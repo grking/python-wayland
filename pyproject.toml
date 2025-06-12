@@ -51,27 +51,7 @@ extra-args = [
 ]
 [tool.hatch.envs.hatch-test.scripts]
 run = [
-  "pytest --cov-report=xml --cov-config=pyproject.toml --asyncio-mode=auto",
-]
-
-[tool.hatch.envs.cov]
-detached=true
-extra-dependencies = [
-  "lxml",
-  "black",
-  "ruff",
-  "textual",
-  "textual-dev",
-  "pytest-textual-snapshot",
-  "pytest",
-  "pytest-cov",
-  "pytest-asyncio",
-  "coverage"
-]
-
-[tool.hatch.envs.cov.scripts]
-report = [
-  "pytest -q --cov-report=xml --cov-config=pyproject.toml --cov=tests --cov-report=term --asyncio-mode=auto",
+  "pytest --cov-report=xml --cov-config=pyproject.toml --cov=tests --asyncio-mode=auto",
 ]
 
 [project.optional-dependencies]
@@ -178,8 +158,6 @@ exclude_lines = [
   "if TYPE_CHECKING:",
 ]
 
-[tool.coverage.xml]
-output=".coverage.xml"
 
 [tool.ruff.format]
 quote-style = "double"

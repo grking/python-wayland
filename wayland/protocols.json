@@ -7200,6 +7200,47 @@
   ],
   "version":1
  },
+ "wp_pointer_warp_v1":{
+  "enums":[],
+  "events":[],
+  "requests":[
+   {
+    "args":[],
+    "name":"destroy",
+    "opcode":0,
+    "type":"destructor"
+   },
+   {
+    "args":[
+     {
+      "interface":"wl_surface",
+      "name":"surface",
+      "type":"object"
+     },
+     {
+      "interface":"wl_pointer",
+      "name":"pointer",
+      "type":"object"
+     },
+     {
+      "name":"x",
+      "type":"fixed"
+     },
+     {
+      "name":"y",
+      "type":"fixed"
+     },
+     {
+      "name":"serial",
+      "type":"uint"
+     }
+    ],
+    "name":"warp_pointer",
+    "opcode":1
+   }
+  ],
+  "version":1
+ },
  "wp_presentation":{
   "enums":[
    {

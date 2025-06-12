@@ -1,5 +1,7 @@
 ## Wayland/Python Naming Conflicts
 
+Wayland interfaces use the original Wayland naming convention by default rather than being renamed to a more Pythonic form. This ensures that [Wayland API documentation](https://python-wayland.org/wayland) and other Wayland references remain directly applicable when using this library.
+
 Wayland identifiers that collide with Python builtin keywords are renamed to end with an underscore. There are very few of these. The list of known protocols that have changes are:
 
 * `wayland.wl_registry.global` renamed to `global_`

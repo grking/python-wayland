@@ -1,26 +1,10 @@
 site_name: Python Wayland
+site_url: https://python-wayland.org
 site_description: A Python implementation of the Wayland protocol client API
 repo_url: https://github.com/grking/python-wayland
 site_dir: site
 repo_name: grking/python-wayland
 edit_uri: ""
-
-nav:
-  - Getting Started:
-    - Installation: index.md
-    - Introduction: introduction.md
-    - Examples: examples.md
-  - API Reference:
-    - Overview: api/overview.md
-    - wayland.client: api/client.md
-    - wayland.client.package: api/package.md
-  - Wayland API Reference: wayland/  # auto populated
-  - Project Documentation:
-    - Developing:
-      - Overview: developing.md
-      - Quick Start: developing-quickstart.md
-    - Changelog: changelog.md
-    - Github Project: https://github.com/grking/python-wayland
 
 watch:
   - docs
@@ -38,9 +22,9 @@ theme:
   - navigation.instant.preview
   - navigation.path
   - navigation.sections
+  - navigation.expand
   - navigation.tabs
   - navigation.tabs.sticky
-  - navigation.top
   - search.suggest
   - toc.follow
   - toc.integrate
@@ -168,4 +152,4 @@ markdown_extensions:
     custom_checkbox: true
 - toc:
     permalink: "¤"
-    toc_depth: 3
+    toc_depth: 4

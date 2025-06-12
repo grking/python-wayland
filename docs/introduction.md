@@ -1,88 +1,104 @@
-# Introduction
-`python-wayland` is a pure Python implementation of the Wayland protocol, focused on the development of Wayland clients rather than compositors.
+# Getting Started: A Simple Example
 
-Wayland interfaces are exposed with the original Wayland naming convention by default, rather than renaming them into a more Pythonic form. This is so [wayland API documentation](https://python-wayland.org/wayland) and other Wayland references are directly useful and relevant to the use of this library.
-
-Wayland names are renamed if they clashes with Python keywords, see [Wayland/Python Naming Conflicts](naming.md) for details.
-
-## A Basic Example
-
-Here we connect to the Wayland compositor and print a list of the available global interfaces and their version numbers.
+Let's start by connecting to a Wayland compositor and discovering what global interfaces it provides:
 
 ```python
-import wayland
-from wayland import wayland_class
-
-@wayland_class("wl_registry")
-class Registry(wayland.wl_registry):
-
-    def on_global(self, name, interface, version):
-        print(interface)
-
-display = wayland.wl_display()
-registry = display.get_registry()
-while True:
-    display.dispatch_timeout(0.2)
+--8<-- "examples/00-simple-decorator.py"
 ```
 
-Let's break that down and take a look at what's happening in more detail.
+Running this code produces output like:
+
+```bash
+wl_seat (version 9)
+wl_data_device_manager (version 3)
+wl_compositor (version 6)
+wl_subcompositor (version 1)
+wl_shm (version 1)
+wp_viewporter (version 1)
+```
+
+## Understanding the Code
+
+Let's break down what's happening in this example:
+
+### 1. Imports
 
 ```python
 import wayland
 from wayland import wayland_class
 ```
 
-The main `wayland` package is imported and we choose to import the optional `wayland_class` decorator. This is one of the available methods for registering our own custom classes which can inherit from the Wayland classes and override or extend their functionality.
+We import the main library and the [`wayland_class`][wayland.client.wayland_class] decorator, which provides a convenient way to register custom interface implementations.
+
+### 2. Custom Registry Class
 
 ```python
 @wayland_class("wl_registry")
 class Registry(wayland.wl_registry):
 ```
 
-We define our own class named `Registry` inheriting from the Wayland interface `wl_registry`. The decorator provides a shortcut to tell `python-wayland` that anytime a object of the type `wl_registry` is created it should create an instance of our own custom class rather than the default class.
+Here we create a custom class that extends [`wl_registry`][wayland.wl_registry]. The decorator tells `python-wayland` to use our custom class whenever a `wl_registry` object is created.
+
+### 3. Event Handler Method
 
 ```python
     def on_global(self, name, interface, version):
-        print(interface)
+        print(f"{interface} (version {version})")
 ```
 
-This is one way of registering event handlers, an implicit event handler using a method naming convention. If we define methods starting with `on_` followed by the name of the Wayland event, those methods will be automatically bound as an event handler for us.
+This demonstrates implicit event handler registration. Methods named `on_` followed by an event name are automatically registered as handlers. In this case, `on_global` will handle all [`global`][wayland.wl_registry.events.global_] events from the registry.
 
-Our `on_global` method will be automatically called for every `global` event that the `wl_registry` sends. There is nothing else we need do other than define the method.
+> **Note:** There are other ways to register event handlers, which we'll explore in later sections.
 
-There are also alternative, more explicit, methods of registering event handlers.
+### 4. Creating the Display
 
 ```python
 display = wayland.wl_display()
 ```
 
-Here we create an instance of `wl_display`, the special Wayland object number 1. In `python-wayland` this object is extended with essential functionality such as event dispatching, in a similar way as `libwayland-client` the standard C Wayland library does. See it's [documentation](wayland/wl_display/) for full details of the available functions.
+This creates a [`wl_display`][wayland.wl_display] instance—the fundamental Wayland object (ID 1). In `python-wayland`, this object includes essential functionality like connection management and event dispatching, similar to `libwayland-client`.
 
-Still up to this point we have not attempted to make any connection to the local Wayland compositor. Everything up to here would work even on a system which was not running Wayland.
+At this point, we haven't connected to the compositor yet. The connection happens automatically when needed.
+
+### 5. Getting the Registry
 
 ```python
 registry = display.get_registry()
 ```
 
-The standard Wayland `wl_display.get_registry()` method. It creates and returns an instance of `wl_registry`. Because we registered our own class for `wl_registry` this method will actually return an instance of our own class. As our class inherited from the standard `wl_registry` class, it's behaviour stays the same as the normal Wayland behaviour and as soon as it's created, `wl_registry` starts generating `global` events.
+The [`get_registry`][wayland.wl_display.get_registry] method creates a registry instance. Since we registered our custom class, this returns an instance of `Registry` rather than the default `wl_registry`.
 
-As we had not explicitly connected to the Wayland compositor, and because auto connection is enabled by default, calling `get_registry()` caused `python-wayland` to connect to the Wayland socket and start request and event processing. An exception would be raised here if no Wayland compositor was available for us to connect to.
+This call triggers:
+
+* Automatic connection to the Wayland compositor (if not already connected)
+* The compositor immediately sends [`global`][wayland.wl_registry.events.global_] events for all available interfaces
+
+> **Important:** An exception will be raised here if no Wayland compositor is available.
+
+### 6. Event Loop
 
 ```python
 while True:
     display.dispatch_timeout(0.2)
 ```
 
-Our very basic main event loop. We call the display objects `dispatch_timeout` method, a blocking call to dispatch Wayland events to registered event handlers. If there are no events pending it will block until either events arrive or the timeout given in seconds elapses.
+This simple event loop continuously processes Wayland events. The [`dispatch_timeout`][wayland.wl_display.dispatch_timeout] method:
 
-As each `global` event is raised by the compositor through the `wl_registry` object our `on_global` event handler will be called and we will see the names of the global interfaces printed:
+* Dispatches any pending events to their handlers
+* Blocks for up to 0.2 seconds waiting for new events
+* Returns when events are processed or the timeout expires
 
-```text
-wl_seat
-wl_data_device_manager
-wl_compositor
-wl_subcompositor
-wl_shm
-...etc...
-```
+As [`global`][wayland.wl_registry.events.global_] events arrive, our `on_global` handler prints each interface name and version.
 
+## Next Steps
+
+This example demonstrated the basics of:
+
+* Connecting to a Wayland compositor
+* Implementing custom interface classes
+* Handling Wayland events
+* Running an event loop
+
+See [further examples](examples.md).
+
+_More documentation to be written_
