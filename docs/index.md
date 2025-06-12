@@ -1,30 +1,18 @@
 # python-wayland
 
-A pure Python implementation of the Wayland protocol, from scratch, with no external runtime dependencies.
+`python-wayland` is a Python implementation of the Wayland protocol built from the ground up with no runtime dependencies - no libwayland, no C libraries, just Python. It's designed primarily for developing Wayland clients.
 
-### Install Using `pip`
+## What This Documentation Covers
 
-```bash
-pip install python-wayland
-```
+This documentation includes:
 
-### Install Using `uv`
+* A complete [Wayland protocol reference](wayland/index.md)
+* Explanations of [how to use](introduction.md) `python-wayland` to interact with Wayland services
+* [Examples](examples.md) demonstrating request sending, event handling and other essential functionality.
 
-```bash
-uv add python-wayland
-```
+## What This Documentation Doesn't Cover
 
-### Requirements
+This documentation does not teach Wayland concepts or use. For learning Wayland itself, see:
 
-* Python 3.8 or higher
-* A Wayland compositor (for runtime use)
-
-No additional dependencies are required - python-wayland is a pure Python implementation.
-
-### Install Using `git`
-
-If you want to use the `python-wayland` library it's easier to install as above. Clone the git repo if you want to change `python-wayland` itself.
-
-```bash
-git clone https://github.com/grking/python-wayland
-```
+* Drew DeVault's excellent [Wayland Book](https://wayland-book.com/)
+* The [official Wayland documentation](https://wayland.freedesktop.org/docs/html/)

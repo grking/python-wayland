@@ -5,7 +5,7 @@ import time
 from queue import Queue
 
 from wayland.constants import PROTOCOL_HEADER_SIZE
-from wayland.proxy import Proxy
+from wayland.message import pack_argument
 from wayland.serialiser import Message, MessageType
 
 
@@ -17,7 +17,6 @@ class MockServer:
         self.thread = None
         self.running = False
         self.requests = Queue()
-        self._request_helper = None
 
     def start(self):
         self.server_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -25,10 +24,6 @@ class MockServer:
         self.server_sock.bind(self.sock_path)
         self.server_sock.listen(1)
         self.running = True
-
-        self._request_helper = Proxy.Request(
-            name="helper", args=[], opcode=0, state=None, scope=None, object_id=1
-        )
 
         self.thread = threading.Thread(target=self._run)
         self.thread.start()
@@ -96,20 +91,7 @@ class MockServer:
         self.client_sock.sendall(header + data)
 
     def _pack_argument(self, packet, arg_type, value):
-        if self._request_helper:
-            return self._request_helper._Request__pack_argument(packet, arg_type, value)
-
-        if arg_type == "uint":
-            return packet + struct.pack("I", value), value
-        if arg_type == "string":
-            if isinstance(value, str):
-                value = value.encode("utf-8")
-            value += b"\x00"
-            padding = ((len(value) + 3) & ~3) - len(value)
-            value += b"\x00" * padding
-            length = len(value.rstrip(b"\x00")) + 1
-            return packet + struct.pack(f"I{len(value)}s", length, value), value
-        return packet, value
+        return pack_argument(packet, arg_type, value)
 
     def send_global_event(self, registry_object_id, name, interface, version):
         packet = b""
@@ -122,6 +104,11 @@ class MockServer:
         packet = b""
         packet, _ = self._pack_argument(packet, "uint", capabilities)
         self.send_event(seat_object_id, 0, packet)
+
+    def send_global_remove_event(self, registry_object_id, name):
+        packet = b""
+        packet, _ = self._pack_argument(packet, "uint", name)
+        self.send_event(registry_object_id, 1, packet)
 
     def get_request(self, timeout=1):
         return self.requests.get(timeout=timeout)

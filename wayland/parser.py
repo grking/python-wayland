@@ -489,9 +489,14 @@ class WaylandParser:
             and description.text is not None
             and description.text.strip()
         ):
-            text = textwrap.dedent(description.text).strip()
+            summary = description.attrib.get("summary", "").strip().capitalize()
+            if summary:
+                text = textwrap.dedent(description.text).strip()
+                text = f"{summary}\n\n{text}"
+            else:
+                text = textwrap.dedent(description.text).strip()
         elif description is not None and description.attrib.get("summary", "").strip():
-            # Only use summary if there is nothing else
+            # only have summary
             text = description.attrib.get("summary", "").strip().capitalize()
         else:
             text = ""

@@ -66,9 +66,11 @@ def wayland_server():
         # Set environment variables for the client to connect to the mock server
         original_wayland_display = os.environ.get("WAYLAND_DISPLAY")
         original_xdg_runtime_dir = os.environ.get("XDG_RUNTIME_DIR")
+        original_debug_socket = os.environ.get("PYTHON_WAYLAND_DEBUG_SOCKET")
 
         os.environ["WAYLAND_DISPLAY"] = "wayland-0"
         os.environ["XDG_RUNTIME_DIR"] = tmpdir
+        os.environ["PYTHON_WAYLAND_DEBUG_SOCKET"] = "python-wayland-test-socket"
 
         server = MockServer(str(sock_path))
         server.start()
@@ -98,3 +100,8 @@ def wayland_server():
             os.environ["XDG_RUNTIME_DIR"] = original_xdg_runtime_dir
         else:
             os.environ.pop("XDG_RUNTIME_DIR", None)
+
+        if original_debug_socket is not None:
+            os.environ["PYTHON_WAYLAND_DEBUG_SOCKET"] = original_debug_socket
+        else:
+            os.environ.pop("PYTHON_WAYLAND_DEBUG_SOCKET", None)

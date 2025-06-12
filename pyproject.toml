@@ -32,15 +32,26 @@ Source = "https://github.com/grking/python-wayland"
 Changelog = "https://github.com/grking/python-wayland/blob/main/CHANGELOG.md"
 
 [tool.hatch.envs.hatch-test]
+randomize = false
+parallel = false
 extra-dependencies = [
   "lxml",
   "black",
-  "ruff"
+  "ruff",
+  "textual",
+  "textual-dev",
+  "pytest-textual-snapshot",
+  "pytest-asyncio",
+  "coverage",
+  "pytest-cov"
 ]
 extra-args = [
     "--import-mode=importlib",
-    "--capture=no",
-    "-q"
+    "--capture=no"
+]
+[tool.hatch.envs.hatch-test.scripts]
+run = [
+  "pytest --cov-report=xml --cov-config=pyproject.toml --cov=tests --asyncio-mode=auto",
 ]
 
 [project.optional-dependencies]
@@ -52,7 +63,8 @@ debugger = [
 dependencies = [
   "lxml",
   "textual",
-  "textual-dev"
+  "textual-dev",
+  "pytest-textual-snapshot",
 ]
 
 [tool.hatch.envs.wayland]
@@ -64,6 +76,7 @@ extra-dependencies = [
 ]
 
 [tool.hatch.envs.docs]
+detached = true
 extra-dependencies = [
   "mypy",
   "black",
@@ -126,23 +139,25 @@ exclude = [
 packages = ["wayland"]
 
 [tool.coverage.run]
-source_pkgs = ["wayland", "tests"]
+source_pkgs = ["wayland"]
 branch = true
 parallel = true
 omit = [
   "wayland/__about__.py",
+  "tests/*"
 ]
 
 [tool.coverage.paths]
 wayland = ["wayland"]
-tests = ["tests", "*/wayland/tests"]
 
 [tool.coverage.report]
+show_missing = false
 exclude_lines = [
   "no cov",
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
 ]
+
 
 [tool.ruff.format]
 quote-style = "double"

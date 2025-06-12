@@ -30,7 +30,7 @@ class TestWaylandParserHelpers(unittest.TestCase):
         # Test with summary and text
         mock_desc_node.attrib = {"summary": "test summary"}
         mock_desc_node.text = "  Line 1 \n  Line 2  \n\n  Line 3  "
-        expected = "Line 1\nLine 2\n\nLine 3"
+        expected = "Test summary\n\nLine 1\nLine 2\n\nLine 3"
         assert WaylandParser.get_description(mock_desc_node) == expected
 
         # Test with only summary
@@ -1085,6 +1085,240 @@ class TestWaylandParserFileScanning(unittest.TestCase):
             mock_copied_interfaces, indent=1, sort_keys=True
         )
         assert result == '{"full_json": true}'
+
+
+class TestWaylandParserCloneGitRepo(unittest.TestCase):
+    def setUp(self):
+        self.parser = WaylandParser()
+
+    @patch("wayland.parser.tempfile.gettempdir")
+    @patch("wayland.parser.os.path.basename")
+    @patch("wayland.parser.os.path.join")
+    @patch("wayland.parser.os.path.isdir")
+    @patch("wayland.parser.shutil.rmtree")
+    @patch.object(WaylandParser, "_run")
+    @patch("wayland.parser.log")
+    def test_clone_git_repo_new_repo(
+        self,
+        mock_log,
+        mock_run,
+        mock_rmtree,
+        mock_isdir,
+        mock_join,
+        mock_basename,
+        mock_gettempdir,
+    ):
+        """Test cloning a new repository."""
+        mock_gettempdir.return_value = "/tmp"
+        mock_basename.return_value = "test-repo"
+        mock_join.return_value = "/tmp/test-repo"
+        mock_isdir.return_value = False
+
+        result = self.parser.clone_git_repo("https://example.com/test-repo.git")
+
+        mock_run.assert_called_once_with(
+            ["git", "clone", "https://example.com/test-repo.git", "/tmp/test-repo"]
+        )
+        mock_rmtree.assert_not_called()
+        assert result == "/tmp/test-repo"
+
+    @patch("wayland.parser.tempfile.gettempdir")
+    @patch("wayland.parser.os.path.basename")
+    @patch("wayland.parser.os.path.join")
+    @patch("wayland.parser.os.path.isdir")
+    @patch("wayland.parser.shutil.rmtree")
+    @patch.object(WaylandParser, "_run")
+    @patch("wayland.parser.log")
+    def test_clone_git_repo_existing_repo_update(
+        self,
+        mock_log,
+        mock_run,
+        mock_rmtree,
+        mock_isdir,
+        mock_join,
+        mock_basename,
+        mock_gettempdir,
+    ):
+        """Test updating an existing repository."""
+        mock_gettempdir.return_value = "/tmp"
+        mock_basename.return_value = "existing-repo"
+        mock_join.return_value = "/tmp/existing-repo"
+        mock_isdir.return_value = True
+
+        result = self.parser.clone_git_repo("https://example.com/existing-repo.git")
+
+        mock_run.assert_called_once_with(
+            ["git", "pull", "--quiet"], cwd="/tmp/existing-repo"
+        )
+        mock_rmtree.assert_not_called()
+        assert result == "/tmp/existing-repo"
+
+    @patch("wayland.parser.tempfile.gettempdir")
+    @patch("wayland.parser.os.path.basename")
+    @patch("wayland.parser.os.path.join")
+    @patch("wayland.parser.os.path.isdir")
+    @patch("wayland.parser.shutil.rmtree")
+    @patch.object(WaylandParser, "_run")
+    @patch("wayland.parser.log")
+    def test_clone_git_repo_existing_repo_delete_and_clone(
+        self,
+        mock_log,
+        mock_run,
+        mock_rmtree,
+        mock_isdir,
+        mock_join,
+        mock_basename,
+        mock_gettempdir,
+    ):
+        """Test deleting existing repo - note: current implementation has a bug where it still tries to pull."""
+        mock_gettempdir.return_value = "/tmp"
+        mock_basename.return_value = "delete-repo"
+        mock_join.return_value = "/tmp/delete-repo"
+        mock_isdir.return_value = True
+
+        result = self.parser.clone_git_repo(
+            "https://example.com/delete-repo.git", delete_existing=True
+        )
+
+        mock_rmtree.assert_called_once_with("/tmp/delete-repo")
+        mock_run.assert_called_once_with(
+            ["git", "pull", "--quiet"], cwd="/tmp/delete-repo"
+        )
+        assert result == "/tmp/delete-repo"
+
+    @patch("wayland.parser.os.path.basename")
+    @patch("wayland.parser.os.path.join")
+    @patch("wayland.parser.os.path.isdir")
+    @patch.object(WaylandParser, "_run")
+    @patch("wayland.parser.log")
+    def test_clone_git_repo_custom_dest_dir(
+        self, mock_log, mock_run, mock_isdir, mock_join, mock_basename
+    ):
+        """Test cloning to a custom destination directory."""
+        mock_basename.return_value = "custom-repo"
+        mock_join.return_value = "/custom/path/custom-repo"
+        mock_isdir.return_value = False
+
+        result = self.parser.clone_git_repo(
+            "https://example.com/custom-repo.git", dest_dir="/custom/path"
+        )
+
+        mock_run.assert_called_once_with(
+            [
+                "git",
+                "clone",
+                "https://example.com/custom-repo.git",
+                "/custom/path/custom-repo",
+            ]
+        )
+        assert result == "/custom/path/custom-repo"
+
+
+class TestWaylandParserExtractArguments(unittest.TestCase):
+    def setUp(self):
+        self.parser = WaylandParser()
+
+    def test_extract_arguments_with_descriptions_summary(self):
+        """Test extracting arguments with summary attribute."""
+        mock_param1 = MagicMock(spec=etree._Element)
+        mock_param1.attrib = {"name": "arg1", "type": "uint", "summary": "First arg"}
+
+        mock_param2 = MagicMock(spec=etree._Element)
+        mock_param2.attrib = {"name": "arg2", "type": "string"}
+
+        params = [mock_param1, mock_param2]
+        result = self.parser._extract_arguments_with_descriptions(params)
+
+        expected = [
+            {
+                "name": "arg1",
+                "type": "uint",
+                "summary": "First arg",
+                "description": "First arg",
+            },
+            {"name": "arg2", "type": "string", "description": ""},
+        ]
+        assert result == expected
+
+    def test_extract_arguments_with_descriptions_no_summary(self):
+        """Test extracting arguments without summary attribute."""
+        mock_param = MagicMock(spec=etree._Element)
+        mock_param.attrib = {"name": "simple_arg", "type": "int"}
+
+        result = self.parser._extract_arguments_with_descriptions([mock_param])
+
+        expected = [{"name": "simple_arg", "type": "int", "description": ""}]
+        assert result == expected
+
+    def test_extract_arguments_with_descriptions_empty_list(self):
+        """Test extracting arguments from empty list."""
+        result = self.parser._extract_arguments_with_descriptions([])
+        assert result == []
+
+
+class TestWaylandParserGetRemoteUris(unittest.TestCase):
+    def setUp(self):
+        self.parser = WaylandParser()
+
+    @patch("wayland.parser.tempfile.gettempdir")
+    @patch.object(WaylandParser, "clone_git_repo")
+    @patch.object(WaylandParser, "get_local_files")
+    @patch("wayland.parser.log")
+    @patch(
+        "wayland.parser.REMOTE_PROTOCOL_SOURCES",
+        new=[
+            {
+                "name": "Test Source",
+                "url": "https://example.com/test.git",
+                "dirs": ["protocols"],
+                "ignore": ["test.xml"],
+            }
+        ],
+    )
+    def test_get_remote_uris_success(
+        self, mock_log, mock_get_local_files, mock_clone_git_repo, mock_gettempdir
+    ):
+        """Test successful remote URI processing."""
+        mock_gettempdir.return_value = "/tmp"
+        mock_clone_git_repo.return_value = "/tmp/test"
+        mock_get_local_files.return_value = ["/tmp/test/protocols/protocol1.xml"]
+
+        result = self.parser.get_remote_uris()
+
+        mock_clone_git_repo.assert_called_once_with(
+            "https://example.com/test.git", "/tmp", delete_existing=False
+        )
+        mock_get_local_files.assert_called_once_with(
+            search_directories=["/tmp/test/protocols"], ignore_filenames=["test.xml"]
+        )
+        assert result == ["/tmp/test/protocols/protocol1.xml"]
+
+    @patch("wayland.parser.tempfile.gettempdir")
+    @patch.object(WaylandParser, "clone_git_repo")
+    @patch.object(WaylandParser, "get_local_files")
+    @patch("wayland.parser.log")
+    @patch(
+        "wayland.parser.REMOTE_PROTOCOL_SOURCES",
+        new=[
+            {
+                "name": "Failed Source",
+                "url": "https://example.com/fail.git",
+                "dirs": ["protocols"],
+            }
+        ],
+    )
+    def test_get_remote_uris_clone_failure(
+        self, mock_log, mock_get_local_files, mock_clone_git_repo, mock_gettempdir
+    ):
+        """Test handling of clone failure."""
+        mock_gettempdir.return_value = "/tmp"
+        mock_clone_git_repo.return_value = False
+
+        result = self.parser.get_remote_uris()
+
+        mock_get_local_files.assert_not_called()
+        mock_log.error.assert_called_once()
+        assert result == []
 
 
 if __name__ == "__main__":

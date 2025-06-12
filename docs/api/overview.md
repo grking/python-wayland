@@ -1,12 +1,15 @@
 # API Documentation
 
-All the Wayland interfaces are available in the [`wayland` namespace.](../wayland/index.md)
+All the Wayland interfaces are available in the [`wayland`](../wayland/index.md) namespace.
 
-`wayland.client` provides additional functionality that is not part of the low-level Wayland protocol. Helper or convenience functions to assist with developing using `python-wayland`.
+`wayland.client` provides additional library specific functionality that is not part of the Wayland protocol itself.
+
+* [`wayland.client`][wayland.client]
+* [`wayland.client.package`][wayland.client.package]
 
 ## Wayland Protocol Debugger
 
-The most useful feature is the Wayland protocol debugger. This allows you to monitor all requests and events between your application and the Wayland compositor.
+A stand alone terminal Wayland protocol debugger is included. This allows you to monitor all requests and events between your application and the Wayland compositor.
 
 ![Wayland debugger interface](../assets/images/wayland-debugger.png)
 
