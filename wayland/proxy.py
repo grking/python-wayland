@@ -17,6 +17,7 @@ from wayland.client.package import get_package_root
 from wayland.constants import MAX_EVENT_RESOLUTION
 from wayland.debugger import Debugger
 from wayland.log import log
+from wayland.message import pack_argument, unpack_argument
 from wayland.state import WaylandState
 
 
@@ -62,15 +63,6 @@ class Proxy:
             self.packet = b""
             self._debugger = Debugger()
 
-        @classmethod
-        def _pad(cls, data):
-            if isinstance(data, str):
-                data = data.encode("utf-8")
-            data += b"\x00"
-            padding = ((len(data) + 3) & ~3) - len(data)
-            data += b"\x00" * padding
-            return data
-
         def __call__(self, *args):
             args = list(args)
 
@@ -80,7 +72,6 @@ class Proxy:
 
             kwargs = {}
             packet = b""
-            values = []
             interface = None
             ancillary = None
             return_value = None
@@ -106,11 +97,11 @@ class Proxy:
                 kwargs[arg["name"]] = value
 
                 # Pack the argument
-                packet, value = self.__pack_argument(packet, arg["type"], value)
-                ancillary = self.__handle_fd_argument(arg["type"], value, ancillary)
-
-                # Debug info
-                values.append(self.__format_debug_arg(value, arg["type"]))
+                packet, fds = self.__pack_argument(packet, arg["type"], value)
+                if fds:
+                    ancillary = [
+                        (socket.SOL_SOCKET, socket.SCM_RIGHTS, struct.pack("I", fds[0]))
+                    ]
 
             self.kwargs = kwargs.copy()
             self.packet = packet
@@ -124,40 +115,7 @@ class Proxy:
             return return_value
 
         def __pack_argument(self, packet, arg_type, value):
-            if arg_type in ("new_id", "uint"):
-                if isinstance(value, Enum):
-                    packet += struct.pack("I", value.value)
-                else:
-                    packet += struct.pack("I", value)
-            elif arg_type == "object":
-                packet += struct.pack("I", getattr(value, "object_id", 0))
-            elif arg_type == "int":
-                packet += struct.pack("i", value)
-            elif arg_type == "enum":
-                packet += struct.pack("I", value.value)
-            elif arg_type == "string":
-                length = len(value) + 1
-                value = self._pad(value)
-                packet += struct.pack(f"I{len(value)}s", length, value)
-            elif arg_type == "fixed":
-                integer_part = int(value) << 8
-                fractional_part = int((value - int(value)) * 256)
-                value = integer_part | (fractional_part & 0xFF)
-                packet += struct.pack("I", value)
-
-            return packet, value
-
-        def __handle_fd_argument(self, arg_type, value, ancillary):
-            if arg_type == "fd":
-                ancillary = [
-                    (socket.SOL_SOCKET, socket.SCM_RIGHTS, struct.pack("I", value))
-                ]
-            return ancillary
-
-        def __format_debug_arg(self, value, arg_type):
-            if arg_type == "object" and isinstance(value, object):
-                return f"{value._name}#{value.object_id}"
-            return str(value)
+            return pack_argument(packet, arg_type, value)
 
     class Events:
         pass
@@ -265,51 +223,9 @@ class Proxy:
             return value
 
         def __unpack_argument(self, packet, arg_type, get_fd, enum_type):
-            read = 0
-            if enum_type is not None:
-                (value,) = struct.unpack_from("I", packet)
-                value = self.__int_to_enum(enum_type, value)
-                read = 4
-            elif arg_type in ("new_id", "uint", "object"):
-                (value,) = struct.unpack_from("I", packet)
-                read = 4
-            elif arg_type == "int":
-                (value,) = struct.unpack_from("i", packet)
-                read = 4
-            elif arg_type == "fd":
-                # we fetch the fd from the incoming fd queue
-                value = get_fd()
-            elif arg_type == "string":
-                (length,) = struct.unpack_from("I", packet)
-                packet = packet[4:]
-                padded_length = (length + 3) & ~3
-                (value,) = struct.unpack_from(f"{padded_length}s", packet)
-                value = value[: length - 1].decode("utf-8")
-                read = padded_length
-            elif arg_type == "array":
-                (length,) = struct.unpack_from("I", packet)
-                packet = packet[4:]
-                padded_length = (length + 3) & ~3
-                if length > 0:
-                    # Read the raw array data
-                    (array_data,) = struct.unpack_from(f"{padded_length}s", packet)
-                    # Convert bytes to list of integers
-                    num_elements = length // 4
-                    value = list(struct.unpack(f"{num_elements}I", array_data[:length]))
-                else:
-                    value = []
-
-                read = padded_length
-            elif arg_type == "fixed":
-                (value,) = struct.unpack_from("I", packet)
-                read = 4
-                integer_part = value >> 8
-                fractional_part = value & 0xFF
-                value = integer_part + fractional_part / 256.0
-            else:
-                raise ValueError("Unknown type " + arg_type)
-
-            return packet[read:], value
+            return unpack_argument(
+                packet, arg_type, get_fd, enum_type, self.__int_to_enum
+            )
 
     class DynamicObject:
         @property

@@ -6,3 +6,9 @@ dist/
 .vscode
 site/
 .r*
+.cov*
+snapshot*
+
+/*.md
+!CHANGELOG.md
+!README.md

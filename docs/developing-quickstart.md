@@ -19,6 +19,9 @@ pipx install hatch
 
 * Run the tests with `hatch test`
 * Run lint check with `hatch fmt`
+* Display a test coverage report with `hatch run cov:report`
+
+_Note `hatch test` outputs binary and xml coverage reports_
 
 ## Generating Documentation
 
@@ -29,14 +32,14 @@ The documentation is automatically produced using [MkDocs](https://www.mkdocs.or
 
 ## Docker Containers
 
+### Most Useful
 * Run unit tests in Sway `hatch run docker-sway`
 * Run unit tests in Weston `hatch run docker-weston`
 
+### Additional Docker Helpers
 * Stop all docker containers `hatch run docker-stop`
-
 * Sway container shell `hatch run docker-sway-shell`
 * Weston container shell `hatch run docker-sway-shell`
-
 * Build all images `hatch run docker-build`
 
 ## Updating Wayland Protocol Definitions

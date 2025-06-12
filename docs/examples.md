@@ -100,4 +100,7 @@ while not displays_done or displays_done < total_displays:
 
 ## Further Reading
 
-These examples demonstrate some basic usage of `python-wayland`. For more documentation on the Wayland protocol, Drew DeVault's excellent [Wayland Book](https://wayland-book.com/)
+These examples demonstrate some basic usage of `python-wayland`. For more documentation on the Wayland protocol generally see:
+
+* Drew DeVault's excellent [Wayland Book](https://wayland-book.com/)
+* The [official Wayland documentation](https://wayland.freedesktop.org/docs/html/)

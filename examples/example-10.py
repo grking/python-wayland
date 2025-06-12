@@ -7,7 +7,7 @@ from wayland.client import register_factory
 class Registry(wayland.wl_registry):
 
     def on_global(self, name, interface, version):
-        print(interface)
+        print(f'{name},"{interface}",{version}')
 
 
 if __name__ == "__main__":

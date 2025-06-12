@@ -23,7 +23,7 @@ class MessageLog(DataTable):
 
     def on_data_table_row_highlighted(self, event):
         self.selected_index = event.cursor_row
-        self.selected_row_key = event.row_key.value
+        self.selected_row_key = event.row_key.value if event.row_key else None
 
     def update_messages(self, messages: list) -> None:
         self.clear()
