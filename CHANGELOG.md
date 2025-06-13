@@ -37,6 +37,7 @@ This version replaces the previous experiments with a more formal Wayland class 
 - `array` types in events are now correctly parsed into Python lists.
 - Importing the package has consistent behaviour on Wayland and non-Wayland systems.
 - Fixed type hints where enums had the wrong type when passed as an argument to a request.
+- Fixed protocol error when parsing some unicode characters in strings.
 
 ## v0.7.1 (28th May 2025)
 - Remove dependency on requests library.

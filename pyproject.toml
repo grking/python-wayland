@@ -76,7 +76,6 @@ extra-dependencies = [
 ]
 
 [tool.hatch.envs.docs]
-detached = true
 extra-dependencies = [
   "mypy",
   "black",
@@ -117,10 +116,10 @@ docker-stop = """
   docker compose -f docker/docker-compose.yml -f docker/docker-compose.sway.yml down -v
 """
 
-docker-sway = "docker compose -f docker/docker-compose.yml -f docker/docker-compose.sway.yml run --rm env-sway-gui"
-docker-sway-shell = "docker compose -f docker/docker-compose.yml -f docker/docker-compose.sway.yml run --rm env-sway-shell"
-docker-weston = "docker compose -f docker/docker-compose.yml -f docker/docker-compose.weston.yml run --rm env-weston-gui"
-docker-weston-shell = "docker compose -f docker/docker-compose.yml -f docker/docker-compose.weston.yml run --rm env-weston-shell"
+docker-sway = "docker compose -f docker/docker-compose.yml -f docker/docker-compose.sway.yml run --rm --build env-sway-gui"
+docker-sway-shell = "docker compose -f docker/docker-compose.yml -f docker/docker-compose.sway.yml run --rm --build env-sway-shell"
+docker-weston = "docker compose -f docker/docker-compose.yml -f docker/docker-compose.weston.yml run --rm --build env-weston-gui"
+docker-weston-shell = "docker compose -f docker/docker-compose.yml -f docker/docker-compose.weston.yml run --rm --build env-weston-shell"
 
 [build-system]
 requires = ["hatchling"]
