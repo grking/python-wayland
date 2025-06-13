@@ -188,6 +188,9 @@ class TypeHinter:
             enum_type = "IntFlag" if member.get("bitfield") else "Enum"
 
             signature = [self._pad(f"class {enum_name}({enum_type}):", indent_level)]
+            if member.get("description"):
+                signature.append(self.indent(member["description"], indent_level + 1))
+
             for arg in member["args"]:
                 value_name = arg["name"]
                 try:
@@ -196,6 +199,17 @@ class TypeHinter:
                 except ValueError:
                     pass
                 signature.append(self._pad(f"{value_name}: int", indent_level + 1))
+                if arg.get("description"):
+                    comment_lines = [
+                        f"{line.strip()}"
+                        for line in arg["description"].splitlines()
+                        if line.strip()
+                    ]
+                    if comment_lines:
+                        comment_block = "\n".join(comment_lines)
+                        signature.append(
+                            self.indent(comment_block, indent_level + 1, comment=True)
+                        )
 
             definitions.append("\n".join(signature) + "\n\n")
 
@@ -209,8 +223,12 @@ class TypeHinter:
     def indent(
         cls, input_string: str, indent_level: int, *, comment: bool = True
     ) -> str:
-        indent = cls._pad("", indent_level)
+        indent_str = cls._pad("", indent_level)
         if comment:
-            input_string = f'"""\n{input_string}\n"""\n'
+            if "\n" in input_string.strip():
+                input_string = f'"""\n{input_string}\n"""\n'
+            else:
+                # Single line doc comment
+                input_string = f'"""{input_string}"""\n'
 
-        return textwrap.indent(input_string, indent)
+        return textwrap.indent(input_string, indent_str)

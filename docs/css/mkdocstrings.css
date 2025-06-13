@@ -1,3 +1,18 @@
+/* Enums */
+code.doc-symbol-enum,
+a code.doc-symbol-enum {
+  color: rgb(44, 130, 44);
+  background-color: var(--doc-symbol-class-bg-color);
+}
+
+code.doc-symbol-enum::after {
+  content: "enum";
+}
+
+.doc-enum-item-name {
+  color: rgb(44, 130, 44) !important;
+}
+
 /* Indentation. */
 div.doc-contents:not(.first) {
   padding-left: 25px;
@@ -70,3 +85,4 @@ a.autorefs-external:hover::after {
     translate: calc(var(--tree-thickness) * -1) calc(var(--tree-thickness) * -1);
   }
 }
+

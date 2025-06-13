@@ -463,6 +463,7 @@ class TestWaylandParserProcessElement(unittest.TestCase):
                 child = MagicMock(spec=etree._Element)
                 child.tag = child_tag_name
                 child.attrib = dict(child_data)
+                child.find = MagicMock(return_value=None)
                 children.append(child)
         node.findall = MagicMock(return_value=children)
 

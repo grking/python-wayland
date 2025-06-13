@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import keyword
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -481,15 +482,17 @@ class WaylandParser:
                 f"Successfully processed interface '{interface_name}' v{current_version} from {current_file_path_for_logging}."
             )
 
-    @staticmethod
-    def get_description(description: etree.Element) -> str:
+    def format_summary(self, summary):
+        return re.sub(r"\b([a-z_]*_[a-z_]*)\b", r"`\1`", summary).strip().capitalize()
+
+    def get_description(self, description: etree.Element) -> str:
         if (
             description is not None
             and hasattr(description, "text")
             and description.text is not None
             and description.text.strip()
         ):
-            summary = description.attrib.get("summary", "").strip().capitalize()
+            summary = self.format_summary(description.attrib.get("summary", ""))
             if summary:
                 text = textwrap.dedent(description.text).strip()
                 text = f"{summary}\n\n{text}"
@@ -497,7 +500,7 @@ class WaylandParser:
                 text = textwrap.dedent(description.text).strip()
         elif description is not None and description.attrib.get("summary", "").strip():
             # only have summary
-            text = description.attrib.get("summary", "").strip().capitalize()
+            text = self.format_summary(description.attrib.get("summary", ""))
         else:
             text = ""
         return "\n".join(line.rstrip() for line in text.splitlines())
@@ -508,8 +511,11 @@ class WaylandParser:
         args = []
         for param in params:
             arg_dict = dict(param.attrib)
-            if "summary" in arg_dict:
-                arg_dict["description"] = arg_dict["summary"]
+            description_node = param.find("description")
+            if description_node is not None:
+                arg_dict["description"] = self.get_description(description_node)
+            elif "summary" in arg_dict:
+                arg_dict["description"] = self.format_summary(arg_dict["summary"])
             else:
                 arg_dict["description"] = ""
             args.append(arg_dict)
