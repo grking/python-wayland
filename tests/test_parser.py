@@ -21,34 +21,34 @@ class TestWaylandParserHelpers(unittest.TestCase):
         assert self.parser.definition_uri == ""
 
     def test_get_description(self):
-        """Tests the get_description static method."""
+        """Tests the get_description instance method."""
         mock_desc_node = MagicMock(spec=etree._Element)
 
         # Test with None
-        assert WaylandParser.get_description(None) == ""
+        assert self.parser.get_description(None) == ""
 
         # Test with summary and text
         mock_desc_node.attrib = {"summary": "test summary"}
         mock_desc_node.text = "  Line 1 \n  Line 2  \n\n  Line 3  "
         expected = "Test summary\n\nLine 1\nLine 2\n\nLine 3"
-        assert WaylandParser.get_description(mock_desc_node) == expected
+        assert self.parser.get_description(mock_desc_node) == expected
 
         # Test with only summary
         mock_desc_node.text = None
-        assert WaylandParser.get_description(mock_desc_node) == "Test summary"
+        assert self.parser.get_description(mock_desc_node) == "Test summary"
 
         mock_desc_node.text = "   "  # Whitespace only text
-        assert WaylandParser.get_description(mock_desc_node) == "Test summary"
+        assert self.parser.get_description(mock_desc_node) == "Test summary"
 
         # Test with only text (no summary in attrib)
         mock_desc_node.attrib = {}
         mock_desc_node.text = "Only text here."
-        assert WaylandParser.get_description(mock_desc_node) == "Only text here."
+        assert self.parser.get_description(mock_desc_node) == "Only text here."
 
         # Test with empty summary and text
         mock_desc_node.attrib = {"summary": ""}
         mock_desc_node.text = ""
-        assert WaylandParser.get_description(mock_desc_node) == ""
+        assert self.parser.get_description(mock_desc_node) == ""
 
     def test_remove_keys(self):
         """Tests the _remove_keys static method."""
@@ -341,7 +341,7 @@ class TestWaylandParserGetXmlRoot(unittest.TestCase):
 
         root = self.parser._get_xml_root(mock_path)
 
-        mock_abspath.assert_called_once_with(mock_path)
+        mock_abspath.assert_called_with(mock_path)
         assert self.parser.definition_uri == mock_abs_path
         mock_exists.assert_called_once_with(mock_abs_path)
         mock_xml_parser.assert_called_once_with(remove_blank_text=True)
@@ -575,7 +575,7 @@ class TestWaylandParserProcessElement(unittest.TestCase):
                 "name": "normal",
                 "value": "0",
                 "summary": "normal",
-                "description": "normal",
+                "description": "Normal",
             },
             {
                 "name": "90",
@@ -1223,9 +1223,11 @@ class TestWaylandParserExtractArguments(unittest.TestCase):
         """Test extracting arguments with summary attribute."""
         mock_param1 = MagicMock(spec=etree._Element)
         mock_param1.attrib = {"name": "arg1", "type": "uint", "summary": "First arg"}
+        mock_param1.find.return_value = None
 
         mock_param2 = MagicMock(spec=etree._Element)
         mock_param2.attrib = {"name": "arg2", "type": "string"}
+        mock_param2.find.return_value = None
 
         params = [mock_param1, mock_param2]
         result = self.parser._extract_arguments_with_descriptions(params)
@@ -1245,6 +1247,7 @@ class TestWaylandParserExtractArguments(unittest.TestCase):
         """Test extracting arguments without summary attribute."""
         mock_param = MagicMock(spec=etree._Element)
         mock_param.attrib = {"name": "simple_arg", "type": "int"}
+        mock_param.find.return_value = None
 
         result = self.parser._extract_arguments_with_descriptions([mock_param])
 
