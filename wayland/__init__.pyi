@@ -19,10 +19,25 @@ class wl_display:
     version = 1
 
     class error(Enum):
+        """
+        Global error values
+
+        These errors are global and can be emitted in response to any
+        server request.
+        """
+
         invalid_object: int
+        """Server couldn't find object"""
+
         invalid_method: int
+        """Method doesn't exist on the specified interface or malformed request"""
+
         no_memory: int
+        """Server is out of memory"""
+
         implementation: int
+        """Implementation error in compositor"""
+
 
 
     @staticmethod
@@ -138,9 +153,9 @@ class wl_display:
             of the error, for (debugging) convenience.
 
             Args:
-                object_id: object where the error occurred
-                code: error code
-                message: error description
+                object_id: Object where the error occurred
+                code: Error code
+                message: Error description
             """
 
             ...
@@ -157,7 +172,7 @@ class wl_display:
             it will know that it can safely reuse the object ID.
 
             Args:
-                id: deleted object ID
+                id: Deleted object id
             """
 
             ...
@@ -200,8 +215,8 @@ class wl_registry:
         specified name as the identifier.
 
         Args:
-            name: unique numeric name of the object
-            id: bounded object
+            name: Unique numeric name of the object
+            id: Bounded object
         """
 
         ...
@@ -219,9 +234,9 @@ class wl_registry:
             given version of the given interface.
 
             Args:
-                name: numeric name of the global object
-                interface: interface implemented by the object
-                version: interface version
+                name: Numeric name of the global object
+                interface: Interface implemented by the object
+                version: Interface version
             """
 
             ...
@@ -243,7 +258,7 @@ class wl_registry:
             the global going away and a client sending a request to it.
 
             Args:
-                name: numeric name of the global object
+                name: Numeric name of the global object
             """
 
             ...
@@ -272,7 +287,7 @@ class wl_callback:
             Notify the client when the related request is done.
 
             Args:
-                callback_data: request-specific data for the callback
+                callback_data: Request-specific data for the callback
             """
 
             ...
@@ -349,11 +364,11 @@ class wl_shm_pool:
         a buffer from it.
 
         Args:
-            offset: buffer byte offset within the pool
-            width: buffer width, in pixels
-            height: buffer height, in pixels
-            stride: number of bytes from the beginning of one row to the beginning of the next row
-            format: buffer pixel format
+            offset: Buffer byte offset within the pool
+            width: Buffer width, in pixels
+            height: Buffer height, in pixels
+            stride: Number of bytes from the beginning of one row to the beginning of the next row
+            format: Buffer pixel format
 
         Returns:
             wl_buffer: The created object
@@ -392,7 +407,7 @@ class wl_shm_pool:
         the new pool size.
 
         Args:
-            size: new size of the pool, in bytes
+            size: New size of the pool, in bytes
         """
 
         ...
@@ -415,96 +430,293 @@ class wl_shm:
     version = 2
 
     class error(Enum):
+        """
+        `wl_shm` error values
+
+        These errors can be emitted in response to wl_shm requests.
+        """
+
         invalid_format: int
+        """Buffer format is not known"""
+
         invalid_stride: int
+        """Invalid size or stride during pool or buffer creation"""
+
         invalid_fd: int
+        """Mmapping the file descriptor failed"""
+
 
 
     class format(Enum):
+        """
+        Pixel formats
+
+        This describes the memory layout of an individual pixel.
+
+        All renderers should support argb8888 and xrgb8888 but any other
+        formats are optional and may not be supported by the particular
+        renderer in use.
+
+        The drm format codes match the macros defined in drm_fourcc.h, except
+        argb8888 and xrgb8888. The formats actually supported by the compositor
+        will be reported by the format event.
+
+        For all wl_shm formats and unless specified in another protocol
+        extension, pre-multiplied alpha is used for pixel values.
+        """
+
         argb8888: int
+        """32-bit argb format, [31:0] a:r:g:b 8:8:8:8 little endian"""
+
         xrgb8888: int
+        """32-bit rgb format, [31:0] x:r:g:b 8:8:8:8 little endian"""
+
         c8: int
+        """8-bit color index format, [7:0] c"""
+
         rgb332: int
+        """8-bit rgb format, [7:0] r:g:b 3:3:2"""
+
         bgr233: int
+        """8-bit bgr format, [7:0] b:g:r 2:3:3"""
+
         xrgb4444: int
+        """16-bit xrgb format, [15:0] x:r:g:b 4:4:4:4 little endian"""
+
         xbgr4444: int
+        """16-bit xbgr format, [15:0] x:b:g:r 4:4:4:4 little endian"""
+
         rgbx4444: int
+        """16-bit rgbx format, [15:0] r:g:b:x 4:4:4:4 little endian"""
+
         bgrx4444: int
+        """16-bit bgrx format, [15:0] b:g:r:x 4:4:4:4 little endian"""
+
         argb4444: int
+        """16-bit argb format, [15:0] a:r:g:b 4:4:4:4 little endian"""
+
         abgr4444: int
+        """16-bit abgr format, [15:0] a:b:g:r 4:4:4:4 little endian"""
+
         rgba4444: int
+        """16-bit rbga format, [15:0] r:g:b:a 4:4:4:4 little endian"""
+
         bgra4444: int
+        """16-bit bgra format, [15:0] b:g:r:a 4:4:4:4 little endian"""
+
         xrgb1555: int
+        """16-bit xrgb format, [15:0] x:r:g:b 1:5:5:5 little endian"""
+
         xbgr1555: int
+        """16-bit xbgr 1555 format, [15:0] x:b:g:r 1:5:5:5 little endian"""
+
         rgbx5551: int
+        """16-bit rgbx 5551 format, [15:0] r:g:b:x 5:5:5:1 little endian"""
+
         bgrx5551: int
+        """16-bit bgrx 5551 format, [15:0] b:g:r:x 5:5:5:1 little endian"""
+
         argb1555: int
+        """16-bit argb 1555 format, [15:0] a:r:g:b 1:5:5:5 little endian"""
+
         abgr1555: int
+        """16-bit abgr 1555 format, [15:0] a:b:g:r 1:5:5:5 little endian"""
+
         rgba5551: int
+        """16-bit rgba 5551 format, [15:0] r:g:b:a 5:5:5:1 little endian"""
+
         bgra5551: int
+        """16-bit bgra 5551 format, [15:0] b:g:r:a 5:5:5:1 little endian"""
+
         rgb565: int
+        """16-bit rgb 565 format, [15:0] r:g:b 5:6:5 little endian"""
+
         bgr565: int
+        """16-bit bgr 565 format, [15:0] b:g:r 5:6:5 little endian"""
+
         rgb888: int
+        """24-bit rgb format, [23:0] r:g:b little endian"""
+
         bgr888: int
+        """24-bit bgr format, [23:0] b:g:r little endian"""
+
         xbgr8888: int
+        """32-bit xbgr format, [31:0] x:b:g:r 8:8:8:8 little endian"""
+
         rgbx8888: int
+        """32-bit rgbx format, [31:0] r:g:b:x 8:8:8:8 little endian"""
+
         bgrx8888: int
+        """32-bit bgrx format, [31:0] b:g:r:x 8:8:8:8 little endian"""
+
         abgr8888: int
+        """32-bit abgr format, [31:0] a:b:g:r 8:8:8:8 little endian"""
+
         rgba8888: int
+        """32-bit rgba format, [31:0] r:g:b:a 8:8:8:8 little endian"""
+
         bgra8888: int
+        """32-bit bgra format, [31:0] b:g:r:a 8:8:8:8 little endian"""
+
         xrgb2101010: int
+        """32-bit xrgb format, [31:0] x:r:g:b 2:10:10:10 little endian"""
+
         xbgr2101010: int
+        """32-bit xbgr format, [31:0] x:b:g:r 2:10:10:10 little endian"""
+
         rgbx1010102: int
+        """32-bit rgbx format, [31:0] r:g:b:x 10:10:10:2 little endian"""
+
         bgrx1010102: int
+        """32-bit bgrx format, [31:0] b:g:r:x 10:10:10:2 little endian"""
+
         argb2101010: int
+        """32-bit argb format, [31:0] a:r:g:b 2:10:10:10 little endian"""
+
         abgr2101010: int
+        """32-bit abgr format, [31:0] a:b:g:r 2:10:10:10 little endian"""
+
         rgba1010102: int
+        """32-bit rgba format, [31:0] r:g:b:a 10:10:10:2 little endian"""
+
         bgra1010102: int
+        """32-bit bgra format, [31:0] b:g:r:a 10:10:10:2 little endian"""
+
         yuyv: int
+        """Packed ycbcr format, [31:0] cr0:y1:cb0:y0 8:8:8:8 little endian"""
+
         yvyu: int
+        """Packed ycbcr format, [31:0] cb0:y1:cr0:y0 8:8:8:8 little endian"""
+
         uyvy: int
+        """Packed ycbcr format, [31:0] y1:cr0:y0:cb0 8:8:8:8 little endian"""
+
         vyuy: int
+        """Packed ycbcr format, [31:0] y1:cb0:y0:cr0 8:8:8:8 little endian"""
+
         ayuv: int
+        """Packed aycbcr format, [31:0] a:y:cb:cr 8:8:8:8 little endian"""
+
         nv12: int
+        """2 plane ycbcr cr:cb format, 2x2 subsampled cr:cb plane"""
+
         nv21: int
+        """2 plane ycbcr cb:cr format, 2x2 subsampled cb:cr plane"""
+
         nv16: int
+        """2 plane ycbcr cr:cb format, 2x1 subsampled cr:cb plane"""
+
         nv61: int
+        """2 plane ycbcr cb:cr format, 2x1 subsampled cb:cr plane"""
+
         yuv410: int
+        """3 plane ycbcr format, 4x4 subsampled cb (1) and cr (2) planes"""
+
         yvu410: int
+        """3 plane ycbcr format, 4x4 subsampled cr (1) and cb (2) planes"""
+
         yuv411: int
+        """3 plane ycbcr format, 4x1 subsampled cb (1) and cr (2) planes"""
+
         yvu411: int
+        """3 plane ycbcr format, 4x1 subsampled cr (1) and cb (2) planes"""
+
         yuv420: int
+        """3 plane ycbcr format, 2x2 subsampled cb (1) and cr (2) planes"""
+
         yvu420: int
+        """3 plane ycbcr format, 2x2 subsampled cr (1) and cb (2) planes"""
+
         yuv422: int
+        """3 plane ycbcr format, 2x1 subsampled cb (1) and cr (2) planes"""
+
         yvu422: int
+        """3 plane ycbcr format, 2x1 subsampled cr (1) and cb (2) planes"""
+
         yuv444: int
+        """3 plane ycbcr format, non-subsampled cb (1) and cr (2) planes"""
+
         yvu444: int
+        """3 plane ycbcr format, non-subsampled cr (1) and cb (2) planes"""
+
         r8: int
+        """[7:0] r"""
+
         r16: int
+        """[15:0] r little endian"""
+
         rg88: int
+        """[15:0] r:g 8:8 little endian"""
+
         gr88: int
+        """[15:0] g:r 8:8 little endian"""
+
         rg1616: int
+        """[31:0] r:g 16:16 little endian"""
+
         gr1616: int
+        """[31:0] g:r 16:16 little endian"""
+
         xrgb16161616f: int
+        """[63:0] x:r:g:b 16:16:16:16 little endian"""
+
         xbgr16161616f: int
+        """[63:0] x:b:g:r 16:16:16:16 little endian"""
+
         argb16161616f: int
+        """[63:0] a:r:g:b 16:16:16:16 little endian"""
+
         abgr16161616f: int
+        """[63:0] a:b:g:r 16:16:16:16 little endian"""
+
         xyuv8888: int
+        """[31:0] x:y:cb:cr 8:8:8:8 little endian"""
+
         vuy888: int
+        """[23:0] cr:cb:y 8:8:8 little endian"""
+
         vuy101010: int
+        """Y followed by u then v, 10:10:10. non-linear modifier only"""
+
         y210: int
+        """[63:0] cr0:0:y1:0:cb0:0:y0:0 10:6:10:6:10:6:10:6 little endian per 2 y pixels"""
+
         y212: int
+        """[63:0] cr0:0:y1:0:cb0:0:y0:0 12:4:12:4:12:4:12:4 little endian per 2 y pixels"""
+
         y216: int
+        """[63:0] cr0:y1:cb0:y0 16:16:16:16 little endian per 2 y pixels"""
+
         y410: int
+        """[31:0] a:cr:y:cb 2:10:10:10 little endian"""
+
         y412: int
+        """[63:0] a:0:cr:0:y:0:cb:0 12:4:12:4:12:4:12:4 little endian"""
+
         y416: int
+        """[63:0] a:cr:y:cb 16:16:16:16 little endian"""
+
         xvyu2101010: int
+        """[31:0] x:cr:y:cb 2:10:10:10 little endian"""
+
         xvyu12_16161616: int
+        """[63:0] x:0:cr:0:y:0:cb:0 12:4:12:4:12:4:12:4 little endian"""
+
         xvyu16161616: int
+        """[63:0] x:cr:y:cb 16:16:16:16 little endian"""
+
         y0l0: int
+        """[63:0]   a3:a2:y3:0:cr0:0:y2:0:a1:a0:y1:0:cb0:0:y0:0  1:1:8:2:8:2:8:2:1:1:8:2:8:2:8:2 little endian"""
+
         x0l0: int
+        """[63:0]   x3:x2:y3:0:cr0:0:y2:0:x1:x0:y1:0:cb0:0:y0:0  1:1:8:2:8:2:8:2:1:1:8:2:8:2:8:2 little endian"""
+
         y0l2: int
+        """[63:0]   a3:a2:y3:cr0:y2:a1:a0:y1:cb0:y0  1:1:10:10:10:1:1:10:10:10 little endian"""
+
         x0l2: int
+        """[63:0]   x3:x2:y3:cr0:y2:x1:x0:y1:cb0:y0  1:1:10:10:10:1:1:10:10:10 little endian"""
+
         yuv420_8bit: int
         yuv420_10bit: int
         xrgb8888_a8: int
@@ -516,34 +728,88 @@ class wl_shm:
         rgb565_a8: int
         bgr565_a8: int
         nv24: int
+        """Non-subsampled cr:cb plane"""
+
         nv42: int
+        """Non-subsampled cb:cr plane"""
+
         p210: int
+        """2x1 subsampled cr:cb plane, 10 bit per channel"""
+
         p010: int
+        """2x2 subsampled cr:cb plane 10 bits per channel"""
+
         p012: int
+        """2x2 subsampled cr:cb plane 12 bits per channel"""
+
         p016: int
+        """2x2 subsampled cr:cb plane 16 bits per channel"""
+
         axbxgxrx106106106106: int
+        """[63:0] a:x:b:x:g:x:r:x 10:6:10:6:10:6:10:6 little endian"""
+
         nv15: int
+        """2x2 subsampled cr:cb plane"""
+
         q410: int
         q401: int
         xrgb16161616: int
+        """[63:0] x:r:g:b 16:16:16:16 little endian"""
+
         xbgr16161616: int
+        """[63:0] x:b:g:r 16:16:16:16 little endian"""
+
         argb16161616: int
+        """[63:0] a:r:g:b 16:16:16:16 little endian"""
+
         abgr16161616: int
+        """[63:0] a:b:g:r 16:16:16:16 little endian"""
+
         c1: int
+        """[7:0] c0:c1:c2:c3:c4:c5:c6:c7 1:1:1:1:1:1:1:1 eight pixels/byte"""
+
         c2: int
+        """[7:0] c0:c1:c2:c3 2:2:2:2 four pixels/byte"""
+
         c4: int
+        """[7:0] c0:c1 4:4 two pixels/byte"""
+
         d1: int
+        """[7:0] d0:d1:d2:d3:d4:d5:d6:d7 1:1:1:1:1:1:1:1 eight pixels/byte"""
+
         d2: int
+        """[7:0] d0:d1:d2:d3 2:2:2:2 four pixels/byte"""
+
         d4: int
+        """[7:0] d0:d1 4:4 two pixels/byte"""
+
         d8: int
+        """[7:0] d"""
+
         r1: int
+        """[7:0] r0:r1:r2:r3:r4:r5:r6:r7 1:1:1:1:1:1:1:1 eight pixels/byte"""
+
         r2: int
+        """[7:0] r0:r1:r2:r3 2:2:2:2 four pixels/byte"""
+
         r4: int
+        """[7:0] r0:r1 4:4 two pixels/byte"""
+
         r10: int
+        """[15:0] x:r 6:10 little endian"""
+
         r12: int
+        """[15:0] x:r 4:12 little endian"""
+
         avuy8888: int
+        """[31:0] a:cr:cb:y 8:8:8:8 little endian"""
+
         xvuy8888: int
+        """[31:0] x:cr:cb:y 8:8:8:8 little endian"""
+
         p030: int
+        """2x2 subsampled cr:cb plane 10 bits per channel packed"""
+
 
 
     @staticmethod
@@ -558,8 +824,8 @@ class wl_shm:
         descriptor, to use as backing memory for the pool.
 
         Args:
-            fd: file descriptor for the pool
-            size: pool size, in bytes
+            fd: File descriptor for the pool
+            size: Pool size, in bytes
 
         Returns:
             wl_shm_pool: The created object
@@ -591,14 +857,14 @@ class wl_shm:
             argb8888 and xrgb8888.
 
             Args:
-                format: buffer pixel format
+                format: Buffer pixel format
             """
 
             ...
 
 class wl_buffer:
     """
-    Content for a wl_surface
+    Content for a `wl_surface`
 
     A buffer provides the content for a wl_surface. Buffers are
     created through factory interfaces such as wl_shm, wp_linux_buffer_params
@@ -673,9 +939,17 @@ class wl_data_offer:
 
     class error(Enum):
         invalid_finish: int
+        """Finish request was called untimely"""
+
         invalid_action_mask: int
+        """Action mask contains invalid values"""
+
         invalid_action: int
+        """Action argument has an invalid value"""
+
         invalid_offer: int
+        """Offer doesn't accept this request"""
+
 
 
     @staticmethod
@@ -699,8 +973,8 @@ class wl_data_offer:
         conjunction with wl_data_source.action for feedback.
 
         Args:
-            serial: serial number of the accept request
-            mime_type: mime type accepted by the client
+            serial: Serial number of the accept request
+            mime_type: Mime type accepted by the client
         """
 
         ...
@@ -727,8 +1001,8 @@ class wl_data_offer:
         determine acceptance.
 
         Args:
-            mime_type: mime type desired by receiver
-            fd: file descriptor for data transfer
+            mime_type: Mime type desired by receiver
+            fd: File descriptor for data transfer
         """
 
         ...
@@ -804,8 +1078,8 @@ class wl_data_offer:
         will be raised otherwise.
 
         Args:
-            dnd_actions: actions supported by the destination client
-            preferred_action: action preferred by the destination client
+            dnd_actions: Actions supported by the destination client
+            preferred_action: Action preferred by the destination client
         """
 
         ...
@@ -820,7 +1094,7 @@ class wl_data_offer:
             event per offered mime type.
 
             Args:
-                mime_type: offered mime type
+                mime_type: Offered mime type
             """
 
             ...
@@ -836,7 +1110,7 @@ class wl_data_offer:
             wl_data_source.set_actions.
 
             Args:
-                source_actions: actions offered by the data source
+                source_actions: Actions offered by the data source
             """
 
             ...
@@ -883,7 +1157,7 @@ class wl_data_offer:
             must happen before the call to wl_data_offer.finish.
 
             Args:
-                dnd_action: action selected by the compositor
+                dnd_action: Action selected by the compositor
             """
 
             ...
@@ -902,7 +1176,11 @@ class wl_data_source:
 
     class error(Enum):
         invalid_action_mask: int
+        """Action mask contains invalid values"""
+
         invalid_source: int
+        """Source doesn't accept this request"""
+
 
 
     @staticmethod
@@ -915,7 +1193,7 @@ class wl_data_source:
         multiple types.
 
         Args:
-            mime_type: mime type offered by the data source
+            mime_type: Mime type offered by the data source
         """
 
         ...
@@ -950,7 +1228,7 @@ class wl_data_source:
         for drag-and-drop will raise a protocol error.
 
         Args:
-            dnd_actions: actions supported by the data source
+            dnd_actions: Actions supported by the data source
         """
 
         ...
@@ -967,7 +1245,7 @@ class wl_data_source:
             Used for feedback during drag-and-drop.
 
             Args:
-                mime_type: mime type accepted by the target
+                mime_type: Mime type accepted by the target
             """
 
             ...
@@ -982,8 +1260,8 @@ class wl_data_source:
             close it.
 
             Args:
-                mime_type: mime type for the data
-                fd: file descriptor for the data
+                mime_type: Mime type for the data
+                fd: File descriptor for the data
             """
 
             ...
@@ -1082,7 +1360,7 @@ class wl_data_source:
             they reflect the current action.
 
             Args:
-                dnd_action: action selected by the compositor
+                dnd_action: Action selected by the compositor
             """
 
             ...
@@ -1102,7 +1380,11 @@ class wl_data_device:
 
     class error(Enum):
         role: int
+        """Given `wl_surface` has another role"""
+
         used_source: int
+        """Source has already been used"""
+
 
 
     @staticmethod
@@ -1141,10 +1423,10 @@ class wl_data_device:
         may send a used_source error.
 
         Args:
-            source: data source for the eventual transfer
-            origin: surface where the drag originates
-            icon: drag-and-drop icon surface
-            serial: serial number of the implicit grab on the origin
+            source: Data source for the eventual transfer
+            origin: Surface where the drag originates
+            icon: Drag-and-drop icon surface
+            serial: Serial number of the implicit grab on the origin
         """
 
         ...
@@ -1164,8 +1446,8 @@ class wl_data_device:
         may send a used_source error.
 
         Args:
-            source: data source for the selection
-            serial: serial number of the event that triggered this request
+            source: Data source for the selection
+            serial: Serial number of the event that triggered this request
         """
 
         ...
@@ -1184,7 +1466,7 @@ class wl_data_device:
         @staticmethod
         def data_offer(id: wl_data_offer) -> None:
             """
-            Introduce a new wl_data_offer
+            Introduce a new `wl_data_offer`
 
             The data_offer event introduces a new wl_data_offer object,
             which will subsequently be used in either the
@@ -1195,7 +1477,7 @@ class wl_data_device:
             mime types it offers.
 
             Args:
-                id: the new data_offer object
+                id: The new `data_offer` object
             """
 
             ...
@@ -1211,11 +1493,11 @@ class wl_data_device:
             coordinates.
 
             Args:
-                serial: serial number of the enter event
-                surface: client surface entered
-                x: surface-local x coordinate
-                y: surface-local y coordinate
-                id: source data_offer object
+                serial: Serial number of the enter event
+                surface: Client surface entered
+                x: Surface-local x coordinate
+                y: Surface-local y coordinate
+                id: Source `data_offer` object
             """
 
             ...
@@ -1243,9 +1525,9 @@ class wl_data_device:
             coordinates.
 
             Args:
-                time: timestamp with millisecond granularity
-                x: surface-local x coordinate
-                y: surface-local y coordinate
+                time: Timestamp with millisecond granularity
+                x: Surface-local x coordinate
+                y: Surface-local y coordinate
             """
 
             ...
@@ -1291,7 +1573,7 @@ class wl_data_device:
             data_offer, if any, upon receiving this event.
 
             Args:
-                id: selection data_offer object
+                id: Selection `data_offer` object
             """
 
             ...
@@ -1315,10 +1597,46 @@ class wl_data_device_manager:
     version = 3
 
     class dnd_action(IntFlag):
+        """
+        Drag and drop actions
+
+        This is a bitmask of the available/preferred actions in a
+        drag-and-drop operation.
+
+        In the compositor, the selected action is a result of matching the
+        actions offered by the source and destination sides.  "action" events
+        with a "none" action will be sent to both source and destination if
+        there is no match. All further checks will effectively happen on
+        (source actions ∩ destination actions).
+
+        In addition, compositors may also pick different actions in
+        reaction to key modifiers being pressed. One common design that
+        is used in major toolkits (and the behavior recommended for
+        compositors) is:
+
+        - If no modifiers are pressed, the first match (in bit order)
+          will be used.
+        - Pressing Shift selects "move", if enabled in the mask.
+        - Pressing Control selects "copy", if enabled in the mask.
+
+        Behavior beyond that is considered implementation-dependent.
+        Compositors may for example bind other modifiers (like Alt/Meta)
+        or drags initiated with other buttons than BTN_LEFT to specific
+        actions (e.g. "ask").
+        """
+
         none: int
+        """No action"""
+
         copy: int
+        """Copy action"""
+
         move: int
+        """Move action"""
+
         ask: int
+        """Ask action"""
+
 
 
     @staticmethod
@@ -1342,7 +1660,7 @@ class wl_data_device_manager:
         Create a new data device for a given seat.
 
         Args:
-            seat: seat associated with the data device
+            seat: Seat associated with the data device
 
         Returns:
             wl_data_device: The created object
@@ -1369,6 +1687,8 @@ class wl_shell:
 
     class error(Enum):
         role: int
+        """Given `wl_surface` has another role"""
+
 
 
     @staticmethod
@@ -1383,7 +1703,7 @@ class wl_shell:
         Only one shell surface can be associated with a given surface.
 
         Args:
-            surface: surface to be given the shell surface role
+            surface: Surface to be given the shell surface role
 
         Returns:
             wl_shell_surface: The created object
@@ -1411,26 +1731,78 @@ class wl_shell_surface:
     version = 1
 
     class resize(IntFlag):
+        """
+        Edge values for resizing
+
+        These values are used to indicate which edge of a surface
+        is being dragged in a resize operation. The server may
+        use this information to adapt its behavior, e.g. choose
+        an appropriate cursor image.
+        """
+
         none: int
+        """No edge"""
+
         top: int
+        """Top edge"""
+
         bottom: int
+        """Bottom edge"""
+
         left: int
+        """Left edge"""
+
         top_left: int
+        """Top and left edges"""
+
         bottom_left: int
+        """Bottom and left edges"""
+
         right: int
+        """Right edge"""
+
         top_right: int
+        """Top and right edges"""
+
         bottom_right: int
+        """Bottom and right edges"""
+
 
 
     class transient(IntFlag):
+        """
+        Details of transient behaviour
+
+        These flags specify details of the expected behaviour
+        of transient surfaces. Used in the set_transient request.
+        """
+
         inactive: int
+        """Do not set keyboard focus"""
+
 
 
     class fullscreen_method(Enum):
+        """
+        Different method to set the surface fullscreen
+
+        Hints to indicate to the compositor how to deal with a conflict
+        between the dimensions of the surface and the dimensions of the
+        output. The compositor is free to ignore this parameter.
+        """
+
         default: int
+        """No preference, apply default policy"""
+
         scale: int
+        """Scale, preserve the surface's aspect ratio and center on output"""
+
         driver: int
+        """Switch output mode to the smallest mode that can fit the surface, add black borders to compensate size mismatch"""
+
         fill: int
+        """No upscaling, center on output and add black borders to compensate size mismatch"""
+
 
 
     @staticmethod
@@ -1442,7 +1814,7 @@ class wl_shell_surface:
         the client may be deemed unresponsive.
 
         Args:
-            serial: serial number of the ping event
+            serial: Serial number of the ping event
         """
 
         ...
@@ -1459,8 +1831,8 @@ class wl_shell_surface:
         the surface (e.g. fullscreen or maximized).
 
         Args:
-            seat: seat whose pointer is used
-            serial: serial number of the implicit grab on the pointer
+            seat: Seat whose pointer is used
+            serial: Serial number of the implicit grab on the pointer
         """
 
         ...
@@ -1477,9 +1849,9 @@ class wl_shell_surface:
         the surface (e.g. fullscreen or maximized).
 
         Args:
-            seat: seat whose pointer is used
-            serial: serial number of the implicit grab on the pointer
-            edges: which edge or corner is being dragged
+            seat: Seat whose pointer is used
+            serial: Serial number of the implicit grab on the pointer
+            edges: Which edge or corner is being dragged
         """
 
         ...
@@ -1510,10 +1882,10 @@ class wl_shell_surface:
         The flags argument controls details of the transient behaviour.
 
         Args:
-            parent: parent surface
-            x: surface-local x coordinate
-            y: surface-local y coordinate
-            flags: transient surface behavior
+            parent: Parent surface
+            x: Surface-local x coordinate
+            y: Surface-local y coordinate
+            flags: Transient surface behavior
         """
 
         ...
@@ -1558,9 +1930,9 @@ class wl_shell_surface:
         be made fullscreen.
 
         Args:
-            method: method for resolving size conflict
-            framerate: framerate in mHz
-            output: output on which the surface is to be fullscreen
+            method: Method for resolving size conflict
+            framerate: Framerate in mhz
+            output: Output on which the surface is to be fullscreen
         """
 
         ...
@@ -1591,12 +1963,12 @@ class wl_shell_surface:
         parent surface, in surface-local coordinates.
 
         Args:
-            seat: seat whose pointer is used
-            serial: serial number of the implicit grab on the pointer
-            parent: parent surface
-            x: surface-local x coordinate
-            y: surface-local y coordinate
-            flags: transient surface behavior
+            seat: Seat whose pointer is used
+            serial: Serial number of the implicit grab on the pointer
+            parent: Parent surface
+            x: Surface-local x coordinate
+            y: Surface-local y coordinate
+            flags: Transient surface behavior
         """
 
         ...
@@ -1626,7 +1998,7 @@ class wl_shell_surface:
         The details depend on the compositor implementation.
 
         Args:
-            output: output on which the surface is to be maximized
+            output: Output on which the surface is to be maximized
         """
 
         ...
@@ -1645,7 +2017,7 @@ class wl_shell_surface:
         The string must be encoded in UTF-8.
 
         Args:
-            title: surface title
+            title: Surface title
         """
 
         ...
@@ -1663,7 +2035,7 @@ class wl_shell_surface:
         the application's .desktop file as the class.
 
         Args:
-            class_: surface class
+            class_: Surface class
         """
 
         ...
@@ -1678,7 +2050,7 @@ class wl_shell_surface:
             requests. A client is expected to reply with a pong request.
 
             Args:
-                serial: serial number of the ping
+                serial: Serial number of the ping
             """
 
             ...
@@ -1707,9 +2079,9 @@ class wl_shell_surface:
             in surface-local coordinates.
 
             Args:
-                edges: how the surface was resized
-                width: new width of the surface
-                height: new height of the surface
+                edges: How the surface was resized
+                width: New width of the surface
+                height: New height of the surface
             """
 
             ...
@@ -1777,11 +2149,27 @@ class wl_surface:
     version = 6
 
     class error(Enum):
+        """
+        `wl_surface` error values
+
+        These errors can be emitted in response to wl_surface requests.
+        """
+
         invalid_scale: int
+        """Buffer scale value is invalid"""
+
         invalid_transform: int
+        """Buffer transform value is invalid"""
+
         invalid_size: int
+        """Buffer size is invalid"""
+
         invalid_offset: int
+        """Buffer offset is invalid"""
+
         defunct_role_object: int
+        """Surface was destroyed before its role object"""
+
 
 
     @staticmethod
@@ -1866,9 +2254,9 @@ class wl_surface:
         destroying buffers.
 
         Args:
-            buffer: buffer of surface contents
-            x: surface-local x coordinate
-            y: surface-local y coordinate
+            buffer: Buffer of surface contents
+            x: Surface-local x coordinate
+            y: Surface-local y coordinate
         """
 
         ...
@@ -1901,10 +2289,10 @@ class wl_surface:
         instead of surface coordinates.
 
         Args:
-            x: surface-local x coordinate
-            y: surface-local y coordinate
-            width: width of damage rectangle
-            height: height of damage rectangle
+            x: Surface-local x coordinate
+            y: Surface-local y coordinate
+            width: Width of damage rectangle
+            height: Height of damage rectangle
         """
 
         ...
@@ -1984,7 +2372,7 @@ class wl_surface:
         region to be set to empty.
 
         Args:
-            region: opaque region of the surface
+            region: Opaque region of the surface
         """
 
         ...
@@ -2018,7 +2406,7 @@ class wl_surface:
         to infinite.
 
         Args:
-            region: input region of the surface
+            region: Input region of the surface
         """
 
         ...
@@ -2089,7 +2477,7 @@ class wl_surface:
         is raised.
 
         Args:
-            transform: transform for interpreting buffer contents
+            transform: Transform for interpreting buffer contents
         """
 
         ...
@@ -2124,7 +2512,7 @@ class wl_surface:
         raised.
 
         Args:
-            scale: scale for interpreting buffer contents
+            scale: Scale for interpreting buffer contents
         """
 
         ...
@@ -2168,10 +2556,10 @@ class wl_surface:
         after receiving the wl_surface.commit.
 
         Args:
-            x: buffer-local x coordinate
-            y: buffer-local y coordinate
-            width: width of damage rectangle
-            height: height of damage rectangle
+            x: Buffer-local x coordinate
+            y: Buffer-local y coordinate
+            width: Width of damage rectangle
+            height: Height of damage rectangle
         """
 
         ...
@@ -2198,8 +2586,8 @@ class wl_surface:
         to 5. See wl_surface.attach for details.
 
         Args:
-            x: surface-local x coordinate
-            y: surface-local y coordinate
+            x: Surface-local x coordinate
+            y: Surface-local y coordinate
         """
 
         ...
@@ -2217,7 +2605,7 @@ class wl_surface:
             Note that a surface may be overlapping with zero or more outputs.
 
             Args:
-                output: output entered by the surface
+                output: Output entered by the surface
             """
 
             ...
@@ -2238,7 +2626,7 @@ class wl_surface:
             used instead.
 
             Args:
-                output: output left by the surface
+                output: Output left by the surface
             """
 
             ...
@@ -2262,7 +2650,7 @@ class wl_surface:
             The compositor shall emit a scale value greater than 0.
 
             Args:
-                factor: preferred scaling factor
+                factor: Preferred scaling factor
             """
 
             ...
@@ -2283,7 +2671,7 @@ class wl_surface:
             surface buffer more efficiently.
 
             Args:
-                transform: preferred transform
+                transform: Preferred transform
             """
 
             ...
@@ -2301,13 +2689,34 @@ class wl_seat:
     version = 10
 
     class capability(IntFlag):
+        """
+        Seat capability bitmask
+
+        This is a bitmask of capabilities this seat has; if a member is
+        set, then it is present on the seat.
+        """
+
         pointer: int
+        """The seat has pointer devices"""
+
         keyboard: int
+        """The seat has one or more keyboards"""
+
         touch: int
+        """The seat has touch devices"""
+
 
 
     class error(Enum):
+        """
+        `wl_seat` error values
+
+        These errors can be emitted in response to wl_seat requests.
+        """
+
         missing_capability: int
+        """`get_pointer`, `get_keyboard` or `get_touch` called on seat without the matching capability"""
+
 
 
     @staticmethod
@@ -2414,7 +2823,7 @@ class wl_seat:
             keyboard and touch capabilities, respectively.
 
             Args:
-                capabilities: capabilities of the seat
+                capabilities: Capabilities of the seat
             """
 
             ...
@@ -2442,7 +2851,7 @@ class wl_seat:
             destroyed and re-created later.
 
             Args:
-                name: seat identifier
+                name: Seat identifier
             """
 
             ...
@@ -2465,28 +2874,91 @@ class wl_pointer:
 
     class error(Enum):
         role: int
+        """Given `wl_surface` has another role"""
+
 
 
     class button_state(Enum):
+        """
+        Physical button state
+
+        Describes the physical state of a button that produced the button
+        event.
+        """
+
         released: int
+        """The button is not pressed"""
+
         pressed: int
+        """The button is pressed"""
+
 
 
     class axis(Enum):
+        """
+        Axis types
+
+        Describes the axis types of scroll events.
+        """
+
         vertical_scroll: int
+        """Vertical axis"""
+
         horizontal_scroll: int
+        """Horizontal axis"""
+
 
 
     class axis_source(Enum):
+        """
+        Axis source types
+
+        Describes the source types for axis events. This indicates to the
+        client how an axis event was physically generated; a client may
+        adjust the user interface accordingly. For example, scroll events
+        from a "finger" source may be in a smooth coordinate space with
+        kinetic scrolling whereas a "wheel" source may be in discrete steps
+        of a number of lines.
+
+        The "continuous" axis source is a device generating events in a
+        continuous coordinate space, but using something other than a
+        finger. One example for this source is button-based scrolling where
+        the vertical motion of a device is converted to scroll events while
+        a button is held down.
+
+        The "wheel tilt" axis source indicates that the actual device is a
+        wheel but the scroll event is not caused by a rotation but a
+        (usually sideways) tilt of the wheel.
+        """
+
         wheel: int
+        """A physical wheel rotation"""
+
         finger: int
+        """Finger on a touch surface"""
+
         continuous: int
+        """Continuous coordinate space"""
+
         wheel_tilt: int
+        """A physical wheel tilt"""
+
 
 
     class axis_relative_direction(Enum):
+        """
+        Axis relative direction
+
+        This specifies the direction of the physical motion that caused a
+        wl_pointer.axis event, relative to the wl_pointer.axis direction.
+        """
+
         identical: int
+        """Physical motion matches axis direction"""
+
         inverted: int
+        """Physical motion is the inverse of the axis direction"""
+
 
 
     @staticmethod
@@ -2529,10 +3001,10 @@ class wl_pointer:
         ignored.
 
         Args:
-            serial: serial number of the enter event
-            surface: pointer surface
-            hotspot_x: surface-local x coordinate
-            hotspot_y: surface-local y coordinate
+            serial: Serial number of the enter event
+            surface: Pointer surface
+            hotspot_x: Surface-local x coordinate
+            hotspot_y: Surface-local y coordinate
         """
 
         ...
@@ -2565,10 +3037,10 @@ class wl_pointer:
             an appropriate pointer image with the set_cursor request.
 
             Args:
-                serial: serial number of the enter event
-                surface: surface entered by the pointer
-                surface_x: surface-local x coordinate
-                surface_y: surface-local y coordinate
+                serial: Serial number of the enter event
+                surface: Surface entered by the pointer
+                surface_x: Surface-local x coordinate
+                surface_y: Surface-local y coordinate
             """
 
             ...
@@ -2585,8 +3057,8 @@ class wl_pointer:
             for the new focus.
 
             Args:
-                serial: serial number of the leave event
-                surface: surface left by the pointer
+                serial: Serial number of the leave event
+                surface: Surface left by the pointer
             """
 
             ...
@@ -2601,9 +3073,9 @@ class wl_pointer:
             focused surface.
 
             Args:
-                time: timestamp with millisecond granularity
-                surface_x: surface-local x coordinate
-                surface_y: surface-local y coordinate
+                time: Timestamp with millisecond granularity
+                surface_x: Surface-local x coordinate
+                surface_y: Surface-local y coordinate
             """
 
             ...
@@ -2629,10 +3101,10 @@ class wl_pointer:
             protocol.
 
             Args:
-                serial: serial number of the button event
-                time: timestamp with millisecond granularity
-                button: button that produced the event
-                state: physical state of the button
+                serial: Serial number of the button event
+                time: Timestamp with millisecond granularity
+                button: Button that produced the event
+                state: Physical state of the button
             """
 
             ...
@@ -2660,9 +3132,9 @@ class wl_pointer:
             scroll distance.
 
             Args:
-                time: timestamp with millisecond granularity
-                axis: axis type
-                value: length of vector in surface-local coordinate space
+                time: Timestamp with millisecond granularity
+                axis: Axis type
+                value: Length of vector in surface-local coordinate space
             """
 
             ...
@@ -2742,7 +3214,7 @@ class wl_pointer:
             not guaranteed.
 
             Args:
-                axis_source: source of the axis event
+                axis_source: Source of the axis event
             """
 
             ...
@@ -2768,8 +3240,8 @@ class wl_pointer:
             preceding wl_pointer.axis event.
 
             Args:
-                time: timestamp with millisecond granularity
-                axis: the axis stopped with this event
+                time: Timestamp with millisecond granularity
+                axis: The axis stopped with this event
             """
 
             ...
@@ -2811,8 +3283,8 @@ class wl_pointer:
             not guaranteed.
 
             Args:
-                axis: axis type
-                discrete: number of steps
+                axis: Axis type
+                discrete: Number of steps
             """
 
             ...
@@ -2845,8 +3317,8 @@ class wl_pointer:
             not guaranteed.
 
             Args:
-                axis: axis type
-                value120: scroll distance as fraction of 120
+                axis: Axis type
+                value120: Scroll distance as fraction of 120
             """
 
             ...
@@ -2893,8 +3365,8 @@ class wl_pointer:
             guaranteed.
 
             Args:
-                axis: axis type
-                direction: physical direction relative to axis motion
+                axis: Axis type
+                direction: Physical direction relative to axis motion
             """
 
             ...
@@ -2920,21 +3392,50 @@ class wl_keyboard:
     version = 10
 
     class keymap_format(Enum):
+        """
+        Keyboard mapping format
+
+        This specifies the format of the keymap provided to the
+        client with the wl_keyboard.keymap event.
+        """
+
         no_keymap: int
+        """No keymap; client must understand how to interpret the raw keycode"""
+
         xkb_v1: int
+        """Libxkbcommon compatible, null-terminated string; to determine the xkb keycode, clients must add 8 to the key event keycode"""
+
 
 
     class key_state(Enum):
+        """
+        Physical key state
+
+        Describes the physical state of a key that produced the key event.
+
+        Since version 10, the key can be in a "repeated" pseudo-state which
+        means the same as "pressed", but is used to signal repetition in the
+        key event.
+
+        The key may only enter the repeated state after entering the pressed
+        state and before entering the released state. This event may be
+        generated multiple times while the key is down.
+        """
+
         released: int
+        """Key is not pressed"""
+
         pressed: int
+        """Key is pressed"""
+
         repeated: int
+        """Key was repeated"""
+
 
 
     @staticmethod
     def release() -> None:
-        """
-        Release the keyboard object
-        """
+        """Release the keyboard object"""
 
         ...
 
@@ -2952,9 +3453,9 @@ class wl_keyboard:
             the recipient, as MAP_SHARED may fail.
 
             Args:
-                format: keymap format
-                fd: keymap file descriptor
-                size: keymap size, in bytes
+                format: Keymap format
+                fd: Keymap file descriptor
+                size: Keymap size, in bytes
             """
 
             ...
@@ -2979,9 +3480,9 @@ class wl_keyboard:
             events. The order of keys in the list is unspecified.
 
             Args:
-                serial: serial number of the enter event
-                surface: surface gaining keyboard focus
-                keys: the keys currently logically down
+                serial: Serial number of the enter event
+                surface: Surface gaining keyboard focus
+                keys: The keys currently logically down
             """
 
             ...
@@ -3003,8 +3504,8 @@ class wl_keyboard:
             before this event.
 
             Args:
-                serial: serial number of the leave event
-                surface: surface that lost keyboard focus
+                serial: Serial number of the leave event
+                surface: Surface that lost keyboard focus
             """
 
             ...
@@ -3039,10 +3540,10 @@ class wl_keyboard:
             responsibility of key repetition.
 
             Args:
-                serial: serial number of the key event
-                time: timestamp with millisecond granularity
-                key: key that produced the event
-                state: physical state of the key
+                serial: Serial number of the key event
+                time: Timestamp with millisecond granularity
+                key: Key that produced the event
+                state: Physical state of the key
             """
 
             ...
@@ -3067,11 +3568,11 @@ class wl_keyboard:
             group.
 
             Args:
-                serial: serial number of the modifiers event
-                mods_depressed: depressed modifiers
-                mods_latched: latched modifiers
-                mods_locked: locked modifiers
-                group: keyboard layout
+                serial: Serial number of the modifiers event
+                mods_depressed: Depressed modifiers
+                mods_latched: Latched modifiers
+                mods_locked: Locked modifiers
+                group: Keyboard layout
             """
 
             ...
@@ -3095,8 +3596,8 @@ class wl_keyboard:
             of wl_keyboard.
 
             Args:
-                rate: the rate of repeating keys in characters per second
-                delay: delay in milliseconds since key down until repeating starts
+                rate: The rate of repeating keys in characters per second
+                delay: Delay in milliseconds since key down until repeating starts
             """
 
             ...
@@ -3120,9 +3621,7 @@ class wl_touch:
 
     @staticmethod
     def release() -> None:
-        """
-        Release the touch object
-        """
+        """Release the touch object"""
 
         ...
 
@@ -3138,12 +3637,12 @@ class wl_touch:
             reused in the future.
 
             Args:
-                serial: serial number of the touch down event
-                time: timestamp with millisecond granularity
-                surface: surface touched
-                id: the unique ID of this touch point
-                x: surface-local x coordinate
-                y: surface-local y coordinate
+                serial: Serial number of the touch down event
+                time: Timestamp with millisecond granularity
+                surface: Surface touched
+                id: The unique id of this touch point
+                x: Surface-local x coordinate
+                y: Surface-local y coordinate
             """
 
             ...
@@ -3158,9 +3657,9 @@ class wl_touch:
             reused in a future touch down event.
 
             Args:
-                serial: serial number of the touch up event
-                time: timestamp with millisecond granularity
-                id: the unique ID of this touch point
+                serial: Serial number of the touch up event
+                time: Timestamp with millisecond granularity
+                id: The unique id of this touch point
             """
 
             ...
@@ -3173,10 +3672,10 @@ class wl_touch:
             A touch point has changed coordinates.
 
             Args:
-                time: timestamp with millisecond granularity
-                id: the unique ID of this touch point
-                x: surface-local x coordinate
-                y: surface-local y coordinate
+                time: Timestamp with millisecond granularity
+                id: The unique id of this touch point
+                x: Surface-local x coordinate
+                y: Surface-local y coordinate
             """
 
             ...
@@ -3247,9 +3746,9 @@ class wl_touch:
             shape if it did not receive this event.
 
             Args:
-                id: the unique ID of this touch point
-                major: length of the major axis in surface-local coordinates
-                minor: length of the minor axis in surface-local coordinates
+                id: The unique id of this touch point
+                major: Length of the major axis in surface-local coordinates
+                minor: Length of the minor axis in surface-local coordinates
             """
 
             ...
@@ -3284,8 +3783,8 @@ class wl_touch:
             orientation reports.
 
             Args:
-                id: the unique ID of this touch point
-                orientation: angle between major axis and positive surface y-axis in degrees
+                id: The unique id of this touch point
+                orientation: Angle between major axis and positive surface y-axis in degrees
             """
 
             ...
@@ -3305,28 +3804,89 @@ class wl_output:
     version = 4
 
     class subpixel(Enum):
+        """
+        Subpixel geometry information
+
+        This enumeration describes how the physical
+        pixels on an output are laid out.
+        """
+
         unknown: int
+        """Unknown geometry"""
+
         none: int
+        """No geometry"""
+
         horizontal_rgb: int
+        """Horizontal rgb"""
+
         horizontal_bgr: int
+        """Horizontal bgr"""
+
         vertical_rgb: int
+        """Vertical rgb"""
+
         vertical_bgr: int
+        """Vertical bgr"""
+
 
 
     class transform(Enum):
+        """
+        Transformation applied to buffer contents
+
+        This describes transformations that clients and compositors apply to
+        buffer contents.
+
+        The flipped values correspond to an initial flip around a
+        vertical axis followed by rotation.
+
+        The purpose is mainly to allow clients to render accordingly and
+        tell the compositor, so that for fullscreen surfaces, the
+        compositor will still be able to scan out directly from client
+        surfaces.
+        """
+
         normal: int
+        """No transform"""
+
         transform_90: int
+        """90 degrees counter-clockwise"""
+
         transform_180: int
+        """180 degrees counter-clockwise"""
+
         transform_270: int
+        """270 degrees counter-clockwise"""
+
         flipped: int
+        """180 degree flip around a vertical axis"""
+
         flipped_90: int
+        """Flip and rotate 90 degrees counter-clockwise"""
+
         flipped_180: int
+        """Flip and rotate 180 degrees counter-clockwise"""
+
         flipped_270: int
+        """Flip and rotate 270 degrees counter-clockwise"""
+
 
 
     class mode(IntFlag):
+        """
+        Mode information
+
+        These flags describe properties of an output mode.
+        They are used in the flags bitfield of the mode event.
+        """
+
         current: int
+        """Indicates this is the current mode"""
+
         preferred: int
+        """Indicates this is the preferred mode"""
+
 
 
     @staticmethod
@@ -3368,14 +3928,14 @@ class wl_output:
             clients should use name and description.
 
             Args:
-                x: x position within the global compositor space
-                y: y position within the global compositor space
-                physical_width: width in millimeters of the output
-                physical_height: height in millimeters of the output
-                subpixel: subpixel orientation of the output
-                make: textual description of the manufacturer
-                model: textual description of the model
-                transform: additional transformation applied to buffer contents during presentation
+                x: X position within the global compositor space
+                y: Y position within the global compositor space
+                physical_width: Width in millimeters of the output
+                physical_height: Height in millimeters of the output
+                subpixel: Subpixel orientation of the output
+                make: Textual description of the manufacturer
+                model: Textual description of the model
+                transform: Additional transformation applied to buffer contents during presentation
             """
 
             ...
@@ -3420,10 +3980,10 @@ class wl_output:
             refresh rate or the size.
 
             Args:
-                flags: bitfield of mode flags
-                width: width of the mode in hardware units
-                height: height of the mode in hardware units
-                refresh: vertical refresh rate in mHz
+                flags: Bitfield of mode flags
+                width: Width of the mode in hardware units
+                height: Height of the mode in hardware units
+                refresh: Vertical refresh rate in mhz
             """
 
             ...
@@ -3467,7 +4027,7 @@ class wl_output:
             The scale event will be followed by a done event.
 
             Args:
-                factor: scaling factor of output
+                factor: Scaling factor of output
             """
 
             ...
@@ -3507,7 +4067,7 @@ class wl_output:
             The name event will be followed by a done event.
 
             Args:
-                name: output name
+                name: Output name
             """
 
             ...
@@ -3533,7 +4093,7 @@ class wl_output:
             The description event will be followed by a done event.
 
             Args:
-                description: output description
+                description: Output description
             """
 
             ...
@@ -3569,10 +4129,10 @@ class wl_region:
         Add the specified rectangle to the region.
 
         Args:
-            x: region-local x coordinate
-            y: region-local y coordinate
-            width: rectangle width
-            height: rectangle height
+            x: Region-local x coordinate
+            y: Region-local y coordinate
+            width: Rectangle width
+            height: Rectangle height
         """
 
         ...
@@ -3585,10 +4145,10 @@ class wl_region:
         Subtract the specified rectangle from the region.
 
         Args:
-            x: region-local x coordinate
-            y: region-local y coordinate
-            width: rectangle width
-            height: rectangle height
+            x: Region-local x coordinate
+            y: Region-local y coordinate
+            width: Rectangle width
+            height: Rectangle height
         """
 
         ...
@@ -3622,7 +4182,11 @@ class wl_subcompositor:
 
     class error(Enum):
         bad_surface: int
+        """The to-be sub-surface is invalid"""
+
         bad_parent: int
+        """The to-be sub-surface parent is invalid"""
+
 
 
     @staticmethod
@@ -3663,8 +4227,8 @@ class wl_subcompositor:
         the sub-surface, see the documentation on wl_subsurface interface.
 
         Args:
-            surface: the surface to be turned into a sub-surface
-            parent: the parent surface
+            surface: The surface to be turned into a sub-surface
+            parent: The parent surface
 
         Returns:
             wl_subsurface: The created object
@@ -3674,7 +4238,7 @@ class wl_subcompositor:
 
 class wl_subsurface:
     """
-    Sub-surface interface to a wl_surface
+    Sub-surface interface to a `wl_surface`
 
     An additional interface to a wl_surface object, which has been
     made a sub-surface. A sub-surface has one parent surface. A
@@ -3734,6 +4298,8 @@ class wl_subsurface:
 
     class error(Enum):
         bad_surface: int
+        """`wl_surface` is not a sibling or the parent"""
+
 
 
     @staticmethod
@@ -3770,8 +4336,8 @@ class wl_subsurface:
         The initial position is 0, 0.
 
         Args:
-            x: x coordinate in the parent surface
-            y: y coordinate in the parent surface
+            x: X coordinate in the parent surface
+            y: Y coordinate in the parent surface
         """
 
         ...
@@ -3796,7 +4362,7 @@ class wl_subsurface:
         of its siblings and parent.
 
         Args:
-            sibling: the reference surface
+            sibling: The reference surface
         """
 
         ...
@@ -3810,7 +4376,7 @@ class wl_subsurface:
         See wl_subsurface.place_above.
 
         Args:
-            sibling: the reference surface
+            sibling: The reference surface
         """
 
         ...
@@ -3878,16 +4444,14 @@ class wl_fixes:
 
     @staticmethod
     def destroy() -> None:
-        """
-        Destroys this object
-        """
+        """Destroys this object"""
 
         ...
 
     @staticmethod
     def destroy_registry(registry: wl_registry) -> None:
         """
-        Destroy a wl_registry
+        Destroy a `wl_registry`
 
         This request destroys a wl_registry object.
 
@@ -3900,14 +4464,14 @@ class wl_fixes:
         wl_display.delete_id event.
 
         Args:
-            registry: the registry to destroy
+            registry: The registry to destroy
         """
 
         ...
 
 class zwp_linux_dmabuf_v1:
     """
-    Factory for creating dmabuf-based wl_buffers
+    Factory for creating dmabuf-based `wl_buffers`
 
     This interface offers ways to create generic dmabuf-based wl_buffers.
 
@@ -4056,7 +4620,7 @@ class zwp_linux_dmabuf_v1:
             get_surface_feedback.
 
             Args:
-                format: DRM_FORMAT code
+                format: Drm_format code
             """
 
             ...
@@ -4091,16 +4655,16 @@ class zwp_linux_dmabuf_v1:
             get_surface_feedback.
 
             Args:
-                format: DRM_FORMAT code
-                modifier_hi: high 32 bits of layout modifier
-                modifier_lo: low 32 bits of layout modifier
+                format: Drm_format code
+                modifier_hi: High 32 bits of layout modifier
+                modifier_lo: Low 32 bits of layout modifier
             """
 
             ...
 
 class zwp_linux_buffer_params_v1:
     """
-    Parameters for creating a dmabuf-based wl_buffer
+    Parameters for creating a dmabuf-based `wl_buffer`
 
     This temporary object is a collection of dmabufs and other
     parameters that together form a single logical buffer. The temporary
@@ -4124,19 +4688,41 @@ class zwp_linux_buffer_params_v1:
 
     class error(Enum):
         already_used: int
+        """The `dmabuf_batch` object has already been used to create a `wl_buffer`"""
+
         plane_idx: int
+        """Plane index out of bounds"""
+
         plane_set: int
+        """The plane index was already set"""
+
         incomplete: int
+        """Missing or too many planes to create a buffer"""
+
         invalid_format: int
+        """Format not supported"""
+
         invalid_dimensions: int
+        """Invalid width or height"""
+
         out_of_bounds: int
+        """Offset + stride * height goes out of dmabuf bounds"""
+
         invalid_wl_buffer: int
+        """Invalid `wl_buffer` resulted from importing dmabufs via                the `create_immed` request on given `buffer_params`"""
+
 
 
     class flags(IntFlag):
         y_invert: int
+        """Contents are y-inverted"""
+
         interlaced: int
+        """Content is interlaced"""
+
         bottom_first: int
+        """Bottom field first"""
+
 
 
     @staticmethod
@@ -4176,12 +4762,12 @@ class zwp_linux_buffer_params_v1:
         was already set.
 
         Args:
-            fd: dmabuf fd
-            plane_idx: plane index
-            offset: offset in bytes
-            stride: stride in bytes
-            modifier_hi: high 32 bits of layout modifier
-            modifier_lo: low 32 bits of layout modifier
+            fd: Dmabuf fd
+            plane_idx: Plane index
+            offset: Offset in bytes
+            stride: Stride in bytes
+            modifier_hi: High 32 bits of layout modifier
+            modifier_lo: Low 32 bits of layout modifier
         """
 
         ...
@@ -4189,7 +4775,7 @@ class zwp_linux_buffer_params_v1:
     @staticmethod
     def create(width: int, height: int, format: int, flags: zwp_linux_buffer_params_v1.flags) -> None:
         """
-        Create a wl_buffer from the given dmabufs
+        Create a `wl_buffer` from the given dmabufs
 
         This asks for creation of a wl_buffer from the added dmabuf
         buffers. The wl_buffer is not created immediately but returned via
@@ -4252,10 +4838,10 @@ class zwp_linux_buffer_params_v1:
         cancel the buffer creation, it can just destroy this object.
 
         Args:
-            width: base plane width in pixels
-            height: base plane height in pixels
-            format: DRM_FORMAT code
-            flags: see enum flags
+            width: Base plane width in pixels
+            height: Base plane height in pixels
+            format: Drm_format code
+            flags: See enum flags
         """
 
         ...
@@ -4263,7 +4849,7 @@ class zwp_linux_buffer_params_v1:
     @staticmethod
     def create_immed(width: int, height: int, format: int, flags: zwp_linux_buffer_params_v1.flags) -> wl_buffer:
         """
-        Immediately create a wl_buffer from the given                      dmabufs
+        Immediately create a `wl_buffer` from the given                      dmabufs
 
         This asks for immediate creation of a wl_buffer by importing the
         added dmabufs.
@@ -4290,10 +4876,10 @@ class zwp_linux_buffer_params_v1:
         same restrictions.
 
         Args:
-            width: base plane width in pixels
-            height: base plane height in pixels
-            format: DRM_FORMAT code
-            flags: see enum flags
+            width: Base plane width in pixels
+            height: Base plane height in pixels
+            format: Drm_format code
+            flags: See enum flags
 
         Returns:
             wl_buffer: The created object
@@ -4314,7 +4900,7 @@ class zwp_linux_buffer_params_v1:
             zwp_linux_buffer_params_v1 object.
 
             Args:
-                buffer: the newly created wl_buffer
+                buffer: The newly created `wl_buffer`
             """
 
             ...
@@ -4369,6 +4955,8 @@ class zwp_linux_dmabuf_feedback_v1:
 
     class tranche_flags(IntFlag):
         scanout: int
+        """Direct scan-out tranche"""
+
 
 
     @staticmethod
@@ -4418,8 +5006,8 @@ class zwp_linux_dmabuf_feedback_v1:
             store duplicate format + modifier pairs in the table.
 
             Args:
-                fd: table file descriptor
-                size: table size, in bytes
+                fd: Table file descriptor
+                size: Table size, in bytes
             """
 
             ...
@@ -4454,7 +5042,7 @@ class zwp_linux_dmabuf_feedback_v1:
             must force the buffer to have a linear layout.
 
             Args:
-                device: device dev_t value
+                device: Device `dev_t` value
             """
 
             ...
@@ -4505,7 +5093,7 @@ class zwp_linux_dmabuf_feedback_v1:
             This event is tied to a preference tranche, see the tranche_done event.
 
             Args:
-                device: device dev_t value
+                device: Device `dev_t` value
             """
 
             ...
@@ -4541,7 +5129,7 @@ class zwp_linux_dmabuf_feedback_v1:
             wp_linux_buffer_params.create request.
 
             Args:
-                indices: array of 16-bit indexes
+                indices: Array of 16-bit indexes
             """
 
             ...
@@ -4561,21 +5149,30 @@ class zwp_linux_dmabuf_feedback_v1:
             This event is tied to a preference tranche, see the tranche_done event.
 
             Args:
-                flags: tranche flags
+                flags: Tranche flags
             """
 
             ...
 
 class wp_presentation:
-    """
-    Timed presentation related wl_surface requests
-    """
+    """Timed presentation related `wl_surface` requests"""
     object_id = 0
     version = 2
 
     class error(Enum):
+        """
+        Fatal presentation errors
+
+        These fatal protocol errors may be emitted in response to
+        illegal presentation requests.
+        """
+
         invalid_timestamp: int
+        """Invalid value in `tv_nsec`"""
+
         invalid_flag: int
+        """Invalid flag"""
+
 
 
     @staticmethod
@@ -4605,7 +5202,7 @@ class wp_presentation:
         presentation_feedback interface.
 
         Args:
-            surface: target surface
+            surface: Target surface
 
         Returns:
             wp_presentation_feedback: The created object
@@ -4649,7 +5246,7 @@ class wp_presentation:
             value directly, not by asking the compositor.
 
             Args:
-                clk_id: platform clock identifier
+                clk_id: Platform clock identifier
             """
 
             ...
@@ -4674,10 +5271,54 @@ class wp_presentation_feedback:
     version = 2
 
     class kind(IntFlag):
+        """
+        Bitmask of flags in presented event
+
+        These flags provide information about how the presentation of
+        the related content update was done. The intent is to help
+        clients assess the reliability of the feedback and the visual
+        quality with respect to possible tearing and timings.
+        """
+
         vsync: int
+        """
+        Presentation was vsync'd
+        The presentation was synchronized to the "vertical retrace" by
+        the display hardware such that tearing does not happen.
+        Relying on software scheduling is not acceptable for this
+        flag. If presentation is done by a copy to the active
+        frontbuffer, then it must guarantee that tearing cannot
+        happen.
+        """
+
         hw_clock: int
+        """
+        Hardware provided the presentation timestamp
+        The display hardware provided measurements that the hardware
+        driver converted into a presentation timestamp. Sampling a
+        clock in software is not acceptable for this flag.
+        """
+
         hw_completion: int
+        """
+        Hardware signalled the start of the presentation
+        The display hardware signalled that it started using the new
+        image content. The opposite of this is e.g. a timer being used
+        to guess when the display hardware has switched to the new
+        image content.
+        """
+
         zero_copy: int
+        """
+        Presentation was done zero-copy
+        The presentation of this update was done zero-copy. This means
+        the buffer from the client was given to display hardware as
+        is, without copying it. Compositing with OpenGL counts as
+        copying, even if textured directly from the client buffer.
+        Possible zero-copy cases include direct scanout of a
+        fullscreen surface and a surface on a hardware overlay.
+        """
+
 
 
 
@@ -4697,7 +5338,7 @@ class wp_presentation_feedback:
             right wl_output global at all, this event is not sent.
 
             Args:
-                output: presentation output
+                output: Presentation output
             """
 
             ...
@@ -4753,13 +5394,13 @@ class wp_presentation_feedback:
             and seq_lo must be zero.
 
             Args:
-                tv_sec_hi: high 32 bits of the seconds part of the presentation timestamp
-                tv_sec_lo: low 32 bits of the seconds part of the presentation timestamp
-                tv_nsec: nanoseconds part of the presentation timestamp
-                refresh: nanoseconds till next refresh
-                seq_hi: high 32 bits of refresh counter
-                seq_lo: low 32 bits of refresh counter
-                flags: combination of 'kind' values
+                tv_sec_hi: High 32 bits of the seconds part of the presentation timestamp
+                tv_sec_lo: Low 32 bits of the seconds part of the presentation timestamp
+                tv_nsec: Nanoseconds part of the presentation timestamp
+                refresh: Nanoseconds till next refresh
+                seq_hi: High 32 bits of refresh counter
+                seq_lo: Low 32 bits of refresh counter
+                flags: Combination of 'kind' values
             """
 
             ...
@@ -4795,7 +5436,7 @@ class zwp_tablet_manager_v2:
         provides access to all graphics tablets in this seat.
 
         Args:
-            seat: The wl_seat object to retrieve the tablets for
+            seat: The `wl_seat` object to retrieve the tablets for
 
         Returns:
             zwp_tablet_seat_v2: The created object
@@ -4849,7 +5490,7 @@ class zwp_tablet_seat_v2:
             sent through the wp_tablet interface.
 
             Args:
-                id: the newly added graphics tablet
+                id: The newly added graphics tablet
             """
 
             ...
@@ -4865,7 +5506,7 @@ class zwp_tablet_seat_v2:
             type, etc.) is sent through the wp_tablet_tool interface.
 
             Args:
-                id: the newly added tablet tool
+                id: The newly added tablet tool
             """
 
             ...
@@ -4887,7 +5528,7 @@ class zwp_tablet_seat_v2:
             interface.
 
             Args:
-                id: the newly added pad
+                id: The newly added pad
             """
 
             ...
@@ -4921,32 +5562,95 @@ class zwp_tablet_tool_v2:
     version = 2
 
     class type(Enum):
+        """
+        A physical tool type
+
+        Describes the physical type of a tool. The physical type of a tool
+        generally defines its base usage.
+
+        The mouse tool represents a mouse-shaped tool that is not a relative
+        device but bound to the tablet's surface, providing absolute
+        coordinates.
+
+        The lens tool is a mouse-shaped tool with an attached lens to
+        provide precision focus.
+        """
+
         pen: int
+        """Pen"""
+
         eraser: int
+        """Eraser"""
+
         brush: int
+        """Brush"""
+
         pencil: int
+        """Pencil"""
+
         airbrush: int
+        """Airbrush"""
+
         finger: int
+        """Finger"""
+
         mouse: int
+        """Mouse"""
+
         lens: int
+        """Lens"""
+
 
 
     class capability(Enum):
+        """
+        Capability flags for a tool
+
+        Describes extra capabilities on a tablet.
+
+        Any tool must provide x and y values, extra axes are
+        device-specific.
+        """
+
         tilt: int
+        """Tilt axes"""
+
         pressure: int
+        """Pressure axis"""
+
         distance: int
+        """Distance axis"""
+
         rotation: int
+        """Z-rotation axis"""
+
         slider: int
+        """Slider axis"""
+
         wheel: int
+        """Wheel axis"""
+
 
 
     class button_state(Enum):
+        """
+        Physical button state
+
+        Describes the physical state of a button that produced the button event.
+        """
+
         released: int
+        """Button is not pressed"""
+
         pressed: int
+        """Button is pressed"""
+
 
 
     class error(Enum):
         role: int
+        """Given `wl_surface` has another role"""
+
 
 
     @staticmethod
@@ -4986,9 +5690,9 @@ class zwp_tablet_tool_v2:
         protocol error is raised.
 
         Args:
-            serial: serial of the proximity_in event
-            hotspot_x: surface-local x coordinate
-            hotspot_y: surface-local y coordinate
+            serial: Serial of the `proximity_in` event
+            hotspot_x: Surface-local x coordinate
+            hotspot_y: Surface-local y coordinate
         """
 
         ...
@@ -5016,7 +5720,7 @@ class zwp_tablet_tool_v2:
             wp_tablet_tool.done event.
 
             Args:
-                tool_type: the physical tool type
+                tool_type: The physical tool type
             """
 
             ...
@@ -5043,8 +5747,8 @@ class zwp_tablet_tool_v2:
             wp_tablet_tool.done event.
 
             Args:
-                hardware_serial_hi: the unique serial number of the tool, most significant bits
-                hardware_serial_lo: the unique serial number of the tool, least significant bits
+                hardware_serial_hi: The unique serial number of the tool, most significant bits
+                hardware_serial_lo: The unique serial number of the tool, least significant bits
             """
 
             ...
@@ -5066,8 +5770,8 @@ class zwp_tablet_tool_v2:
             wp_tablet_tool.done event.
 
             Args:
-                hardware_id_hi: the hardware id, most significant bits
-                hardware_id_lo: the hardware id, least significant bits
+                hardware_id_hi: The hardware id, most significant bits
+                hardware_id_lo: The hardware id, least significant bits
             """
 
             ...
@@ -5086,7 +5790,7 @@ class zwp_tablet_tool_v2:
             wp_tablet_tool.done event.
 
             Args:
-                capability: the capability
+                capability: The capability
             """
 
             ...
@@ -5223,8 +5927,8 @@ class zwp_tablet_tool_v2:
             Sent whenever a tablet tool moves.
 
             Args:
-                x: surface-local x coordinate
-                y: surface-local y coordinate
+                x: Surface-local x coordinate
+                y: Surface-local y coordinate
             """
 
             ...
@@ -5274,8 +5978,8 @@ class zwp_tablet_tool_v2:
             positive x or y axis.
 
             Args:
-                tilt_x: The current value of the X tilt axis
-                tilt_y: The current value of the Y tilt axis
+                tilt_x: The current value of the x tilt axis
+                tilt_y: The current value of the y tilt axis
             """
 
             ...
@@ -5290,7 +5994,7 @@ class zwp_tablet_tool_v2:
             logical neutral position.
 
             Args:
-                degrees: The current rotation of the Z axis
+                degrees: The current rotation of the z axis
             """
 
             ...
@@ -5389,11 +6093,27 @@ class zwp_tablet_v2:
     version = 2
 
     class bustype(Enum):
+        """
+        Bus type
+
+        Describes the bus types this tablet is connected to.
+        """
+
         usb: int
+        """Usb"""
+
         bluetooth: int
+        """Bluetooth"""
+
         virtual: int
+        """Virtual"""
+
         serial: int
+        """Serial"""
+
         i2c: int
+        """I2c"""
+
 
 
     @staticmethod
@@ -5420,7 +6140,7 @@ class zwp_tablet_v2:
                     wp_tablet.done event.
 
             Args:
-                name: the device name
+                name: The device name
             """
 
             ...
@@ -5444,8 +6164,8 @@ class zwp_tablet_v2:
             wp_tablet.done event.
 
             Args:
-                vid: vendor id
-                pid: product id
+                vid: Vendor id
+                pid: Product id
             """
 
             ...
@@ -5471,7 +6191,7 @@ class zwp_tablet_v2:
             wp_tablet.done event.
 
             Args:
-                path: path to local device
+                path: Path to local device
             """
 
             ...
@@ -5518,7 +6238,7 @@ class zwp_tablet_v2:
             wp_tablet.done event.
 
             Args:
-                bustype: bus type
+                bustype: Bus type
             """
 
             ...
@@ -5537,7 +6257,18 @@ class zwp_tablet_pad_ring_v2:
     version = 2
 
     class source(Enum):
+        """
+        Ring axis source
+
+        Describes the source types for ring events. This indicates to the
+        client how a ring event was physically generated; a client may
+        adjust the user interface accordingly. For example, events
+        from a "finger" source may trigger kinetic scrolling.
+        """
+
         finger: int
+        """Finger"""
+
 
 
     @staticmethod
@@ -5566,8 +6297,8 @@ class zwp_tablet_pad_ring_v2:
         ignored.
 
         Args:
-            description: ring description
-            serial: serial of the mode switch event
+            description: Ring description
+            serial: Serial of the mode switch event
         """
 
         ...
@@ -5602,7 +6333,7 @@ class zwp_tablet_pad_ring_v2:
             no event is sent.
 
             Args:
-                source: the event source
+                source: The event source
             """
 
             ...
@@ -5618,7 +6349,7 @@ class zwp_tablet_pad_ring_v2:
             north of the ring in the pad's current rotation.
 
             Args:
-                degrees: the current angle in degrees
+                degrees: The current angle in degrees
             """
 
             ...
@@ -5662,7 +6393,7 @@ class zwp_tablet_pad_ring_v2:
             angle, frame, etc.
 
             Args:
-                time: timestamp with millisecond granularity
+                time: Timestamp with millisecond granularity
             """
 
             ...
@@ -5681,7 +6412,18 @@ class zwp_tablet_pad_strip_v2:
     version = 2
 
     class source(Enum):
+        """
+        Strip axis source
+
+        Describes the source types for strip events. This indicates to the
+        client how a strip event was physically generated; a client may
+        adjust the user interface accordingly. For example, events
+        from a "finger" source may trigger kinetic scrolling.
+        """
+
         finger: int
+        """Finger"""
+
 
 
     @staticmethod
@@ -5710,8 +6452,8 @@ class zwp_tablet_pad_strip_v2:
         ignored.
 
         Args:
-            description: strip description
-            serial: serial of the mode switch event
+            description: Strip description
+            serial: Serial of the mode switch event
         """
 
         ...
@@ -5746,7 +6488,7 @@ class zwp_tablet_pad_strip_v2:
             no event is sent.
 
             Args:
-                source: the event source
+                source: The event source
             """
 
             ...
@@ -5763,7 +6505,7 @@ class zwp_tablet_pad_strip_v2:
             the pad's current rotation.
 
             Args:
-                position: the current position
+                position: The current position
             """
 
             ...
@@ -5808,7 +6550,7 @@ class zwp_tablet_pad_strip_v2:
             position, frame, etc.
 
             Args:
-                time: timestamp with millisecond granularity
+                time: Timestamp with millisecond granularity
             """
 
             ...
@@ -5874,7 +6616,7 @@ class zwp_tablet_pad_group_v2:
             will be sent with an empty array.
 
             Args:
-                buttons: buttons in this group
+                buttons: Buttons in this group
             """
 
             ...
@@ -5926,7 +6668,7 @@ class zwp_tablet_pad_group_v2:
             more than one mode is available.
 
             Args:
-                modes: the number of modes
+                modes: The number of modes
             """
 
             ...
@@ -5978,8 +6720,8 @@ class zwp_tablet_pad_group_v2:
             wp_tablet_dial.set_feedback request for each changed ring, strip or dial.
 
             Args:
-                time: the time of the event with millisecond granularity
-                mode: the new mode of the pad
+                time: The time of the event with millisecond granularity
+                mode: The new mode of the pad
             """
 
             ...
@@ -6029,8 +6771,19 @@ class zwp_tablet_pad_v2:
     version = 2
 
     class button_state(Enum):
+        """
+        Physical button state
+
+        Describes the physical state of a button that caused the button
+        event.
+        """
+
         released: int
+        """The button is not pressed"""
+
         pressed: int
+        """The button is pressed"""
+
 
 
     @staticmethod
@@ -6064,9 +6817,9 @@ class zwp_tablet_pad_v2:
         be ignored.
 
         Args:
-            button: button index
-            description: button description
-            serial: serial of the mode switch event
+            button: Button index
+            description: Button description
+            serial: Serial of the mode switch event
         """
 
         ...
@@ -6114,7 +6867,7 @@ class zwp_tablet_pad_v2:
             wp_tablet_pad.done event.
 
             Args:
-                path: path to local device
+                path: Path to local device
             """
 
             ...
@@ -6132,7 +6885,7 @@ class zwp_tablet_pad_v2:
             button is available.
 
             Args:
-                buttons: the number of buttons
+                buttons: The number of buttons
             """
 
             ...
@@ -6157,8 +6910,8 @@ class zwp_tablet_pad_v2:
             Sent whenever the physical state of a button changes.
 
             Args:
-                time: the time of the event with millisecond granularity
-                button: the index of the button that changed state
+                time: The time of the event with millisecond granularity
+                button: The index of the button that changed state
             """
 
             ...
@@ -6171,9 +6924,9 @@ class zwp_tablet_pad_v2:
             Notification that this pad is focused on the specified surface.
 
             Args:
-                serial: serial number of the enter event
-                tablet: the tablet the pad is attached to
-                surface: surface the pad is focused on
+                serial: Serial number of the enter event
+                tablet: The tablet the pad is attached to
+                surface: Surface the pad is focused on
             """
 
             ...
@@ -6187,8 +6940,8 @@ class zwp_tablet_pad_v2:
             surface.
 
             Args:
-                serial: serial number of the leave event
-                surface: surface the pad is no longer focused on
+                serial: Serial number of the leave event
+                surface: Surface the pad is no longer focused on
             """
 
             ...
@@ -6247,8 +7000,8 @@ class zwp_tablet_pad_dial_v2:
         ignored.
 
         Args:
-            description: dial description
-            serial: serial of the mode switch event
+            description: Dial description
+            serial: Serial of the mode switch event
         """
 
         ...
@@ -6281,7 +7034,7 @@ class zwp_tablet_pad_dial_v2:
             The value120 must not be zero.
 
             Args:
-                value120: rotation distance as fraction of 120
+                value120: Rotation distance as fraction of 120
             """
 
             ...
@@ -6304,7 +7057,7 @@ class zwp_tablet_pad_dial_v2:
             delta, frame, etc.
 
             Args:
-                time: timestamp with millisecond granularity
+                time: Timestamp with millisecond granularity
             """
 
             ...
@@ -6325,6 +7078,8 @@ class wp_viewporter:
 
     class error(Enum):
         viewport_exists: int
+        """The surface already has a viewport object associated"""
+
 
 
     @staticmethod
@@ -6350,7 +7105,7 @@ class wp_viewporter:
         protocol error is raised.
 
         Args:
-            surface: the surface
+            surface: The surface
 
         Returns:
             wp_viewport: The created object
@@ -6360,7 +7115,7 @@ class wp_viewporter:
 
 class wp_viewport:
     """
-    Crop and scale interface to a wl_surface
+    Crop and scale interface to a `wl_surface`
 
     An additional interface to a wl_surface object, which allows the
     client to specify the cropping and scaling of the surface
@@ -6422,9 +7177,17 @@ class wp_viewport:
 
     class error(Enum):
         bad_value: int
+        """Negative or zero values in width or height"""
+
         bad_size: int
+        """Destination size is not integer"""
+
         out_of_buffer: int
+        """Source rectangle extends outside of the content area"""
+
         no_surface: int
+        """The `wl_surface` was destroyed"""
+
 
 
     @staticmethod
@@ -6455,10 +7218,10 @@ class wp_viewport:
         The crop and scale state is double-buffered, see wl_surface.commit.
 
         Args:
-            x: source rectangle x
-            y: source rectangle y
-            width: source rectangle width
-            height: source rectangle height
+            x: Source rectangle x
+            y: Source rectangle y
+            width: Source rectangle width
+            height: Source rectangle height
         """
 
         ...
@@ -6480,8 +7243,8 @@ class wp_viewport:
         The crop and scale state is double-buffered, see wl_surface.commit.
 
         Args:
-            width: surface width
-            height: surface height
+            width: Surface width
+            height: Surface height
         """
 
         ...
@@ -6501,18 +7264,32 @@ class xdg_wm_base:
 
     class error(Enum):
         role: int
+        """Given `wl_surface` has another role"""
+
         defunct_surfaces: int
+        """`xdg_wm_base` was destroyed before children"""
+
         not_the_topmost_popup: int
+        """The client tried to map or destroy a non-topmost popup"""
+
         invalid_popup_parent: int
+        """The client specified an invalid popup parent surface"""
+
         invalid_surface_state: int
+        """The client provided an invalid surface state"""
+
         invalid_positioner: int
+        """The client provided an invalid positioner"""
+
         unresponsive: int
+        """The client didn’t respond to a ping event in time"""
+
 
 
     @staticmethod
     def destroy() -> None:
         """
-        Destroy xdg_wm_base
+        Destroy `xdg_wm_base`
 
         Destroy this xdg_wm_base object.
 
@@ -6573,7 +7350,7 @@ class xdg_wm_base:
         and xdg_wm_base.error.unresponsive.
 
         Args:
-            serial: serial of the ping event
+            serial: Serial of the ping event
         """
 
         ...
@@ -6599,7 +7376,7 @@ class xdg_wm_base:
             always respond to any xdg_wm_base object it created.
 
             Args:
-                serial: pass this to the pong request
+                serial: Pass this to the pong request
             """
 
             ...
@@ -6633,6 +7410,8 @@ class xdg_positioner:
 
     class error(Enum):
         invalid_input: int
+        """Invalid input provided"""
+
 
 
     class anchor(Enum):
@@ -6660,19 +7439,103 @@ class xdg_positioner:
 
 
     class constraint_adjustment(IntFlag):
+        """
+        Constraint adjustments
+
+        The constraint adjustment value define ways the compositor will adjust
+        the position of the surface, if the unadjusted position would result
+        in the surface being partly constrained.
+
+        Whether a surface is considered 'constrained' is left to the compositor
+        to determine. For example, the surface may be partly outside the
+        compositor's defined 'work area', thus necessitating the child surface's
+        position be adjusted until it is entirely inside the work area.
+
+        The adjustments can be combined, according to a defined precedence: 1)
+        Flip, 2) Slide, 3) Resize.
+        """
+
         none: int
+        """
+        Don't move the child surface when constrained
+        Don't alter the surface position even if it is constrained on some
+        axis, for example partially outside the edge of an output.
+        """
+
         slide_x: int
+        """
+        Move along the x axis until unconstrained
+        Slide the surface along the x axis until it is no longer constrained.
+        First try to slide towards the direction of the gravity on the x axis
+        until either the edge in the opposite direction of the gravity is
+        unconstrained or the edge in the direction of the gravity is
+        constrained.
+        Then try to slide towards the opposite direction of the gravity on the
+        x axis until either the edge in the direction of the gravity is
+        unconstrained or the edge in the opposite direction of the gravity is
+        constrained.
+        """
+
         slide_y: int
+        """
+        Move along the y axis until unconstrained
+        Slide the surface along the y axis until it is no longer constrained.
+        First try to slide towards the direction of the gravity on the y axis
+        until either the edge in the opposite direction of the gravity is
+        unconstrained or the edge in the direction of the gravity is
+        constrained.
+        Then try to slide towards the opposite direction of the gravity on the
+        y axis until either the edge in the direction of the gravity is
+        unconstrained or the edge in the opposite direction of the gravity is
+        constrained.
+        """
+
         flip_x: int
+        """
+        Invert the anchor and gravity on the x axis
+        Invert the anchor and gravity on the x axis if the surface is
+        constrained on the x axis. For example, if the left edge of the
+        surface is constrained, the gravity is 'left' and the anchor is
+        'left', change the gravity to 'right' and the anchor to 'right'.
+        If the adjusted position also ends up being constrained, the resulting
+        position of the flip_x adjustment will be the one before the
+        adjustment.
+        """
+
         flip_y: int
+        """
+        Invert the anchor and gravity on the y axis
+        Invert the anchor and gravity on the y axis if the surface is
+        constrained on the y axis. For example, if the bottom edge of the
+        surface is constrained, the gravity is 'bottom' and the anchor is
+        'bottom', change the gravity to 'top' and the anchor to 'top'.
+        The adjusted position is calculated given the original anchor
+        rectangle and offset, but with the new flipped anchor and gravity
+        values.
+        If the adjusted position also ends up being constrained, the resulting
+        position of the flip_y adjustment will be the one before the
+        adjustment.
+        """
+
         resize_x: int
+        """
+        Horizontally resize the surface
+        Resize the surface horizontally so that it is completely
+        unconstrained.
+        """
+
         resize_y: int
+        """
+        Vertically resize the surface
+        Resize the surface vertically so that it is completely unconstrained.
+        """
+
 
 
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the xdg_positioner object
+        Destroy the `xdg_positioner` object
 
         Notify the compositor that the xdg_positioner will no longer be used.
         """
@@ -6691,8 +7554,8 @@ class xdg_positioner:
         If a zero or negative size is set the invalid_input error is raised.
 
         Args:
-            width: width of positioned rectangle
-            height: height of positioned rectangle
+            width: Width of positioned rectangle
+            height: Height of positioned rectangle
         """
 
         ...
@@ -6714,10 +7577,10 @@ class xdg_positioner:
         If a negative size is set the invalid_input error is raised.
 
         Args:
-            x: x position of anchor rectangle
-            y: y position of anchor rectangle
-            width: width of anchor rectangle
-            height: height of anchor rectangle
+            x: X position of anchor rectangle
+            y: Y position of anchor rectangle
+            width: Width of anchor rectangle
+            height: Height of anchor rectangle
         """
 
         ...
@@ -6735,7 +7598,7 @@ class xdg_positioner:
         edge, or in the center of the anchor rectangle if no edge is specified.
 
         Args:
-            anchor: anchor
+            anchor: Anchor
         """
 
         ...
@@ -6754,7 +7617,7 @@ class xdg_positioner:
         invalid_input error is raised.
 
         Args:
-            gravity: gravity direction
+            gravity: Gravity direction
         """
 
         ...
@@ -6779,7 +7642,7 @@ class xdg_positioner:
         The default adjustment is none.
 
         Args:
-            constraint_adjustment: bit mask of constraint adjustments
+            constraint_adjustment: Bit mask of constraint adjustments
         """
 
         ...
@@ -6802,8 +7665,8 @@ class xdg_positioner:
         with some user interface element placed somewhere in the popup surface.
 
         Args:
-            x: surface position x offset
-            y: surface position y offset
+            x: Surface position x offset
+            y: Surface position y offset
         """
 
         ...
@@ -6835,8 +7698,8 @@ class xdg_positioner:
         The arguments are given in the surface-local coordinate space.
 
         Args:
-            parent_width: future window geometry width of parent
-            parent_height: future window geometry height of parent
+            parent_width: Future window geometry width of parent
+            parent_height: Future window geometry height of parent
         """
 
         ...
@@ -6852,7 +7715,7 @@ class xdg_positioner:
         constrained using.
 
         Args:
-            serial: serial of parent configure event
+            serial: Serial of parent configure event
         """
 
         ...
@@ -6915,17 +7778,29 @@ class xdg_surface:
 
     class error(Enum):
         not_constructed: int
+        """Surface was not fully constructed"""
+
         already_constructed: int
+        """Surface was already constructed"""
+
         unconfigured_buffer: int
+        """Attaching a buffer to an unconfigured surface"""
+
         invalid_serial: int
+        """Invalid serial number when acking a configure event"""
+
         invalid_size: int
+        """Width or height was zero or negative"""
+
         defunct_role_object: int
+        """Surface was destroyed before its role object"""
+
 
 
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the xdg_surface
+        Destroy the `xdg_surface`
 
         Destroy the xdg_surface object. An xdg_surface must only be destroyed
         after its role object has been destroyed, otherwise
@@ -6937,7 +7812,7 @@ class xdg_surface:
     @staticmethod
     def get_toplevel() -> xdg_toplevel:
         """
-        Assign the xdg_toplevel surface role
+        Assign the `xdg_toplevel` surface role
 
         This creates an xdg_toplevel object for the given xdg_surface and gives
         the associated wl_surface the xdg_toplevel role.
@@ -6954,7 +7829,7 @@ class xdg_surface:
     @staticmethod
     def get_popup(parent: xdg_surface, positioner: xdg_positioner) -> xdg_popup:
         """
-        Assign the xdg_popup surface role
+        Assign the `xdg_popup` surface role
 
         This creates an xdg_popup object for the given xdg_surface and gives
         the associated wl_surface the xdg_popup role.
@@ -7056,7 +7931,7 @@ class xdg_surface:
         xdg_surface. Doing so will raise an invalid_serial error.
 
         Args:
-            serial: the serial from the configure event
+            serial: The serial from the configure event
         """
 
         ...
@@ -7085,7 +7960,7 @@ class xdg_surface:
             to one, it is free to discard all but the last event it received.
 
             Args:
-                serial: serial of the configure event
+                serial: Serial of the configure event
             """
 
             ...
@@ -7121,11 +7996,24 @@ class xdg_toplevel:
 
     class error(Enum):
         invalid_resize_edge: int
+        """Provided value is         not a valid variant of the `resize_edge` enum"""
+
         invalid_parent: int
+        """Invalid parent toplevel"""
+
         invalid_size: int
+        """Client provided an invalid min or max size"""
+
 
 
     class resize_edge(Enum):
+        """
+        Edge values for resizing
+
+        These values are used to indicate which edge of a surface
+        is being dragged in a resize operation.
+        """
+
         none: int
         top: int
         bottom: int
@@ -7138,32 +8026,155 @@ class xdg_toplevel:
 
 
     class state(Enum):
+        """
+        Types of state on the surface
+
+        The different state values used on the surface. This is designed for
+        state values like maximized, fullscreen. It is paired with the
+        configure event to ensure that both the client and the compositor
+        setting the state can be synchronized.
+
+        States set in this way are double-buffered, see wl_surface.commit.
+        """
+
         maximized: int
+        """
+        The surface is maximized
+        The surface is maximized. The window geometry specified in the configure
+        event must be obeyed by the client, or the xdg_wm_base.invalid_surface_state
+        error is raised.
+        The client should draw without shadow or other
+        decoration outside of the window geometry.
+        """
+
         fullscreen: int
+        """
+        The surface is fullscreen
+        The surface is fullscreen. The window geometry specified in the
+        configure event is a maximum; the client cannot resize beyond it. For
+        a surface to cover the whole fullscreened area, the geometry
+        dimensions must be obeyed by the client. For more details, see
+        xdg_toplevel.set_fullscreen.
+        """
+
         resizing: int
+        """
+        The surface is being resized
+        The surface is being resized. The window geometry specified in the
+        configure event is a maximum; the client cannot resize beyond it.
+        Clients that have aspect ratio or cell sizing configuration can use
+        a smaller size, however.
+        """
+
         activated: int
+        """
+        The surface is now activated
+        Client window decorations should be painted as if the window is
+        active. Do not assume this means that the window actually has
+        keyboard or pointer focus.
+        """
+
         tiled_left: int
+        """
+        The surface’s left edge is tiled
+        The window is currently in a tiled layout and the left edge is
+        considered to be adjacent to another part of the tiling grid.
+        The client should draw without shadow or other decoration outside of
+        the window geometry on the left edge.
+        """
+
         tiled_right: int
+        """
+        The surface’s right edge is tiled
+        The window is currently in a tiled layout and the right edge is
+        considered to be adjacent to another part of the tiling grid.
+        The client should draw without shadow or other decoration outside of
+        the window geometry on the right edge.
+        """
+
         tiled_top: int
+        """
+        The surface’s top edge is tiled
+        The window is currently in a tiled layout and the top edge is
+        considered to be adjacent to another part of the tiling grid.
+        The client should draw without shadow or other decoration outside of
+        the window geometry on the top edge.
+        """
+
         tiled_bottom: int
+        """
+        The surface’s bottom edge is tiled
+        The window is currently in a tiled layout and the bottom edge is
+        considered to be adjacent to another part of the tiling grid.
+        The client should draw without shadow or other decoration outside of
+        the window geometry on the bottom edge.
+        """
+
         suspended: int
+        """
+        Surface repaint is suspended
+        The surface is currently not ordinarily being repainted; for
+        example because its content is occluded by another window, or its
+        outputs are switched off due to screen locking.
+        """
+
         constrained_left: int
+        """
+        The surface’s left edge is constrained
+        The left edge of the window is currently constrained, meaning it
+        shouldn't attempt to resize from that edge. It can for example mean
+        it's tiled next to a monitor edge on the constrained side of the
+        window.
+        """
+
         constrained_right: int
+        """
+        The surface’s right edge is constrained
+        The right edge of the window is currently constrained, meaning it
+        shouldn't attempt to resize from that edge. It can for example mean
+        it's tiled next to a monitor edge on the constrained side of the
+        window.
+        """
+
         constrained_top: int
+        """
+        The surface’s top edge is constrained
+        The top edge of the window is currently constrained, meaning it
+        shouldn't attempt to resize from that edge. It can for example mean
+        it's tiled next to a monitor edge on the constrained side of the
+        window.
+        """
+
         constrained_bottom: int
+        """
+        The surface’s bottom edge is constrained
+        The bottom edge of the window is currently constrained, meaning it
+        shouldn't attempt to resize from that edge. It can for example mean
+        it's tiled next to a monitor edge on the constrained side of the
+        window.
+        """
+
 
 
     class wm_capabilities(Enum):
         window_menu: int
+        """`show_window_menu` is available"""
+
         maximize: int
+        """`set_maximized` and `unset_maximized` are available"""
+
         fullscreen: int
+        """`set_fullscreen` and `unset_fullscreen` are available"""
+
         minimize: int
+        """`set_minimized` is available"""
+
 
 
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the xdg_toplevel
+        Destroy the `xdg_toplevel`
 
         This request destroys the role surface and unmaps the surface;
         see "Unmapping" behavior in interface section for details.
@@ -7267,10 +8278,10 @@ class xdg_toplevel:
         like a button press, key press, or touch down event.
 
         Args:
-            seat: the wl_seat of the user event
-            serial: the serial of the user event
-            x: the x position to pop up the window menu at
-            y: the y position to pop up the window menu at
+            seat: The `wl_seat` of the user event
+            serial: The serial of the user event
+            x: The x position to pop up the window menu at
+            y: The y position to pop up the window menu at
         """
 
         ...
@@ -7298,8 +8309,8 @@ class xdg_toplevel:
         that the device focus will return when the move is completed.
 
         Args:
-            seat: the wl_seat of the user event
-            serial: the serial of the user event
+            seat: The `wl_seat` of the user event
+            serial: The serial of the user event
         """
 
         ...
@@ -7342,9 +8353,9 @@ class xdg_toplevel:
         cursor image.
 
         Args:
-            seat: the wl_seat of the user event
-            serial: the serial of the user event
-            edges: which edge or corner is being dragged
+            seat: The `wl_seat` of the user event
+            serial: The serial of the user event
+            edges: Which edge or corner is being dragged
         """
 
         ...
@@ -7663,7 +8674,7 @@ class xdg_toplevel:
             native endianness.
 
             Args:
-                capabilities: array of 32-bit capabilities
+                capabilities: Array of 32-bit capabilities
             """
 
             ...
@@ -7702,12 +8713,14 @@ class xdg_popup:
 
     class error(Enum):
         invalid_grab: int
+        """Tried to grab after being mapped"""
+
 
 
     @staticmethod
     def destroy() -> None:
         """
-        Remove xdg_popup interface
+        Remove `xdg_popup` interface
 
         This destroys the popup. Explicitly destroying the xdg_popup
         object will also dismiss the popup, and unmap the surface.
@@ -7762,8 +8775,8 @@ class xdg_popup:
         will always have keyboard focus.
 
         Args:
-            seat: the wl_seat of the user event
-            serial: the serial of the user event
+            seat: The `wl_seat` of the user event
+            serial: The serial of the user event
         """
 
         ...
@@ -7798,7 +8811,7 @@ class xdg_popup:
         send an xdg_positioner.set_parent_size request.
 
         Args:
-            token: reposition request token
+            token: Reposition request token
         """
 
         ...
@@ -7823,10 +8836,10 @@ class xdg_popup:
             set_reactive requested, or in response to xdg_popup.reposition requests.
 
             Args:
-                x: x position relative to parent surface window geometry
-                y: y position relative to parent surface window geometry
-                width: window geometry width
-                height: window geometry height
+                x: X position relative to parent surface window geometry
+                y: Y position relative to parent surface window geometry
+                width: Window geometry width
+                height: Window geometry height
             """
 
             ...
@@ -7865,7 +8878,7 @@ class xdg_popup:
             effect. See xdg_surface.ack_configure for details.
 
             Args:
-                token: reposition request token
+                token: Reposition request token
             """
 
             ...
@@ -7888,6 +8901,8 @@ class wp_alpha_modifier_v1:
 
     class error(Enum):
         already_constructed: int
+        """`wl_surface` already has a alpha modifier object"""
+
 
 
     @staticmethod
@@ -7933,6 +8948,8 @@ class wp_alpha_modifier_surface_v1:
 
     class error(Enum):
         no_surface: int
+        """`wl_surface` was destroyed"""
+
 
 
     @staticmethod
@@ -7986,55 +9003,353 @@ class wp_color_manager_v1:
 
     class error(Enum):
         unsupported_feature: int
+        """Request not supported"""
+
         surface_exists: int
+        """Color management surface exists already"""
+
 
 
     class render_intent(Enum):
+        """
+        Rendering intents
+
+        See the ICC.1:2022 specification from the International Color Consortium
+        for more details about rendering intents.
+
+        The principles of ICC defined rendering intents apply with all types of
+        image descriptions, not only those with ICC file profiles.
+
+        Compositors must support the perceptual rendering intent. Other
+        rendering intents are optional.
+        """
+
         perceptual: int
+        """Perceptual"""
+
         relative: int
+        """Media-relative colorimetric"""
+
         saturation: int
+        """Saturation"""
+
         absolute: int
+        """Icc-absolute colorimetric"""
+
         relative_bpc: int
+        """Media-relative colorimetric + black point compensation"""
+
 
 
     class feature(Enum):
+        """Compositor supported features"""
+
         icc_v2_v4: int
+        """`create_icc_creator` request"""
+
         parametric: int
+        """`create_parametric_creator` request"""
+
         set_primaries: int
+        """Parametric `set_primaries` request"""
+
         set_tf_power: int
+        """Parametric `set_tf_power` request"""
+
         set_luminances: int
+        """Parametric `set_luminances` request"""
+
         set_mastering_display_primaries: int
+        """
+        Parametric `set_mastering_display_primaries` request
+        The compositor supports set_mastering_display_primaries request with a
+        target color volume fully contained inside the primary color volume.
+        """
+
         extended_target_volume: int
+        """
+        Parametric target exceeds primary color volume
+        The compositor additionally supports target color volumes that
+        extend outside of the primary color volume.
+        This can only be advertised if feature set_mastering_display_primaries
+        is supported as well.
+        """
+
         windows_scrgb: int
+        """`create_windows_scrgb` request"""
+
 
 
     class primaries(Enum):
+        """
+        Named color primaries
+
+        Named color primaries used to encode well-known sets of primaries. H.273
+        is the authority, when it comes to the exact values of primaries and
+        authoritative specifications, where an equivalent code point exists.
+
+        A value of 0 is invalid and will never be present in the list of enums.
+
+        Descriptions do list the specifications for convenience.
+        """
+
         srgb: int
+        """
+        Color primaries for the srgb color space as defined by the bt.709 standard
+        Color primaries as defined by
+        - Rec. ITU-R BT.709-6
+        - Rec. ITU-R BT.1361-0 conventional colour gamut system and extended
+        colour gamut system (historical)
+        - IEC 61966-2-1 sRGB or sYCC
+        - IEC 61966-2-4
+        - Society of Motion Picture and Television Engineers (SMPTE) RP 177
+        (1993) Annex B
+        Equivalent to H.273 ColourPrimaries code point 1.
+        """
+
         pal_m: int
+        """
+        Color primaries for pal-m as defined by the bt.470 standard
+        Color primaries as defined by
+        - Rec. ITU-R BT.470-6 System M (historical)
+        - United States National Television System Committee 1953
+        Recommendation for transmission standards for color television
+        - United States Federal Communications Commission (2003) Title 47 Code
+        of Federal Regulations 73.682 (a)(20)
+        Equivalent to H.273 ColourPrimaries code point 4.
+        """
+
         pal: int
+        """
+        Color primaries for pal as defined by the bt.601 standard
+        Color primaries as defined by
+        - Rec. ITU-R BT.470-6 System B, G (historical)
+        - Rec. ITU-R BT.601-7 625
+        - Rec. ITU-R BT.1358-0 625 (historical)
+        - Rec. ITU-R BT.1700-0 625 PAL and 625 SECAM
+        Equivalent to H.273 ColourPrimaries code point 5.
+        """
+
         ntsc: int
+        """
+        Color primaries for ntsc as defined by the bt.601 standard
+        Color primaries as defined by
+        - Rec. ITU-R BT.601-7 525
+        - Rec. ITU-R BT.1358-1 525 or 625 (historical)
+        - Rec. ITU-R BT.1700-0 NTSC
+        - SMPTE 170M (2004)
+        - SMPTE 240M (1999) (historical)
+        Equivalent to H.273 ColourPrimaries code point 6 and 7.
+        """
+
         generic_film: int
+        """
+        Generic film with colour filters using illuminant c
+        Color primaries as defined by H.273 for generic film.
+        Equivalent to H.273 ColourPrimaries code point 8.
+        """
+
         bt2020: int
+        """
+        Color primaries as defined by the bt.2020 and bt.2100 standard
+        Color primaries as defined by
+        - Rec. ITU-R BT.2020-2
+        - Rec. ITU-R BT.2100-0
+        Equivalent to H.273 ColourPrimaries code point 9.
+        """
+
         cie1931_xyz: int
+        """
+        Color primaries of the full cie 1931 xyz color space
+        Color primaries as defined as the maximum of the CIE 1931 XYZ color
+        space by
+        - SMPTE ST 428-1
+        - (CIE 1931 XYZ as in ISO 11664-1)
+        Equivalent to H.273 ColourPrimaries code point 10.
+        """
+
         dci_p3: int
+        """
+        Color primaries of the dci p3 color space as defined by the smpte rp 431 standard
+        Color primaries as defined by Digital Cinema System and published in
+        SMPTE RP 431-2 (2011). Equivalent to H.273 ColourPrimaries code point
+        11.
+        """
+
         display_p3: int
+        """
+        Color primaries of display p3 variant of the dci-p3 color space as defined by the smpte eg 432 standard
+        Color primaries as defined by Digital Cinema System and published in
+        SMPTE EG 432-1 (2010).
+        Equivalent to H.273 ColourPrimaries code point 12.
+        """
+
         adobe_rgb: int
+        """
+        Color primaries of the adobe rgb color space as defined by the iso 12640 standard
+        Color primaries as defined by Adobe as "Adobe RGB" and later published
+        by ISO 12640-4 (2011).
+        """
+
 
 
     class transfer_function(Enum):
+        """
+        Named transfer functions
+
+        Named transfer functions used to represent well-known transfer
+        characteristics. H.273 is the authority, when it comes to the exact
+        formulas and authoritative specifications, where an equivalent code
+        point exists.
+
+        A value of 0 is invalid and will never be present in the list of enums.
+
+        Descriptions do list the specifications for convenience.
+        """
+
         bt1886: int
+        """
+        Bt.1886 display transfer characteristic
+        Rec. ITU-R BT.1886 is the display transfer characteristic assumed by
+        - Rec. ITU-R BT.601-7 525 and 625
+        - Rec. ITU-R BT.709-6
+        - Rec. ITU-R BT.2020-2
+        These recommendations are referred to by H.273 TransferCharacteristics
+        code points 1, 6, 14, and 15, which are all equivalent.
+        This TF implies these default luminances from Rec. ITU-R BT.2035:
+        - primary color volume minimum: 0.01 cd/m²
+        - primary color volume maximum: 100 cd/m²
+        - reference white: 100 cd/m²
+        """
+
         gamma22: int
+        """
+        Assumed display gamma 2.2 transfer function
+        Transfer characteristics as defined by
+        - Rec. ITU-R BT.470-6 System M (historical)
+        - United States National Television System Committee 1953
+        Recommendation for transmission standards for color television
+        - United States Federal Communications Commission (2003) Title 47 Code
+        of Federal Regulations 73.682 (a) (20)
+        - Rec. ITU-R BT.1700-0 625 PAL and 625 SECAM
+        Equivalent to H.273 TransferCharacteristics code point 4.
+        Note: an sRGB display (IEC 61966-2-1) uses this transfer function.
+        """
+
         gamma28: int
+        """
+        Assumed display gamma 2.8 transfer function
+        Transfer characteristics as defined by
+        - Rec. ITU-R BT.470-6 System B, G (historical)
+        Equivalent to H.273 TransferCharacteristics code point 5.
+        """
+
         st240: int
+        """
+        Smpte st 240 transfer function
+        Transfer characteristics as defined by
+        - SMPTE ST 240 (1999)
+        Equivalent to H.273 TransferCharacteristics code point 7.
+        """
+
         ext_linear: int
+        """
+        Extended linear transfer function
+        Linear transfer function defined over all real numbers.
+        Normalised electrical values are equal the normalised optical values.
+        The differences to H.273 TransferCharacteristics code point 8 are
+        the definition over all real numbers.
+        """
+
         log_100: int
+        """
+        Logarithmic 100:1 transfer function
+        Logarithmic transfer characteristic (100:1 range).
+        Equivalent to H.273 TransferCharacteristics code point 9.
+        """
+
         log_316: int
+        """
+        Logarithmic (100*sqrt(10) : 1) transfer function
+        Logarithmic transfer characteristic (100 * Sqrt(10) : 1 range).
+        Equivalent to H.273 TransferCharacteristics code point 10.
+        """
+
         xvycc: int
+        """
+        Iec 61966-2-4 transfer function
+        Transfer characteristics as defined by
+        - IEC 61966-2-4
+        Equivalent to H.273 TransferCharacteristics code point 11.
+        """
+
         srgb: int
+        """
+        Srgb piece-wise transfer function
+        Transfer characteristics as defined by
+        - IEC 61966-2-1 sRGB
+        Equivalent to H.273 TransferCharacteristics code point 13 with
+        MatrixCoefficients set to 0.
+        Note: This is not appropriate for describing sRGB material.
+        sRGB material is intended to be viewed on an sRGB display, and
+        that is described by gamma22.
+        """
+
         ext_srgb: int
+        """
+        Extended srgb piece-wise transfer function
+        Transfer characteristics as defined by
+        - IEC 61966-2-1 sYCC
+        Equivalent to H.273 TransferCharacteristics code point 13 with
+        MatrixCoefficients set to anything but 0.
+        """
+
         st2084_pq: int
+        """
+        Perceptual quantizer transfer function
+        Transfer characteristics as defined by
+        - SMPTE ST 2084 (2014) for 10-, 12-, 14- and 16-bit systems
+        - Rec. ITU-R BT.2100-2 perceptual quantization (PQ) system
+        Equivalent to H.273 TransferCharacteristics code point 16.
+        This TF implies these default luminances
+        - primary color volume minimum: 0.005 cd/m²
+        - primary color volume maximum: 10000 cd/m²
+        - reference white: 203 cd/m²
+        The difference between the primary color volume minimum and maximum
+        must be approximately 10000 cd/m² as that is the swing of the EOTF
+        defined by ST 2084 and BT.2100. The default value for the
+        reference white is a protocol addition: it is suggested by
+        Report ITU-R BT.2408-7 and is not part of ST 2084 or BT.2100.
+        """
+
         st428: int
+        """
+        Smpte st 428 transfer function
+        Transfer characteristics as defined by
+        - SMPTE ST 428-1 (2019)
+        Equivalent to H.273 TransferCharacteristics code point 17.
+        """
+
         hlg: int
+        """
+        Hybrid log-gamma transfer function
+        Transfer characteristics as defined by
+        - ARIB STD-B67 (2015)
+        - Rec. ITU-R BT.2100-2 hybrid log-gamma (HLG) system
+        Equivalent to H.273 TransferCharacteristics code point 18.
+        This TF implies these default luminances
+        - primary color volume minimum: 0.005 cd/m²
+        - primary color volume maximum: 1000 cd/m²
+        - reference white: 203 cd/m²
+        HLG is a relative display-referred signal with a specified
+        non-linear mapping to the display peak luminance (the HLG OOTF).
+        All absolute luminance values used here for HLG assume a 1000 cd/m²
+        peak display.
+        The default value for the reference white is a protocol addition:
+        it is suggested by Report ITU-R BT.2408-7 and is not part of
+        ARIB STD-B67 or BT.2100.
+        """
+
 
 
     @staticmethod
@@ -8051,7 +9366,7 @@ class wp_color_manager_v1:
     @staticmethod
     def get_output(output: wl_output) -> wp_color_management_output_v1:
         """
-        Create a color management interface for a wl_output
+        Create a color management interface for a `wl_output`
 
         This creates a new wp_color_management_output_v1 object for the
         given wl_output.
@@ -8067,7 +9382,7 @@ class wp_color_manager_v1:
     @staticmethod
     def get_surface(surface: wl_surface) -> wp_color_management_surface_v1:
         """
-        Create a color management interface for a wl_surface
+        Create a color management interface for a `wl_surface`
 
         If a wp_color_management_surface_v1 object already exists for the given
         wl_surface, the protocol error surface_exists is raised.
@@ -8206,7 +9521,7 @@ class wp_color_manager_v1:
             for each rendering intent the compositor supports.
 
             Args:
-                render_intent: rendering intent
+                render_intent: Rendering intent
             """
 
             ...
@@ -8220,7 +9535,7 @@ class wp_color_manager_v1:
             for each compositor supported feature listed in the enumeration.
 
             Args:
-                feature: supported feature
+                feature: Supported feature
             """
 
             ...
@@ -8367,9 +9682,17 @@ class wp_color_management_surface_v1:
     version = 1
 
     class error(Enum):
+        """Protocol errors"""
+
         render_intent: int
+        """Unsupported rendering intent"""
+
         image_description: int
+        """Invalid image description"""
+
         inert: int
+        """Forbidden request on inert object"""
+
 
 
     @staticmethod
@@ -8429,7 +9752,7 @@ class wp_color_management_surface_v1:
         the pending state of the surface.
 
         Args:
-            render_intent: rendering intent
+            render_intent: Rendering intent
         """
 
         ...
@@ -8463,8 +9786,14 @@ class wp_color_management_surface_feedback_v1:
     version = 1
 
     class error(Enum):
+        """Protocol errors"""
+
         inert: int
+        """Forbidden request on inert object"""
+
         unsupported_feature: int
+        """Attempted to use an unsupported feature"""
+
 
 
     @staticmethod
@@ -8564,7 +9893,7 @@ class wp_color_management_surface_feedback_v1:
             to the preferred image description
 
             Args:
-                identity: image description id number
+                identity: Image description id number
             """
 
             ...
@@ -8592,11 +9921,23 @@ class wp_image_description_creator_icc_v1:
     version = 1
 
     class error(Enum):
+        """Protocol errors"""
+
         incomplete_set: int
+        """Incomplete parameter set"""
+
         already_set: int
+        """Property already set"""
+
         bad_fd: int
+        """Fd not seekable and readable"""
+
         bad_size: int
+        """No or too much data"""
+
         out_of_file: int
+        """Offset + length exceeds file size"""
+
 
 
     @staticmethod
@@ -8676,9 +10017,9 @@ class wp_image_description_creator_icc_v1:
         already_set is raised.
 
         Args:
-            icc_profile: ICC profile
-            offset: byte offset in fd to start of ICC data
-            length: length of ICC data in bytes
+            icc_profile: Icc profile
+            offset: Byte offset in fd to start of icc data
+            length: Length of icc data in bytes
         """
 
         ...
@@ -8719,12 +10060,26 @@ class wp_image_description_creator_params_v1:
     version = 1
 
     class error(Enum):
+        """Protocol errors"""
+
         incomplete_set: int
+        """Incomplete parameter set"""
+
         already_set: int
+        """Property already set"""
+
         unsupported_feature: int
+        """Request not supported"""
+
         invalid_tf: int
+        """Invalid transfer characteristic"""
+
         invalid_primaries_named: int
+        """Invalid primaries named"""
+
         invalid_luminance: int
+        """Invalid luminance value or range"""
+
 
 
     @staticmethod
@@ -8786,7 +10141,7 @@ class wp_image_description_creator_params_v1:
         protocol error already_set is raised.
 
         Args:
-            tf: named transfer function
+            tf: Named transfer function
         """
 
         ...
@@ -8819,7 +10174,7 @@ class wp_image_description_creator_params_v1:
         the protocol error unsupported_feature.
 
         Args:
-            eexp: the exponent * 10000
+            eexp: The exponent * 10000
         """
 
         ...
@@ -8841,7 +10196,7 @@ class wp_image_description_creator_params_v1:
         already_set is raised.
 
         Args:
-            primaries: named primaries
+            primaries: Named primaries
         """
 
         ...
@@ -8866,14 +10221,14 @@ class wp_image_description_creator_params_v1:
         the protocol error unsupported_feature.
 
         Args:
-            r_x: Red x * 1M
-            r_y: Red y * 1M
-            g_x: Green x * 1M
-            g_y: Green y * 1M
-            b_x: Blue x * 1M
-            b_y: Blue y * 1M
-            w_x: White x * 1M
-            w_y: White y * 1M
+            r_x: Red x * 1m
+            r_y: Red y * 1m
+            g_x: Green x * 1m
+            g_y: Green y * 1m
+            b_x: Blue x * 1m
+            b_y: Blue y * 1m
+            w_x: White x * 1m
+            w_y: White y * 1m
         """
 
         ...
@@ -8934,9 +10289,9 @@ class wp_image_description_creator_params_v1:
         raises the protocol error unsupported_feature.
 
         Args:
-            min_lum: minimum luminance (cd/m²) * 10000
-            max_lum: maximum luminance (cd/m²)
-            reference_lum: reference white luminance (cd/m²)
+            min_lum: Minimum luminance (cd/m²) * 10000
+            max_lum: Maximum luminance (cd/m²)
+            reference_lum: Reference white luminance (cd/m²)
         """
 
         ...
@@ -8994,14 +10349,14 @@ class wp_image_description_creator_params_v1:
         description gracefully, but it may as well result in color artifacts.
 
         Args:
-            r_x: Red x * 1M
-            r_y: Red y * 1M
-            g_x: Green x * 1M
-            g_y: Green y * 1M
-            b_x: Blue x * 1M
-            b_y: Blue y * 1M
-            w_x: White x * 1M
-            w_y: White y * 1M
+            r_x: Red x * 1m
+            r_y: Red y * 1m
+            g_x: Green x * 1m
+            g_y: Green y * 1m
+            b_x: Blue x * 1m
+            b_y: Blue y * 1m
+            w_x: White x * 1m
+            w_y: White y * 1m
         """
 
         ...
@@ -9046,8 +10401,8 @@ class wp_image_description_creator_params_v1:
         description gracefully, but it may as well result in color artifacts.
 
         Args:
-            min_lum: min L (cd/m²) * 10000
-            max_lum: max L (cd/m²)
+            min_lum: Min l (cd/m²) * 10000
+            max_lum: Max l (cd/m²)
         """
 
         ...
@@ -9111,15 +10466,31 @@ class wp_image_description_v1:
     version = 1
 
     class error(Enum):
+        """Protocol errors"""
+
         not_ready: int
+        """Attempted to use an object which is not ready"""
+
         no_information: int
+        """`get_information` not allowed"""
+
 
 
     class cause(Enum):
+        """Generic reason for failure"""
+
         low_version: int
+        """Interface version too low"""
+
         unsupported: int
+        """Unsupported image description data"""
+
         operating_system: int
+        """Error independent of the client"""
+
         no_output: int
+        """The relevant output no longer exists"""
+
 
 
     @staticmethod
@@ -9173,8 +10544,8 @@ class wp_image_description_v1:
             never become ready and it can only be destroyed.
 
             Args:
-                cause: generic reason
-                msg: ad hoc human-readable explanation
+                cause: Generic reason
+                msg: Ad hoc human-readable explanation
             """
 
             ...
@@ -9213,7 +10584,7 @@ class wp_image_description_v1:
             description information.
 
             Args:
-                identity: image description id number
+                identity: Image description id number
             """
 
             ...
@@ -9276,8 +10647,8 @@ class wp_image_description_info_v1:
             kind of a profile.
 
             Args:
-                icc: ICC profile file descriptor
-                icc_size: ICC profile size, in bytes
+                icc: Icc profile file descriptor
+                icc_size: Icc profile size, in bytes
             """
 
             ...
@@ -9294,14 +10665,14 @@ class wp_image_description_info_v1:
             value to carry precision of 6 decimals.
 
             Args:
-                r_x: Red x * 1M
-                r_y: Red y * 1M
-                g_x: Green x * 1M
-                g_y: Green y * 1M
-                b_x: Blue x * 1M
-                b_y: Blue y * 1M
-                w_x: White x * 1M
-                w_y: White y * 1M
+                r_x: Red x * 1m
+                r_y: Red y * 1m
+                g_x: Green x * 1m
+                g_y: Green y * 1m
+                b_x: Blue x * 1m
+                b_y: Blue y * 1m
+                w_x: White x * 1m
+                w_y: White y * 1m
             """
 
             ...
@@ -9315,7 +10686,7 @@ class wp_image_description_info_v1:
             explicitly enumerated named set.
 
             Args:
-                primaries: named primaries
+                primaries: Named primaries
             """
 
             ...
@@ -9334,7 +10705,7 @@ class wp_image_description_info_v1:
             value to carry the precision of 4 decimals.
 
             Args:
-                eexp: the exponent * 10000
+                eexp: The exponent * 10000
             """
 
             ...
@@ -9348,7 +10719,7 @@ class wp_image_description_info_v1:
             named function.
 
             Args:
-                tf: named transfer function
+                tf: Named transfer function
             """
 
             ...
@@ -9368,9 +10739,9 @@ class wp_image_description_info_v1:
             luminance and reference white luminance values are unscaled.
 
             Args:
-                min_lum: minimum luminance (cd/m²) * 10000
-                max_lum: maximum luminance (cd/m²)
-                reference_lum: reference white luminance (cd/m²)
+                min_lum: Minimum luminance (cd/m²) * 10000
+                max_lum: Maximum luminance (cd/m²)
+                reference_lum: Reference white luminance (cd/m²)
             """
 
             ...
@@ -9393,14 +10764,14 @@ class wp_image_description_info_v1:
             value to carry precision of 6 decimals.
 
             Args:
-                r_x: Red x * 1M
-                r_y: Red y * 1M
-                g_x: Green x * 1M
-                g_y: Green y * 1M
-                b_x: Blue x * 1M
-                b_y: Blue y * 1M
-                w_x: White x * 1M
-                w_y: White y * 1M
+                r_x: Red x * 1m
+                r_y: Red y * 1m
+                g_x: Green x * 1m
+                g_y: Green y * 1m
+                b_x: Blue x * 1m
+                b_y: Blue y * 1m
+                w_x: White x * 1m
+                w_y: White y * 1m
             """
 
             ...
@@ -9424,8 +10795,8 @@ class wp_image_description_info_v1:
             carry precision of 4 decimals. Max L value is unscaled for max_lum.
 
             Args:
-                min_lum: min L (cd/m²) * 10000
-                max_lum: max L (cd/m²)
+                min_lum: Min l (cd/m²) * 10000
+                max_lum: Max l (cd/m²)
             """
 
             ...
@@ -9478,7 +10849,11 @@ class wp_color_representation_manager_v1:
     version = 1
 
     class error(Enum):
+        """Protocol errors"""
+
         surface_exists: int
+        """Color representation surface exists already"""
+
 
 
     @staticmethod
@@ -9495,7 +10870,7 @@ class wp_color_representation_manager_v1:
     @staticmethod
     def get_surface(surface: wl_surface) -> wp_color_representation_surface_v1:
         """
-        Create a color representation interface for a wl_surface
+        Create a color representation interface for a `wl_surface`
 
         If a wp_color_representation_surface_v1 object already exists for the
         given wl_surface, the protocol error surface_exists is raised.
@@ -9524,7 +10899,7 @@ class wp_color_representation_manager_v1:
             wp_color_representation_surface_v1::alpha_mode enum.
 
             Args:
-                alpha_mode: supported alpha mode
+                alpha_mode: Supported alpha mode
             """
 
             ...
@@ -9543,8 +10918,8 @@ class wp_color_representation_manager_v1:
             wp_color_representation_surface_v1::range enums.
 
             Args:
-                coefficients: supported matrix coefficients
-                range: full range flag
+                coefficients: Supported matrix coefficients
+                range: Full range flag
             """
 
             ...
@@ -9578,41 +10953,233 @@ class wp_color_representation_surface_v1:
     version = 1
 
     class error(Enum):
+        """Protocol errors"""
+
         alpha_mode: int
+        """Unsupported alpha mode"""
+
         coefficients: int
+        """Unsupported coefficients"""
+
         pixel_format: int
+        """The pixel format and a set value are incompatible"""
+
         inert: int
+        """Forbidden request on inert object"""
+
 
 
     class alpha_mode(Enum):
+        """
+        Alpha mode
+
+        Specifies how the alpha channel affects the color channels.
+        """
+
         premultiplied_electrical: int
+        """
+        Premultiplied alpha in electrical values
+        Electrical color channel values (after transfer function encoding)
+        are already multiplied with the alpha channel value.
+        """
+
         premultiplied_optical: int
+        """
+        Premultiplied alpha in optical values
+        Optical color channel values (before transfer function encoding)
+        are already multiplied with the alpha channel value.
+        """
+
         straight: int
+        """
+        Straight alpha
+        Alpha channel has not been pre-multiplied into color channels.
+        """
+
 
 
     class coefficients(Enum):
+        """
+        Named coefficients
+
+        Named matrix coefficients used to encode well-known sets of
+        coefficients. H.273 is the authority, when it comes to the exact values
+        of coefficients and authoritative specifications, where an equivalent
+        code point exists.
+
+        A value of 0 is invalid and will never be present in the list of enums.
+
+        Descriptions do list the specifications for convenience.
+        """
+
         identity: int
+        """
+        The identity matrix
+        Coefficients as defined by
+        - IEC 61966-2-1 sRGB
+        - SMPTE ST 428-1 (2019)
+        Equivalent to H.273 MatrixCoefficients code point 0.
+        Compatible with pixel formats of the RGB family.
+        """
+
         bt709: int
+        """
+        Bt.709 matrix coefficients
+        Coefficients as defined by
+        - Rec. ITU-R BT.709-6
+        - Rec. ITU-R BT.1361-0 conventional colour gamut system (historical)
+        - Rec. ITU-R BT.1361-0 conventional colour gamut system and extended
+        colour gamut system (historical)
+        - IEC 61966-2-4 xvYCC709
+        - SMPTE RP 177 (1993) Annex B
+        Equivalent to H.273 MatrixCoefficients code point 1.
+        Compatible with pixel formats of the YCbCr family.
+        """
+
         fcc: int
+        """
+        Fcc matrix coefficients
+        Coefficients as defined by
+        - United States Federal Communications Commission (2003) Title 47
+        Code of Federal Regulations 73.682 (a) (20)
+        Equivalent to H.273 MatrixCoefficients code point 4.
+        Compatible with pixel formats of the YCbCr family.
+        """
+
         bt601: int
+        """
+        Bt.601-7 matrix coefficients
+        Coefficients as defined by
+        - Rec. ITU-R BT.470-6 System B, G (historical)
+        - Rec. ITU-R BT.601-7 625
+        - Rec. ITU-R BT.601-7 525
+        - Rec. ITU-R BT.1358-0 625 (historical)
+        - Rec. ITU-R BT.1358-1 525 or 625 (historical)
+        - Rec. ITU-R BT.1700-0 625 PAL and 625 SECAM
+        - Rec. ITU-R BT.1700-0 NTSC
+        - IEC 61966-2-1 sYCC
+        - IEC 61966-2-4 xvYCC601
+        - SMPTE ST 170 (2004)
+        Equivalent to H.273 MatrixCoefficients code point 5, 6.
+        Compatible with pixel formats of the YCbCr family.
+        """
+
         smpte240: int
+        """
+        Smpte st 240 matrix coefficients
+        Coefficients as defined by
+        - SMPTE ST 240 (1999)
+        Equivalent to H.273 MatrixCoefficients code point 7.
+        Compatible with pixel formats of the YCbCr family.
+        """
+
         bt2020: int
+        """
+        Bt.2020 and bt.2100 ycbcr matrix coefficients
+        Coefficients as defined by
+        - Rec. ITU-R BT.2020-2 (non-constant luminance)
+        - Rec. ITU-R BT.2100-2 Y′CbCr
+        Equivalent to H.273 MatrixCoefficients code point 9.
+        Compatible with pixel formats of the YCbCr family.
+        """
+
         bt2020_cl: int
+        """
+        Bt.2020 matrix coefficients for constant luminance
+        Coefficients as defined by
+        - Rec. ITU-R BT.2020-2 (constant luminance)
+        Equivalent to H.273 MatrixCoefficients code point 10.
+        Compatible with pixel formats of the YCbCr family.
+        """
+
         ictcp: int
+        """
+        Bt.2100 ictcp matrix coefficients
+        Coefficients as defined by
+        - Rec. ITU-R BT.2100-2 ICTCP
+        Equivalent to H.273 MatrixCoefficients code point 14.
+        Compatible with pixel formats of the YCbCr family.
+        """
+
 
 
     class range(Enum):
+        """
+        Color range values
+
+        Possible color range values.
+
+        A value of 0 is invalid and will never be present in the list of enums.
+        """
+
         full: int
+        """Full color range"""
+
         limited: int
+        """Limited color range"""
+
 
 
     class chroma_location(Enum):
+        """
+        Chroma sample location for 4:2:0 ycbcr
+
+        Chroma sample location as defined by H.273 Chroma420SampleLocType.
+
+        A value of 0 is invalid and will never be present in the list of enums.
+
+        The descriptions list the matching Vulkan VkChromaLocation combinations
+        for convenience.
+        """
+
         type_0: int
+        """
+        Horizontal offset of 0, vertical offset of 0.5
+        Corresponding to VkChromaLocations:
+        - xChromaOffset: VK_CHROMA_LOCATION_COSITED_EVEN
+        - yChromaOffset: VK_CHROMA_LOCATION_MIDPOINT
+        Equivalent to H.273 Chroma420SampleLocType 0.
+        """
+
         type_1: int
+        """
+        Horizontal offset of 0.5, vertical offset of 0.5
+        Corresponding to VkChromaLocations:
+        - xChromaOffset: VK_CHROMA_LOCATION_MIDPOINT
+        - yChromaOffset: VK_CHROMA_LOCATION_MIDPOINT
+        Equivalent to H.273 Chroma420SampleLocType 1.
+        """
+
         type_2: int
+        """
+        Horizontal offset of 0, vertical offset of 0
+        Corresponding to VkChromaLocations:
+        - xChromaOffset: VK_CHROMA_LOCATION_COSITED_EVEN
+        - yChromaOffset: VK_CHROMA_LOCATION_COSITED_EVEN
+        Equivalent to H.273 Chroma420SampleLocType 2.
+        """
+
         type_3: int
+        """
+        Horizontal offset of 0.5, vertical offset of 0
+        Corresponding to VkChromaLocations:
+        - xChromaOffset: VK_CHROMA_LOCATION_MIDPOINT
+        - yChromaOffset: VK_CHROMA_LOCATION_COSITED_EVEN
+        Equivalent to H.273 Chroma420SampleLocType 3.
+        """
+
         type_4: int
+        """
+        Horizontal offset of 0, vertical offset of 1
+        Equivalent to H.273 Chroma420SampleLocType 4.
+        """
+
         type_5: int
+        """
+        Horizontal offset of 0.5, vertical offset of 1
+        Equivalent to H.273 Chroma420SampleLocType 5.
+        """
+
 
 
     @staticmethod
@@ -9649,7 +11216,7 @@ class wp_color_representation_surface_v1:
         Alpha mode is double buffered, see wl_surface.commit.
 
         Args:
-            alpha_mode: alpha mode
+            alpha_mode: Alpha mode
         """
 
         ...
@@ -9687,8 +11254,8 @@ class wp_color_representation_surface_v1:
         wl_surface.commit.
 
         Args:
-            coefficients: matrix coefficients
-            range: range
+            coefficients: Matrix coefficients
+            range: Range
         """
 
         ...
@@ -9714,7 +11281,7 @@ class wp_color_representation_surface_v1:
         The chroma location type is double-buffered, see wl_surface.commit.
 
         Args:
-            chroma_location: chroma sample location
+            chroma_location: Chroma sample location
         """
 
         ...
@@ -9750,6 +11317,8 @@ class wp_commit_timing_manager_v1:
 
     class error(Enum):
         commit_timer_exists: int
+        """Commit timer already exists for surface"""
+
 
 
     @staticmethod
@@ -9791,8 +11360,14 @@ class wp_commit_timer_v1:
 
     class error(Enum):
         invalid_timestamp: int
+        """Timestamp contains an invalid value"""
+
         timestamp_exists: int
+        """Timestamp exists"""
+
         surface_destroyed: int
+        """The associated surface no longer exists"""
+
 
 
     @staticmethod
@@ -9816,9 +11391,9 @@ class wp_commit_timer_v1:
         destroyed will generate a "surface_destroyed" error.
 
         Args:
-            tv_sec_hi: high 32 bits of the seconds part of target time
-            tv_sec_lo: low 32 bits of the seconds part of target time
-            tv_nsec: nanoseconds part of target time
+            tv_sec_hi: High 32 bits of the seconds part of target time
+            tv_sec_lo: Low 32 bits of the seconds part of target time
+            tv_nsec: Nanoseconds part of target time
         """
 
         ...
@@ -9853,6 +11428,8 @@ class wp_content_type_manager_v1:
 
     class error(Enum):
         already_constructed: int
+        """`wl_surface` already has a content type object"""
+
 
 
     @staticmethod
@@ -9898,10 +11475,42 @@ class wp_content_type_v1:
     version = 1
 
     class type(Enum):
+        """
+        Possible content types
+
+        These values describe the available content types for a surface.
+        """
+
         none: int
+        """
+        No content type applies
+        The content type none means that either the application has no data
+        about the content type, or that the content doesn't fit into one of
+        the other categories.
+        """
+
         photo: int
+        """
+        Photo content type
+        The content type photo describes content derived from digital still
+        pictures and may be presented with minimal processing.
+        """
+
         video: int
+        """
+        Video content type
+        The content type video describes a video or animation and may be
+        presented with more accurate timing to avoid stutter. Where scaling
+        is needed, scaling methods more appropriate for video may be used.
+        """
+
         game: int
+        """
+        Game content type
+        The content type game describes a running game. Its content may be
+        presented with reduced latency.
+        """
+
 
 
     @staticmethod
@@ -9931,7 +11540,7 @@ class wp_content_type_v1:
         details.
 
         Args:
-            content_type: the content type
+            content_type: The content type
         """
 
         ...
@@ -10005,46 +11614,137 @@ class wp_cursor_shape_device_v1:
     version = 2
 
     class shape(Enum):
+        """
+        Cursor shapes
+
+        This enum describes cursor shapes.
+
+        The names are taken from the CSS W3C specification:
+        https://w3c.github.io/csswg-drafts/css-ui/#cursor
+        with a few additions.
+
+        Note that there are some groups of cursor shapes that are related:
+        The first group is drag-and-drop cursors which are used to indicate
+        the selected action during dnd operations. The second group is resize
+        cursors which are used to indicate resizing and moving possibilities
+        on window borders. It is recommended that the shapes in these groups
+        should use visually compatible images and metaphors.
+        """
+
         default: int
+        """Default cursor"""
+
         context_menu: int
+        """A context menu is available for the object under the cursor"""
+
         help: int
+        """Help is available for the object under the cursor"""
+
         pointer: int
+        """Pointer that indicates a link or another interactive element"""
+
         progress: int
+        """Progress indicator"""
+
         wait: int
+        """Program is busy, user should wait"""
+
         cell: int
+        """A cell or set of cells may be selected"""
+
         crosshair: int
+        """Simple crosshair"""
+
         text: int
+        """Text may be selected"""
+
         vertical_text: int
+        """Vertical text may be selected"""
+
         alias: int
+        """Drag-and-drop: alias of/shortcut to something is to be created"""
+
         copy: int
+        """Drag-and-drop: something is to be copied"""
+
         move: int
+        """Drag-and-drop: something is to be moved"""
+
         no_drop: int
+        """Drag-and-drop: the dragged item cannot be dropped at the current cursor location"""
+
         not_allowed: int
+        """Drag-and-drop: the requested action will not be carried out"""
+
         grab: int
+        """Drag-and-drop: something can be grabbed"""
+
         grabbing: int
+        """Drag-and-drop: something is being grabbed"""
+
         e_resize: int
+        """Resizing: the east border is to be moved"""
+
         n_resize: int
+        """Resizing: the north border is to be moved"""
+
         ne_resize: int
+        """Resizing: the north-east corner is to be moved"""
+
         nw_resize: int
+        """Resizing: the north-west corner is to be moved"""
+
         s_resize: int
+        """Resizing: the south border is to be moved"""
+
         se_resize: int
+        """Resizing: the south-east corner is to be moved"""
+
         sw_resize: int
+        """Resizing: the south-west corner is to be moved"""
+
         w_resize: int
+        """Resizing: the west border is to be moved"""
+
         ew_resize: int
+        """Resizing: the east and west borders are to be moved"""
+
         ns_resize: int
+        """Resizing: the north and south borders are to be moved"""
+
         nesw_resize: int
+        """Resizing: the north-east and south-west corners are to be moved"""
+
         nwse_resize: int
+        """Resizing: the north-west and south-east corners are to be moved"""
+
         col_resize: int
+        """Resizing: that the item/column can be resized horizontally"""
+
         row_resize: int
+        """Resizing: that the item/row can be resized vertically"""
+
         all_scroll: int
+        """Something can be scrolled in any direction"""
+
         zoom_in: int
+        """Something can be zoomed in"""
+
         zoom_out: int
+        """Something can be zoomed out"""
+
         dnd_ask: int
+        """Drag-and-drop: the user will select which action will be carried out (non-css value)"""
+
         all_resize: int
+        """Resizing: something can be moved or resized in any direction (non-css value)"""
+
 
 
     class error(Enum):
         invalid_shape: int
+        """The specified shape value is invalid"""
+
 
 
     @staticmethod
@@ -10084,7 +11784,7 @@ class wp_cursor_shape_device_v1:
         Otherwise the request will be ignored.
 
         Args:
-            serial: serial number of the enter event
+            serial: Serial number of the enter event
         """
 
         ...
@@ -10174,7 +11874,7 @@ class wp_drm_lease_device_v1:
             appropriate DRM device or select the appropriate connectors therein.
 
             Args:
-                fd: DRM file descriptor
+                fd: Drm file descriptor
             """
 
             ...
@@ -10273,7 +11973,7 @@ class wp_drm_lease_connector_v1:
             for the wl_output.
 
             Args:
-                name: connector name
+                name: Connector name
             """
 
             ...
@@ -10289,7 +11989,7 @@ class wp_drm_lease_connector_v1:
             lifetime of this object to reflect changes in the description.
 
             Args:
-                description: connector description
+                description: Connector description
             """
 
             ...
@@ -10297,7 +11997,7 @@ class wp_drm_lease_connector_v1:
         @staticmethod
         def connector_id(connector_id: int) -> None:
             """
-            Connector_id
+            `connector_id`
 
             The compositor sends this event once the connector is created to
             indicate the DRM object ID which represents the underlying connector
@@ -10305,7 +12005,7 @@ class wp_drm_lease_connector_v1:
             object IDs, such as CRTCs and planes.
 
             Args:
-                connector_id: DRM connector ID
+                connector_id: Drm connector id
             """
 
             ...
@@ -10356,8 +12056,14 @@ class wp_drm_lease_request_v1:
 
     class error(Enum):
         wrong_device: int
+        """Requested a connector from a different lease device"""
+
         duplicate_connector: int
+        """Requested a connector twice"""
+
         empty_lease: int
+        """Requested a lease without requesting a connector"""
+
 
 
     @staticmethod
@@ -10449,7 +12155,7 @@ class wp_drm_lease_v1:
             lifetime.
 
             Args:
-                leased_fd: leased DRM file descriptor
+                leased_fd: Leased drm file descriptor
             """
 
             ...
@@ -10494,10 +12200,14 @@ class ext_background_effect_manager_v1:
 
     class error(Enum):
         background_effect_exists: int
+        """The surface already has a background effect object"""
+
 
 
     class capability(IntFlag):
         blur: int
+        """The compositor supports applying blur"""
+
 
 
     @staticmethod
@@ -10525,7 +12235,7 @@ class ext_background_effect_manager_v1:
         raised.
 
         Args:
-            surface: the surface
+            surface: The surface
 
         Returns:
             ext_background_effect_surface_v1: The created object
@@ -10536,9 +12246,7 @@ class ext_background_effect_manager_v1:
     class events:
         @staticmethod
         def capabilities(flags: ext_background_effect_manager_v1.capability) -> None:
-            """
-            Capabilities of the compositor
-            """
+            """Capabilities of the compositor"""
 
             ...
 
@@ -10557,6 +12265,8 @@ class ext_background_effect_surface_v1:
 
     class error(Enum):
         surface_destroyed: int
+        """The associated surface has been destroyed"""
+
 
 
     @staticmethod
@@ -10594,7 +12304,7 @@ class ext_background_effect_surface_v1:
         error will be raised.
 
         Args:
-            region: blur region of the surface
+            region: Blur region of the surface
         """
 
         ...
@@ -10660,6 +12370,8 @@ class ext_data_control_device_v1:
 
     class error(Enum):
         used_source: int
+        """Source given to `set_selection` or `set_primary_selection` was already used before"""
+
 
 
     @staticmethod
@@ -10713,7 +12425,7 @@ class ext_data_control_device_v1:
         @staticmethod
         def data_offer(id: ext_data_control_offer_v1) -> None:
             """
-            Introduce a new ext_data_control_offer
+            Introduce a new `ext_data_control_offer`
 
             The data_offer event introduces a new ext_data_control_offer object,
             which will subsequently be used in either the
@@ -10798,6 +12510,8 @@ class ext_data_control_source_v1:
 
     class error(Enum):
         invalid_offer: int
+        """Offer sent after `ext_data_control_device`.`set_selection`"""
+
 
 
     @staticmethod
@@ -10812,7 +12526,7 @@ class ext_data_control_source_v1:
         error.
 
         Args:
-            mime_type: MIME type offered by the data source
+            mime_type: Mime type offered by the data source
         """
 
         ...
@@ -10837,8 +12551,8 @@ class ext_data_control_source_v1:
             type over the passed file descriptor, then close it.
 
             Args:
-                mime_type: MIME type for the data
-                fd: file descriptor for the data
+                mime_type: Mime type for the data
+                fd: File descriptor for the data
             """
 
             ...
@@ -10886,8 +12600,8 @@ class ext_data_control_offer_v1:
         This request may happen multiple times for different MIME types.
 
         Args:
-            mime_type: MIME type desired by receiver
-            fd: file descriptor for data transfer
+            mime_type: Mime type desired by receiver
+            fd: File descriptor for data transfer
         """
 
         ...
@@ -10912,7 +12626,7 @@ class ext_data_control_offer_v1:
             One event per offered MIME type.
 
             Args:
-                mime_type: offered MIME type
+                mime_type: Offered mime type
             """
 
             ...
@@ -11090,7 +12804,7 @@ class ext_foreign_toplevel_handle_v1:
         @staticmethod
         def app_id(app_id: str) -> None:
             """
-            App_id change
+            `app_id` change
 
             The app id of the toplevel has changed.
 
@@ -11168,7 +12882,7 @@ class ext_idle_notifier_v1:
         soon as possible when the seat is inactive.
 
         Args:
-            timeout: minimum idle timeout in msec
+            timeout: Minimum idle timeout in msec
 
         Returns:
             ext_idle_notification_v1: The created object
@@ -11193,7 +12907,7 @@ class ext_idle_notifier_v1:
         soon as possible when the seat is inactive.
 
         Args:
-            timeout: minimum idle timeout in msec
+            timeout: Minimum idle timeout in msec
 
         Returns:
             ext_idle_notification_v1: The created object
@@ -11384,10 +13098,14 @@ class ext_image_copy_capture_manager_v1:
 
     class error(Enum):
         invalid_option: int
+        """Invalid option flag"""
+
 
 
     class options(IntFlag):
         paint_cursors: int
+        """Paint cursors onto captured frames"""
+
 
 
     @staticmethod
@@ -11462,6 +13180,8 @@ class ext_image_copy_capture_session_v1:
 
     class error(Enum):
         duplicate_frame: int
+        """`create_frame` sent before destroying previous frame"""
+
 
 
     @staticmethod
@@ -11506,8 +13226,8 @@ class ext_image_copy_capture_session_v1:
             The client must attach buffers that match this size.
 
             Args:
-                width: buffer width
-                height: buffer height
+                width: Buffer width
+                height: Buffer height
             """
 
             ...
@@ -11523,7 +13243,7 @@ class ext_image_copy_capture_session_v1:
             choose any given format.
 
             Args:
-                format: shm format
+                format: Shm format
             """
 
             ...
@@ -11542,7 +13262,7 @@ class ext_image_copy_capture_session_v1:
             by comparing the dev_t value.
 
             Args:
-                device: device dev_t value
+                device: Device `dev_t` value
             """
 
             ...
@@ -11561,8 +13281,8 @@ class ext_image_copy_capture_session_v1:
             choose any given format.
 
             Args:
-                format: drm format code
-                modifiers: drm format modifiers
+                format: Drm format code
+                modifiers: Drm format modifiers
             """
 
             ...
@@ -11617,14 +13337,36 @@ class ext_image_copy_capture_frame_v1:
 
     class error(Enum):
         no_buffer: int
+        """Capture sent without `attach_buffer`"""
+
         invalid_buffer_damage: int
+        """Invalid buffer damage"""
+
         already_captured: int
+        """Capture request has been sent"""
+
 
 
     class failure_reason(Enum):
         unknown: int
+        """
+        Unknown runtime error
+        An unspecified runtime error has occurred. The client may retry.
+        """
+
         buffer_constraints: int
+        """
+        Buffer constraints mismatch
+        The buffer submitted by the client doesn't match the latest session
+        constraints. The client should re-allocate its buffers and retry.
+        """
+
         stopped: int
+        """
+        Session is no longer available
+        The session has stopped. See ext_image_copy_capture_session_v1.stopped.
+        """
+
 
 
     @staticmethod
@@ -11683,10 +13425,10 @@ class ext_image_copy_capture_frame_v1:
         already_captured protocol error is raised.
 
         Args:
-            x: region x coordinate
-            y: region y coordinate
-            width: region width
-            height: region height
+            x: Region x coordinate
+            y: Region y coordinate
+            width: Region width
+            height: Region height
         """
 
         ...
@@ -11736,10 +13478,10 @@ class ext_image_copy_capture_frame_v1:
             These coordinates originate in the upper left corner of the buffer.
 
             Args:
-                x: damage x coordinate
-                y: damage y coordinate
-                width: damage width
-                height: damage height
+                x: Damage x coordinate
+                y: Damage y coordinate
+                width: Damage width
+                height: Damage height
             """
 
             ...
@@ -11760,9 +13502,9 @@ class ext_image_copy_capture_frame_v1:
             for valid timestamps tv_nsec must be in [0, 999999999].
 
             Args:
-                tv_sec_hi: high 32 bits of the seconds part of the timestamp
-                tv_sec_lo: low 32 bits of the seconds part of the timestamp
-                tv_nsec: nanoseconds part of the timestamp
+                tv_sec_hi: High 32 bits of the seconds part of the timestamp
+                tv_sec_lo: Low 32 bits of the seconds part of the timestamp
+                tv_nsec: Nanoseconds part of the timestamp
             """
 
             ...
@@ -11806,6 +13548,8 @@ class ext_image_copy_capture_cursor_session_v1:
 
     class error(Enum):
         duplicate_session: int
+        """`get_capture_session` sent twice"""
+
 
 
     @staticmethod
@@ -11884,8 +13628,8 @@ class ext_image_copy_capture_cursor_session_v1:
             main buffer size.
 
             Args:
-                x: position x coordinates
-                y: position y coordinates
+                x: Position x coordinates
+                y: Position y coordinates
             """
 
             ...
@@ -11907,8 +13651,8 @@ class ext_image_copy_capture_cursor_session_v1:
             Compositors may delay this event until the client captures a new frame.
 
             Args:
-                x: hotspot x coordinates
-                y: hotspot y coordinates
+                x: Hotspot x coordinates
+                y: Hotspot y coordinates
             """
 
             ...
@@ -12009,10 +13753,20 @@ class ext_session_lock_v1:
 
     class error(Enum):
         invalid_destroy: int
+        """Attempted to destroy session lock while locked"""
+
         invalid_unlock: int
+        """Unlock requested but locked event was never sent"""
+
         role: int
+        """Given `wl_surface` already has a role"""
+
         duplicate_output: int
+        """Given output already has a lock surface"""
+
         already_constructed: int
+        """Given `wl_surface` has a buffer attached or committed"""
+
 
 
     @staticmethod
@@ -12163,9 +13917,17 @@ class ext_session_lock_surface_v1:
 
     class error(Enum):
         commit_before_first_ack: int
+        """Surface committed before first `ack_configure` request"""
+
         null_buffer: int
+        """Surface committed with a null buffer"""
+
         dimensions_mismatch: int
+        """Failed to match ack'd width/height"""
+
         invalid_serial: int
+        """Serial provided in `ack_configure` is invalid"""
+
 
 
     @staticmethod
@@ -12217,7 +13979,7 @@ class ext_session_lock_surface_v1:
         event acked for a given lock surface.
 
         Args:
-            serial: serial from the configure event
+            serial: Serial from the configure event
         """
 
         ...
@@ -12236,7 +13998,7 @@ class ext_session_lock_surface_v1:
             commit after acking a configure is a protocol error.
 
             Args:
-                serial: serial for use in ack_configure
+                serial: Serial for use in `ack_configure`
             """
 
             ...
@@ -12450,7 +14212,7 @@ class ext_workspace_manager_v1:
         @staticmethod
         def finished() -> None:
             """
-            The compositor has finished with the workspace_manager
+            The compositor has finished with the `workspace_manager`
 
             This event indicates that the compositor is done sending events to the
             ext_workspace_manager_v1. The server will destroy the object
@@ -12480,6 +14242,8 @@ class ext_workspace_group_handle_v1:
 
     class group_capabilities(IntFlag):
         create_workspace: int
+        """`create_workspace` request is available"""
+
 
 
     @staticmethod
@@ -12531,7 +14295,7 @@ class ext_workspace_group_handle_v1:
             must send this event again.
 
             Args:
-                capabilities: capabilities
+                capabilities: Capabilities
             """
 
             ...
@@ -12623,16 +14387,41 @@ class ext_workspace_handle_v1:
     version = 1
 
     class state(IntFlag):
+        """
+        Types of states on the workspace
+
+        The different states that a workspace can have.
+        """
+
         active: int
+        """The workspace is active"""
+
         urgent: int
+        """The workspace requests attention"""
+
         hidden: int
+        """
+        The workspace is not visible
+        The workspace is not visible in its workspace group, and clients
+        attempting to visualize the compositor workspace state should not
+        display such workspaces.
+        """
+
 
 
     class workspace_capabilities(IntFlag):
         activate: int
+        """Activate request is available"""
+
         deactivate: int
+        """Deactivate request is available"""
+
         remove: int
+        """Remove request is available"""
+
         assign: int
+        """Assign request is available"""
+
 
 
     @staticmethod
@@ -12799,7 +14588,7 @@ class ext_workspace_handle_v1:
             must send this event again.
 
             Args:
-                capabilities: capabilities
+                capabilities: Capabilities
             """
 
             ...
@@ -12842,7 +14631,16 @@ class wp_fifo_manager_v1:
     version = 1
 
     class error(Enum):
+        """
+        Fatal presentation error
+
+        These fatal protocol errors may be emitted in response to
+        illegal requests.
+        """
+
         already_exists: int
+        """Fifo manager already exists for surface"""
+
 
 
     @staticmethod
@@ -12888,7 +14686,16 @@ class wp_fifo_v1:
     version = 1
 
     class error(Enum):
+        """
+        Fatal error
+
+        These fatal protocol errors may be emitted in response to
+        illegal requests.
+        """
+
         surface_destroyed: int
+        """The associated surface no longer exists"""
+
 
 
     @staticmethod
@@ -12968,6 +14775,8 @@ class wp_fractional_scale_manager_v1:
 
     class error(Enum):
         fractional_scale_exists: int
+        """The surface already has a `fractional_scale` object associated"""
+
 
 
     @staticmethod
@@ -12993,7 +14802,7 @@ class wp_fractional_scale_manager_v1:
         protocol error is raised.
 
         Args:
-            surface: the surface
+            surface: The surface
 
         Returns:
             wp_fractional_scale_v1: The created object
@@ -13003,7 +14812,7 @@ class wp_fractional_scale_manager_v1:
 
 class wp_fractional_scale_v1:
     """
-    Fractional scale interface to a wl_surface
+    Fractional scale interface to a `wl_surface`
 
     An additional interface to a wl_surface object which allows the compositor
     to inform the client of the preferred scale.
@@ -13035,7 +14844,7 @@ class wp_fractional_scale_v1:
             The sent scale is the numerator of a fraction with a denominator of 120.
 
             Args:
-                scale: the new preferred scale
+                scale: The new preferred scale
             """
 
             ...
@@ -13054,7 +14863,11 @@ class wp_linux_drm_syncobj_manager_v1:
 
     class error(Enum):
         surface_exists: int
+        """The surface already has a synchronization object associated"""
+
         invalid_timeline: int
+        """The timeline object could not be imported"""
+
 
 
     @staticmethod
@@ -13086,7 +14899,7 @@ class wp_linux_drm_syncobj_manager_v1:
         to avoid raising a surface_exists protocol error.
 
         Args:
-            surface: the surface
+            surface: The surface
 
         Returns:
             wp_linux_drm_syncobj_surface_v1: The created object
@@ -13104,7 +14917,7 @@ class wp_linux_drm_syncobj_manager_v1:
         If the FD cannot be imported, the invalid_timeline error is raised.
 
         Args:
-            fd: drm_syncobj file descriptor
+            fd: `drm_syncobj` file descriptor
 
         Returns:
             wp_linux_drm_syncobj_timeline_v1: The created object
@@ -13170,11 +14983,23 @@ class wp_linux_drm_syncobj_surface_v1:
 
     class error(Enum):
         no_surface: int
+        """The associated `wl_surface` was destroyed"""
+
         unsupported_buffer: int
+        """The buffer does not support explicit synchronization"""
+
         no_buffer: int
+        """No buffer was attached"""
+
         no_acquire_point: int
+        """No acquire timeline point was set"""
+
         no_release_point: int
+        """No release timeline point was set"""
+
         conflicting_points: int
+        """Acquire and release timeline points are in conflict"""
+
 
 
     @staticmethod
@@ -13221,8 +15046,8 @@ class wp_linux_drm_syncobj_surface_v1:
         raised.
 
         Args:
-            point_hi: high 32 bits of the point value
-            point_lo: low 32 bits of the point value
+            point_hi: High 32 bits of the point value
+            point_lo: Low 32 bits of the point value
         """
 
         ...
@@ -13277,8 +15102,8 @@ class wp_linux_drm_syncobj_surface_v1:
         raised.
 
         Args:
-            point_hi: high 32 bits of the point value
-            point_lo: low 32 bits of the point value
+            point_hi: High 32 bits of the point value
+            point_lo: Low 32 bits of the point value
         """
 
         ...
@@ -13331,9 +15156,9 @@ class wp_pointer_warp_v1:
         and does not have to be from the surface the pointer is warped to.
 
         Args:
-            surface: surface to position the pointer on
-            pointer: the pointer that should be repositioned
-            serial: serial number of the enter event
+            surface: Surface to position the pointer on
+            pointer: The pointer that should be repositioned
+            serial: Serial number of the enter event
         """
 
         ...
@@ -13366,7 +15191,11 @@ class wp_security_context_manager_v1:
 
     class error(Enum):
         invalid_listen_fd: int
+        """Listening socket fd is invalid"""
+
         nested: int
+        """Nested security contexts are forbidden"""
+
 
 
     @staticmethod
@@ -13402,8 +15231,8 @@ class wp_security_context_manager_v1:
         only valid operation on them.
 
         Args:
-            listen_fd: listening socket FD
-            close_fd: FD signaling when done
+            listen_fd: Listening socket fd
+            close_fd: Fd signaling when done
 
         Returns:
             wp_security_context_v1: The created object
@@ -13431,8 +15260,14 @@ class wp_security_context_v1:
 
     class error(Enum):
         already_used: int
+        """Security context has already been committed"""
+
         already_set: int
+        """Metadata has already been set"""
+
         invalid_metadata: int
+        """Metadata is invalid"""
+
 
 
     @staticmethod
@@ -13460,7 +15295,7 @@ class wp_security_context_v1:
         error is sent in this case.
 
         Args:
-            name: the sandbox engine name
+            name: The sandbox engine name
         """
 
         ...
@@ -13485,7 +15320,7 @@ class wp_security_context_v1:
         error is sent in this case.
 
         Args:
-            app_id: the application ID
+            app_id: The application id
         """
 
         ...
@@ -13508,7 +15343,7 @@ class wp_security_context_v1:
         error is sent in this case.
 
         Args:
-            instance_id: the instance ID
+            instance_id: The instance id
         """
 
         ...
@@ -13575,10 +15410,10 @@ class wp_single_pixel_buffer_manager_v1:
         - UINT32_MAX = 100% of the given color component
 
         Args:
-            r: value of the buffer's red channel
-            g: value of the buffer's green channel
-            b: value of the buffer's blue channel
-            a: value of the buffer's alpha channel
+            r: Value of the buffer's red channel
+            g: Value of the buffer's green channel
+            b: Value of the buffer's blue channel
+            a: Value of the buffer's alpha channel
 
         Returns:
             wl_buffer: The created object
@@ -13611,6 +15446,8 @@ class wp_tearing_control_manager_v1:
 
     class error(Enum):
         tearing_control_exists: int
+        """The surface already has a tearing object associated"""
+
 
 
     @staticmethod
@@ -13659,8 +15496,28 @@ class wp_tearing_control_v1:
     version = 1
 
     class presentation_hint(Enum):
+        """
+        Presentation hint values
+
+        This enum provides information for if submitted frames from the client
+        may be presented with tearing.
+        """
+
         vsync: int
+        """
+        Tearing-free presentation
+        The content of this surface is meant to be synchronized to the
+        vertical blanking period. This should not result in visible tearing
+        and may result in a delay before a surface commit is presented.
+        """
+
         async_: int
+        """
+        Asynchronous presentation
+        The content of this surface is meant to be presented with minimal
+        latency and tearing is acceptable.
+        """
+
 
 
     @staticmethod
@@ -13704,7 +15561,7 @@ class xdg_activation_v1:
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the xdg_activation object
+        Destroy the `xdg_activation` object
 
         Notify the compositor that the xdg_activation object will no longer be
         used.
@@ -13747,8 +15604,8 @@ class xdg_activation_v1:
         token is passed.
 
         Args:
-            token: the activation token of the initiating client
-            surface: the wl_surface to activate
+            token: The activation token of the initiating client
+            surface: The `wl_surface` to activate
         """
 
         ...
@@ -13771,6 +15628,8 @@ class xdg_activation_token_v1:
 
     class error(Enum):
         already_used: int
+        """The token has already been used previously"""
+
 
 
     @staticmethod
@@ -13792,8 +15651,8 @@ class xdg_activation_token_v1:
         Must be sent before commit. This information is optional.
 
         Args:
-            serial: the serial of the event that triggered the activation
-            seat: the wl_seat of the event
+            serial: The serial of the event that triggered the activation
+            seat: The `wl_seat` of the event
         """
 
         ...
@@ -13809,7 +15668,7 @@ class xdg_activation_token_v1:
         Must be sent before commit. This information is optional.
 
         Args:
-            app_id: the application id of the client being activated.
+            app_id: The application id of the client being activated.
         """
 
         ...
@@ -13828,7 +15687,7 @@ class xdg_activation_token_v1:
         Must be sent before commit. This information is optional.
 
         Args:
-            surface: the requesting surface
+            surface: The requesting surface
         """
 
         ...
@@ -13865,7 +15724,7 @@ class xdg_activation_token_v1:
             and notifies that the provider is done.
 
             Args:
-                token: the exported activation token
+                token: The exported activation token
             """
 
             ...
@@ -13891,6 +15750,8 @@ class xdg_wm_dialog_v1:
 
     class error(Enum):
         already_used: int
+        """The `xdg_toplevel` object has already been used to create a xdg_dialog_v1"""
+
 
 
     @staticmethod
@@ -14023,7 +15884,7 @@ class xdg_system_bell_v1:
                 extension for a toplevel like surface role.
 
         Args:
-            surface: associated surface
+            surface: Associated surface
         """
 
         ...
@@ -14071,6 +15932,8 @@ class xdg_toplevel_drag_manager_v1:
 
     class error(Enum):
         invalid_source: int
+        """`data_source` already used for toplevel drag"""
+
 
 
     @staticmethod
@@ -14088,7 +15951,7 @@ class xdg_toplevel_drag_manager_v1:
     @staticmethod
     def get_xdg_toplevel_drag(data_source: wl_data_source) -> xdg_toplevel_drag_v1:
         """
-        Get an xdg_toplevel_drag for a wl_data_source
+        Get an `xdg_toplevel_drag` for a `wl_data_source`
 
         Create an xdg_toplevel_drag for a drag and drop operation that is going
         to be started with data_source.
@@ -14108,15 +15971,17 @@ class xdg_toplevel_drag_manager_v1:
         ...
 
 class xdg_toplevel_drag_v1:
-    """
-    Object representing a toplevel move during a drag
-    """
+    """Object representing a toplevel move during a drag"""
     object_id = 0
     version = 1
 
     class error(Enum):
         toplevel_attached: int
+        """Valid toplevel already attached"""
+
         ongoing_drag: int
+        """Drag has not ended"""
+
 
 
     @staticmethod
@@ -14154,8 +16019,8 @@ class xdg_toplevel_drag_v1:
         error.
 
         Args:
-            x_offset: dragged surface x offset
-            y_offset: dragged surface y offset
+            x_offset: Dragged surface x offset
+            y_offset: Dragged surface y offset
         """
 
         ...
@@ -14223,7 +16088,7 @@ class xdg_toplevel_icon_manager_v1:
         assigned, the icon must be reset just like if 'icon' was null.
 
         Args:
-            toplevel: the toplevel to act on
+            toplevel: The toplevel to act on
         """
 
         ...
@@ -14248,7 +16113,7 @@ class xdg_toplevel_icon_manager_v1:
             'done' event, without any preceding 'icon_size' events.
 
             Args:
-                size: the edge size of the square icon in surface-local coordinates, e.g. 64
+                size: The edge size of the square icon in surface-local coordinates, e.g. 64
             """
 
             ...
@@ -14281,8 +16146,14 @@ class xdg_toplevel_icon_v1:
 
     class error(Enum):
         invalid_buffer: int
+        """The provided buffer does not satisfy requirements"""
+
         immutable: int
+        """The icon has already been assigned to a toplevel and must not be changed"""
+
         no_buffer: int
+        """The provided buffer has been destroyed before the toplevel icon"""
+
 
 
     @staticmethod
@@ -14352,7 +16223,7 @@ class xdg_toplevel_icon_v1:
         via 'set_icon', a 'immutable' error must be raised.
 
         Args:
-            scale: the scaling factor of the icon, e.g. 1
+            scale: The scaling factor of the icon, e.g. 1
         """
 
         ...
@@ -14409,7 +16280,7 @@ class xdg_toplevel_tag_manager_v1:
         for example if the purpose of the toplevel changes.
 
         Args:
-            tag: untranslated tag
+            tag: Untranslated tag
         """
 
         ...
@@ -14429,7 +16300,7 @@ class xdg_toplevel_tag_manager_v1:
         well, for example if the purpose of the toplevel changes.
 
         Args:
-            description: translated description
+            description: Translated description
         """
 
         ...
@@ -14459,6 +16330,8 @@ class xwayland_shell_v1:
 
     class error(Enum):
         role: int
+        """Given `wl_surface` has another role"""
+
 
 
     @staticmethod
@@ -14476,7 +16349,7 @@ class xwayland_shell_v1:
     @staticmethod
     def get_xwayland_surface(surface: wl_surface) -> xwayland_surface_v1:
         """
-        Assign the xwayland_surface surface role
+        Assign the `xwayland_surface` surface role
 
         Create an xwayland_surface_v1 interface for a given wl_surface
         object and gives it the xwayland_surface role.
@@ -14496,7 +16369,7 @@ class xwayland_shell_v1:
 
 class xwayland_surface_v1:
     """
-    Interface for associating xwayland windows to wl_surfaces
+    Interface for associating xwayland windows to `wl_surfaces`
 
     An Xwayland surface is a surface managed by an Xwayland server.
     It is used for associating surfaces to Xwayland windows.
@@ -14512,13 +16385,17 @@ class xwayland_surface_v1:
 
     class error(Enum):
         already_associated: int
+        """Given `wl_surface` is already associated with an x11 window"""
+
         invalid_serial: int
+        """Serial was not valid"""
+
 
 
     @staticmethod
     def set_serial(serial_lo: int, serial_hi: int) -> None:
         """
-        Associates a xwayland window to a wl_surface
+        Associates a xwayland window to a `wl_surface`
 
         Associates an Xwayland window to a wl_surface.
         The association state is double-buffered, see wl_surface.commit.
@@ -14543,8 +16420,8 @@ class xwayland_surface_v1:
         otherwise the `already_associated` protocol error will be raised.
 
         Args:
-            serial_lo: The lower 32-bits of the serial number associated with the X11 window
-            serial_hi: The upper 32-bits of the serial number associated with the X11 window
+            serial_lo: The lower 32-bits of the serial number associated with the x11 window
+            serial_hi: The upper 32-bits of the serial number associated with the x11 window
         """
 
         ...
@@ -14603,27 +16480,85 @@ class zwp_fullscreen_shell_v1:
     version = 1
 
     class capability(Enum):
+        """
+        Capabilities advertised by the compositor
+
+        Various capabilities that can be advertised by the compositor.  They
+        are advertised one-at-a-time when the wl_fullscreen_shell interface is
+        bound.  See the wl_fullscreen_shell.capability event for more details.
+
+        ARBITRARY_MODES:
+        This is a hint to the client that indicates that the compositor is
+        capable of setting practically any mode on its outputs.  If this
+        capability is provided, wl_fullscreen_shell.present_surface_for_mode
+        will almost never fail and clients should feel free to set whatever
+        mode they like.  If the compositor does not advertise this, it may
+        still support some modes that are not advertised through wl_global.mode
+        but it is less likely.
+
+        CURSOR_PLANE:
+        This is a hint to the client that indicates that the compositor can
+        handle a cursor surface from the client without actually compositing.
+        This may be because of a hardware cursor plane or some other mechanism.
+        If the compositor does not advertise this capability then setting
+        wl_pointer.cursor may degrade performance or be ignored entirely.  If
+        CURSOR_PLANE is not advertised, it is recommended that the client draw
+        its own cursor and set wl_pointer.cursor(NULL).
+        """
+
         arbitrary_modes: int
+        """Compositor is capable of almost any output mode"""
+
         cursor_plane: int
+        """Compositor has a separate cursor plane"""
+
 
 
     class present_method(Enum):
+        """
+        Different method to set the surface fullscreen
+
+        Hints to indicate to the compositor how to deal with a conflict
+        between the dimensions of the surface and the dimensions of the
+        output. The compositor is free to ignore this parameter.
+        """
+
         default: int
+        """No preference, apply default policy"""
+
         center: int
+        """Center the surface on the output"""
+
         zoom: int
+        """Scale the surface, preserving aspect ratio, to the largest size that will fit on the output"""
+
         zoom_crop: int
+        """Scale the surface, preserving aspect ratio, to fully fill the output cropping if needed"""
+
         stretch: int
+        """Scale the surface to the size of the output ignoring aspect ratio"""
+
 
 
     class error(Enum):
+        """
+        `wl_fullscreen_shell` error values
+
+        These errors can be emitted in response to wl_fullscreen_shell requests.
+        """
+
         invalid_method: int
+        """`present_method` is not known"""
+
         role: int
+        """Given `wl_surface` has another role"""
+
 
 
     @staticmethod
     def release() -> None:
         """
-        Release the wl_fullscreen_shell interface
+        Release the `wl_fullscreen_shell` interface
 
         Release the binding from the wl_fullscreen_shell interface.
 
@@ -14736,9 +16671,7 @@ class zwp_fullscreen_shell_v1:
             ...
 
 class zwp_fullscreen_shell_mode_feedback_v1:
-    """
-
-    """
+    """"""
     object_id = 0
     version = 1
 
@@ -14829,7 +16762,7 @@ class zwp_idle_inhibit_manager_v1:
         Create a new inhibitor object associated with the given surface.
 
         Args:
-            surface: the surface that inhibits the idle behavior
+            surface: The surface that inhibits the idle behavior
 
         Returns:
             zwp_idle_inhibitor_v1: The created object
@@ -14902,9 +16835,7 @@ class zwp_input_method_context_v1:
 
     @staticmethod
     def destroy() -> None:
-        """
-
-        """
+        """"""
 
         ...
 
@@ -14924,7 +16855,7 @@ class zwp_input_method_context_v1:
         Any previously set composing text will be removed.
 
         Args:
-            serial: serial of the latest known text input state
+            serial: Serial of the latest known text input state
         """
 
         ...
@@ -14943,7 +16874,7 @@ class zwp_input_method_context_v1:
         processed by the text_input.
 
         Args:
-            serial: serial of the latest known text input state
+            serial: Serial of the latest known text input state
         """
 
         ...
@@ -15012,9 +16943,7 @@ class zwp_input_method_context_v1:
 
     @staticmethod
     def modifiers_map(map: list) -> None:
-        """
-
-        """
+        """"""
 
         ...
 
@@ -15029,7 +16958,7 @@ class zwp_input_method_context_v1:
         event convention. Sym is an XKB keysym, state is a wl_keyboard key_state.
 
         Args:
-            serial: serial of the latest known text input state
+            serial: Serial of the latest known text input state
         """
 
         ...
@@ -15063,10 +16992,10 @@ class zwp_input_method_context_v1:
         For generating custom key events use the keysym request instead.
 
         Args:
-            serial: serial from wl_keyboard::key
-            time: time from wl_keyboard::key
-            key: key from wl_keyboard::key
-            state: state from wl_keyboard::key
+            serial: Serial from `wl_keyboard`::key
+            time: Time from `wl_keyboard`::key
+            key: Key from `wl_keyboard`::key
+            state: State from `wl_keyboard`::key
         """
 
         ...
@@ -15082,11 +17011,11 @@ class zwp_input_method_context_v1:
         from the wl_keyboard::modifiers event.
 
         Args:
-            serial: serial from wl_keyboard::modifiers
-            mods_depressed: mods_depressed from wl_keyboard::modifiers
-            mods_latched: mods_latched from wl_keyboard::modifiers
-            mods_locked: mods_locked from wl_keyboard::modifiers
-            group: group from wl_keyboard::modifiers
+            serial: Serial from `wl_keyboard`::modifiers
+            mods_depressed: `mods_depressed` from `wl_keyboard`::modifiers
+            mods_latched: `mods_latched` from `wl_keyboard`::modifiers
+            mods_locked: `mods_locked` from `wl_keyboard`::modifiers
+            group: Group from `wl_keyboard`::modifiers
         """
 
         ...
@@ -15096,7 +17025,7 @@ class zwp_input_method_context_v1:
         """
 
         Args:
-            serial: serial of the latest known text input state
+            serial: Serial of the latest known text input state
         """
 
         ...
@@ -15106,7 +17035,7 @@ class zwp_input_method_context_v1:
         """
 
         Args:
-            serial: serial of the latest known text input state
+            serial: Serial of the latest known text input state
         """
 
         ...
@@ -15128,25 +17057,19 @@ class zwp_input_method_context_v1:
 
         @staticmethod
         def reset() -> None:
-            """
-
-            """
+            """"""
 
             ...
 
         @staticmethod
         def content_type(hint: int, purpose: int) -> None:
-            """
-
-            """
+            """"""
 
             ...
 
         @staticmethod
         def invoke_action(button: int, index: int) -> None:
-            """
-
-            """
+            """"""
 
             ...
 
@@ -15155,16 +17078,14 @@ class zwp_input_method_context_v1:
             """
 
             Args:
-                serial: serial of text input state
+                serial: Serial of text input state
             """
 
             ...
 
         @staticmethod
         def preferred_language(language: str) -> None:
-            """
-
-            """
+            """"""
 
             ...
 
@@ -15227,9 +17148,7 @@ class zwp_input_panel_v1:
         ...
 
 class zwp_input_panel_surface_v1:
-    """
-
-    """
+    """"""
     object_id = 0
     version = 1
 
@@ -15300,7 +17219,7 @@ class zwp_input_timestamps_manager_v1:
         by calling zwp_input_timestamps_v1.destroy.
 
         Args:
-            keyboard: the wl_keyboard object for which to get timestamp events
+            keyboard: The `wl_keyboard` object for which to get timestamp events
 
         Returns:
             zwp_input_timestamps_v1: The created object
@@ -15323,7 +17242,7 @@ class zwp_input_timestamps_manager_v1:
         by calling zwp_input_timestamps_v1.destroy.
 
         Args:
-            pointer: the wl_pointer object for which to get timestamp events
+            pointer: The `wl_pointer` object for which to get timestamp events
 
         Returns:
             zwp_input_timestamps_v1: The created object
@@ -15346,7 +17265,7 @@ class zwp_input_timestamps_manager_v1:
         by calling zwp_input_timestamps_v1.destroy.
 
         Args:
-            touch: the wl_touch object for which to get timestamp events
+            touch: The `wl_touch` object for which to get timestamp events
 
         Returns:
             zwp_input_timestamps_v1: The created object
@@ -15400,16 +17319,16 @@ class zwp_input_timestamps_v1:
             for valid timestamps tv_nsec must be in [0, 999999999].
 
             Args:
-                tv_sec_hi: high 32 bits of the seconds part of the timestamp
-                tv_sec_lo: low 32 bits of the seconds part of the timestamp
-                tv_nsec: nanoseconds part of the timestamp
+                tv_sec_hi: High 32 bits of the seconds part of the timestamp
+                tv_sec_lo: Low 32 bits of the seconds part of the timestamp
+                tv_nsec: Nanoseconds part of the timestamp
             """
 
             ...
 
 class zwp_keyboard_shortcuts_inhibit_manager_v1:
     """
-    Context object for keyboard grab_manager
+    Context object for keyboard `grab_manager`
 
     A global interface used for inhibiting the compositor keyboard shortcuts.
     """
@@ -15418,6 +17337,8 @@ class zwp_keyboard_shortcuts_inhibit_manager_v1:
 
     class error(Enum):
         already_inhibited: int
+        """The shortcuts are already inhibited for this surface"""
+
 
 
     @staticmethod
@@ -15442,8 +17363,8 @@ class zwp_keyboard_shortcuts_inhibit_manager_v1:
         a protocol error "already_inhibited" is raised by the compositor.
 
         Args:
-            surface: the surface that inhibits the keyboard shortcuts behavior
-            seat: the wl_seat for which keyboard shortcuts should be disabled
+            surface: The surface that inhibits the keyboard shortcuts behavior
+            seat: The `wl_seat` for which keyboard shortcuts should be disabled
 
         Returns:
             zwp_keyboard_shortcuts_inhibitor_v1: The created object
@@ -15563,6 +17484,8 @@ class zwp_linux_explicit_synchronization_v1:
 
     class error(Enum):
         synchronization_exists: int
+        """The surface already has a synchronization object associated"""
+
 
 
     @staticmethod
@@ -15595,7 +17518,7 @@ class zwp_linux_explicit_synchronization_v1:
         to avoid raising a synchronization_exists protocol error.
 
         Args:
-            surface: the surface
+            surface: The surface
 
         Returns:
             zwp_linux_surface_synchronization_v1: The created object
@@ -15643,11 +17566,23 @@ class zwp_linux_surface_synchronization_v1:
 
     class error(Enum):
         invalid_fence: int
+        """The fence specified by the client could not be imported"""
+
         duplicate_fence: int
+        """Multiple fences added for a single surface commit"""
+
         duplicate_release: int
+        """Multiple releases added for a single surface commit"""
+
         no_surface: int
+        """The associated `wl_surface` was destroyed"""
+
         unsupported_buffer: int
+        """The buffer does not support explicit synchronization"""
+
         no_buffer: int
+        """No buffer was attached"""
+
 
 
     @staticmethod
@@ -15697,7 +17632,7 @@ class zwp_linux_surface_synchronization_v1:
         error is raised.
 
         Args:
-            fd: acquire fence fd
+            fd: Acquire fence fd
         """
 
         ...
@@ -15777,7 +17712,7 @@ class zwp_linux_buffer_release_v1:
             This event destroys the zwp_linux_buffer_release_v1 object.
 
             Args:
-                fence: fence for last operation on buffer
+                fence: Fence for last operation on buffer
             """
 
             ...
@@ -15824,12 +17759,45 @@ class zwp_pointer_constraints_v1:
     version = 1
 
     class error(Enum):
+        """
+        `wp_pointer_constraints` error values
+
+        These errors can be emitted in response to wp_pointer_constraints
+        requests.
+        """
+
         already_constrained: int
+        """Pointer constraint already requested on that surface"""
+
 
 
     class lifetime(Enum):
+        """
+        Constraint lifetime
+
+        These values represent different lifetime semantics. They are passed
+        as arguments to the factory requests to specify how the constraint
+        lifetimes should be managed.
+        """
+
         oneshot: int
+        """
+        The pointer constraint is defunct once deactivated
+        A oneshot pointer constraint will never reactivate once it has been
+        deactivated. See the corresponding deactivation event
+        (wp_locked_pointer.unlocked and wp_confined_pointer.unconfined) for
+        details.
+        """
+
         persistent: int
+        """
+        The pointer constraint may reactivate
+        A persistent pointer constraint may again reactivate once it has
+        been deactivated. See the corresponding deactivation event
+        (wp_locked_pointer.unlocked and wp_confined_pointer.unconfined) for
+        details.
+        """
+
 
 
     @staticmethod
@@ -15884,10 +17852,10 @@ class zwp_pointer_constraints_v1:
         are unaffected.
 
         Args:
-            surface: surface to lock pointer to
-            pointer: the pointer that should be locked
-            region: region of surface
-            lifetime: lock lifetime
+            surface: Surface to lock pointer to
+            pointer: The pointer that should be locked
+            region: Region of surface
+            lifetime: Lock lifetime
 
         Returns:
             zwp_locked_pointer_v1: The created object
@@ -15919,10 +17887,10 @@ class zwp_pointer_constraints_v1:
         information.
 
         Args:
-            surface: surface to lock pointer to
-            pointer: the pointer that should be confined
-            region: region of surface
-            lifetime: confinement lifetime
+            surface: Surface to lock pointer to
+            pointer: The pointer that should be confined
+            region: Region of surface
+            lifetime: Confinement lifetime
 
         Returns:
             zwp_confined_pointer_v1: The created object
@@ -15990,8 +17958,8 @@ class zwp_locked_pointer_v1:
         wl_surface.commit.
 
         Args:
-            surface_x: surface-local x coordinate
-            surface_y: surface-local y coordinate
+            surface_x: Surface-local x coordinate
+            surface_y: Surface-local y coordinate
         """
 
         ...
@@ -16008,7 +17976,7 @@ class zwp_locked_pointer_v1:
         For details about the lock region, see wp_locked_pointer.
 
         Args:
-            region: region of surface
+            region: Region of surface
         """
 
         ...
@@ -16096,7 +18064,7 @@ class zwp_confined_pointer_v1:
         For details about the confine region, see wp_confined_pointer.
 
         Args:
-            region: region of surface
+            region: Region of surface
         """
 
         ...
@@ -16232,9 +18200,7 @@ class zwp_pointer_gesture_swipe_v1:
 
     @staticmethod
     def destroy() -> None:
-        """
-        Destroy the pointer swipe gesture object
-        """
+        """Destroy the pointer swipe gesture object"""
 
         ...
 
@@ -16248,8 +18214,8 @@ class zwp_pointer_gesture_swipe_v1:
             on the device.
 
             Args:
-                time: timestamp with millisecond granularity
-                fingers: number of fingers
+                time: Timestamp with millisecond granularity
+                fingers: Number of fingers
             """
 
             ...
@@ -16266,9 +18232,9 @@ class zwp_pointer_gesture_swipe_v1:
             center of the gesture compared to the previous event.
 
             Args:
-                time: timestamp with millisecond granularity
-                dx: delta x coordinate in surface coordinate space
-                dy: delta y coordinate in surface coordinate space
+                time: Timestamp with millisecond granularity
+                dx: Delta x coordinate in surface coordinate space
+                dy: Delta y coordinate in surface coordinate space
             """
 
             ...
@@ -16287,7 +18253,7 @@ class zwp_pointer_gesture_swipe_v1:
             implementation-dependent.
 
             Args:
-                time: timestamp with millisecond granularity
+                time: Timestamp with millisecond granularity
                 cancelled: 1 if the gesture was cancelled, 0 otherwise
             """
 
@@ -16319,9 +18285,7 @@ class zwp_pointer_gesture_pinch_v1:
 
     @staticmethod
     def destroy() -> None:
-        """
-        Destroy the pinch gesture object
-        """
+        """Destroy the pinch gesture object"""
 
         ...
 
@@ -16335,8 +18299,8 @@ class zwp_pointer_gesture_pinch_v1:
             on the device.
 
             Args:
-                time: timestamp with millisecond granularity
-                fingers: number of fingers
+                time: Timestamp with millisecond granularity
+                fingers: Number of fingers
             """
 
             ...
@@ -16360,11 +18324,11 @@ class zwp_pointer_gesture_pinch_v1:
             pointer_gesture_pinch.begin or pointer_gesture_pinch.update event.
 
             Args:
-                time: timestamp with millisecond granularity
-                dx: delta x coordinate in surface coordinate space
-                dy: delta y coordinate in surface coordinate space
-                scale: scale relative to the initial finger position
-                rotation: angle in degrees cw relative to the previous event
+                time: Timestamp with millisecond granularity
+                dx: Delta x coordinate in surface coordinate space
+                dy: Delta y coordinate in surface coordinate space
+                scale: Scale relative to the initial finger position
+                rotation: Angle in degrees cw relative to the previous event
             """
 
             ...
@@ -16383,7 +18347,7 @@ class zwp_pointer_gesture_pinch_v1:
             implementation-dependent.
 
             Args:
-                time: timestamp with millisecond granularity
+                time: Timestamp with millisecond granularity
                 cancelled: 1 if the gesture was cancelled, 0 otherwise
             """
 
@@ -16417,9 +18381,7 @@ class zwp_pointer_gesture_hold_v1:
 
     @staticmethod
     def destroy() -> None:
-        """
-        Destroy the hold gesture object
-        """
+        """Destroy the hold gesture object"""
 
         ...
 
@@ -16432,8 +18394,8 @@ class zwp_pointer_gesture_hold_v1:
             This event is sent when a hold gesture is detected on the device.
 
             Args:
-                time: timestamp with millisecond granularity
-                fingers: number of fingers
+                time: Timestamp with millisecond granularity
+                fingers: Number of fingers
             """
 
             ...
@@ -16454,7 +18416,7 @@ class zwp_pointer_gesture_hold_v1:
             implementation-dependent.
 
             Args:
-                time: timestamp with millisecond granularity
+                time: Timestamp with millisecond granularity
                 cancelled: 1 if the gesture was cancelled, 0 otherwise
             """
 
@@ -16510,9 +18472,7 @@ class zwp_primary_selection_device_manager_v1:
         ...
 
 class zwp_primary_selection_device_v1:
-    """
-
-    """
+    """"""
     object_id = 0
     version = 1
 
@@ -16528,7 +18488,7 @@ class zwp_primary_selection_device_v1:
         To unset the selection, set the source to NULL.
 
         Args:
-            serial: serial of the event that triggered this request
+            serial: Serial of the event that triggered this request
         """
 
         ...
@@ -16547,7 +18507,7 @@ class zwp_primary_selection_device_v1:
         @staticmethod
         def data_offer(offer: zwp_primary_selection_offer_v1) -> None:
             """
-            Introduce a new wp_primary_selection_offer
+            Introduce a new `wp_primary_selection_offer`
 
             Introduces a new wp_primary_selection_offer object that may be used
             to receive the current primary selection. Immediately following this
@@ -16740,9 +18700,7 @@ class zwp_relative_pointer_v1:
 
     @staticmethod
     def destroy() -> None:
-        """
-        Release the relative pointer object
-        """
+        """Release the relative pointer object"""
 
         ...
 
@@ -16784,12 +18742,12 @@ class zwp_relative_pointer_v1:
             object is associated with.
 
             Args:
-                utime_hi: high 32 bits of a 64 bit timestamp with microsecond granularity
-                utime_lo: low 32 bits of a 64 bit timestamp with microsecond granularity
-                dx: the x component of the motion vector
-                dy: the y component of the motion vector
-                dx_unaccel: the x component of the unaccelerated motion vector
-                dy_unaccel: the y component of the unaccelerated motion vector
+                utime_hi: High 32 bits of a 64 bit timestamp with microsecond granularity
+                utime_lo: Low 32 bits of a 64 bit timestamp with microsecond granularity
+                dx: The x component of the motion vector
+                dy: The y component of the motion vector
+                dx_unaccel: The x component of the unaccelerated motion vector
+                dy_unaccel: The y component of the unaccelerated motion vector
             """
 
             ...
@@ -16815,7 +18773,7 @@ class zwp_tablet_manager_v1:
         provides access to all graphics tablets in this seat.
 
         Args:
-            seat: The wl_seat object to retrieve the tablets for
+            seat: The `wl_seat` object to retrieve the tablets for
 
         Returns:
             zwp_tablet_seat_v1: The created object
@@ -16869,7 +18827,7 @@ class zwp_tablet_seat_v1:
             sent through the wp_tablet interface.
 
             Args:
-                id: the newly added graphics tablet
+                id: The newly added graphics tablet
             """
 
             ...
@@ -16885,7 +18843,7 @@ class zwp_tablet_seat_v1:
             type, etc.) is sent through the wp_tablet_tool interface.
 
             Args:
-                id: the newly added tablet tool
+                id: The newly added tablet tool
             """
 
             ...
@@ -16919,32 +18877,95 @@ class zwp_tablet_tool_v1:
     version = 1
 
     class type(Enum):
+        """
+        A physical tool type
+
+        Describes the physical type of a tool. The physical type of a tool
+        generally defines its base usage.
+
+        The mouse tool represents a mouse-shaped tool that is not a relative
+        device but bound to the tablet's surface, providing absolute
+        coordinates.
+
+        The lens tool is a mouse-shaped tool with an attached lens to
+        provide precision focus.
+        """
+
         pen: int
+        """Pen"""
+
         eraser: int
+        """Eraser"""
+
         brush: int
+        """Brush"""
+
         pencil: int
+        """Pencil"""
+
         airbrush: int
+        """Airbrush"""
+
         finger: int
+        """Finger"""
+
         mouse: int
+        """Mouse"""
+
         lens: int
+        """Lens"""
+
 
 
     class capability(Enum):
+        """
+        Capability flags for a tool
+
+        Describes extra capabilities on a tablet.
+
+        Any tool must provide x and y values, extra axes are
+        device-specific.
+        """
+
         tilt: int
+        """Tilt axes"""
+
         pressure: int
+        """Pressure axis"""
+
         distance: int
+        """Distance axis"""
+
         rotation: int
+        """Z-rotation axis"""
+
         slider: int
+        """Slider axis"""
+
         wheel: int
+        """Wheel axis"""
+
 
 
     class button_state(Enum):
+        """
+        Physical button state
+
+        Describes the physical state of a button that produced the button event.
+        """
+
         released: int
+        """Button is not pressed"""
+
         pressed: int
+        """Button is pressed"""
+
 
 
     class error(Enum):
         role: int
+        """Given `wl_surface` has another role"""
+
 
 
     @staticmethod
@@ -16986,9 +19007,9 @@ class zwp_tablet_tool_v1:
         seats.
 
         Args:
-            serial: serial of the enter event
-            hotspot_x: surface-local x coordinate
-            hotspot_y: surface-local y coordinate
+            serial: Serial of the enter event
+            hotspot_x: Surface-local x coordinate
+            hotspot_y: Surface-local y coordinate
         """
 
         ...
@@ -17016,7 +19037,7 @@ class zwp_tablet_tool_v1:
             wp_tablet_tool.done event.
 
             Args:
-                tool_type: the physical tool type
+                tool_type: The physical tool type
             """
 
             ...
@@ -17043,8 +19064,8 @@ class zwp_tablet_tool_v1:
             wp_tablet_tool.done event.
 
             Args:
-                hardware_serial_hi: the unique serial number of the tool, most significant bits
-                hardware_serial_lo: the unique serial number of the tool, least significant bits
+                hardware_serial_hi: The unique serial number of the tool, most significant bits
+                hardware_serial_lo: The unique serial number of the tool, least significant bits
             """
 
             ...
@@ -17066,8 +19087,8 @@ class zwp_tablet_tool_v1:
             wp_tablet_tool.done event.
 
             Args:
-                hardware_id_hi: the hardware id, most significant bits
-                hardware_id_lo: the hardware id, least significant bits
+                hardware_id_hi: The hardware id, most significant bits
+                hardware_id_lo: The hardware id, least significant bits
             """
 
             ...
@@ -17086,7 +19107,7 @@ class zwp_tablet_tool_v1:
             wp_tablet_tool.done event.
 
             Args:
-                capability: the capability
+                capability: The capability
             """
 
             ...
@@ -17223,8 +19244,8 @@ class zwp_tablet_tool_v1:
             Sent whenever a tablet tool moves.
 
             Args:
-                x: surface-local x coordinate
-                y: surface-local y coordinate
+                x: Surface-local x coordinate
+                y: Surface-local y coordinate
             """
 
             ...
@@ -17274,8 +19295,8 @@ class zwp_tablet_tool_v1:
             positive x or y axis.
 
             Args:
-                tilt_x: The current value of the X tilt axis
-                tilt_y: The current value of the Y tilt axis
+                tilt_x: The current value of the x tilt axis
+                tilt_y: The current value of the y tilt axis
             """
 
             ...
@@ -17290,7 +19311,7 @@ class zwp_tablet_tool_v1:
             logical neutral position.
 
             Args:
-                degrees: The current rotation of the Z axis
+                degrees: The current rotation of the z axis
             """
 
             ...
@@ -17409,7 +19430,7 @@ class zwp_tablet_v1:
             wp_tablet.done event.
 
             Args:
-                name: the device name
+                name: The device name
             """
 
             ...
@@ -17423,8 +19444,8 @@ class zwp_tablet_v1:
             wp_tablet.done event.
 
             Args:
-                vid: USB vendor id
-                pid: USB product id
+                vid: Usb vendor id
+                pid: Usb product id
             """
 
             ...
@@ -17450,7 +19471,7 @@ class zwp_tablet_v1:
             wp_tablet.done event.
 
             Args:
-                path: path to local device
+                path: Path to local device
             """
 
             ...
@@ -17520,40 +19541,113 @@ class zwp_text_input_v1:
     version = 1
 
     class content_hint(IntFlag):
+        """
+        Content hint
+
+        Content hint is a bitmask to allow to modify the behavior of the text
+        input.
+        """
+
         none: int
+        """No special behaviour"""
+
         default: int
+        """Auto completion, correction and capitalization"""
+
         password: int
+        """Hidden and sensitive text"""
+
         auto_completion: int
+        """Suggest word completions"""
+
         auto_correction: int
+        """Suggest word corrections"""
+
         auto_capitalization: int
+        """Switch to uppercase letters at the start of a sentence"""
+
         lowercase: int
+        """Prefer lowercase letters"""
+
         uppercase: int
+        """Prefer uppercase letters"""
+
         titlecase: int
+        """Prefer casing for titles and headings (can be language dependent)"""
+
         hidden_text: int
+        """Characters should be hidden"""
+
         sensitive_data: int
+        """Typed text should not be stored"""
+
         latin: int
+        """Just latin characters should be entered"""
+
         multiline: int
+        """The text input is multiline"""
+
 
 
     class content_purpose(Enum):
+        """
+        Content purpose
+
+        The content purpose allows to specify the primary purpose of a text
+        input.
+
+        This allows an input method to show special purpose input panels with
+        extra characters or to disallow some characters.
+        """
+
         normal: int
+        """Default input, allowing all characters"""
+
         alpha: int
+        """Allow only alphabetic characters"""
+
         digits: int
+        """Allow only digits"""
+
         number: int
+        """Input a number (including decimal separator and sign)"""
+
         phone: int
+        """Input a phone number"""
+
         url: int
+        """Input an url"""
+
         email: int
+        """Input an email address"""
+
         name: int
+        """Input a name of a person"""
+
         password: int
+        """Input a password (combine with password or `sensitive_data` hint)"""
+
         date: int
+        """Input a date"""
+
         time: int
+        """Input a time"""
+
         datetime: int
+        """Input a date and time"""
+
         terminal: int
+        """Input for a terminal"""
+
 
 
     class preedit_style(Enum):
         default: int
+        """Default style for composing text"""
+
         none: int
+        """Style should be the same as in non-composing text"""
+
         active: int
         inactive: int
         highlight: int
@@ -17564,8 +19658,14 @@ class zwp_text_input_v1:
 
     class text_direction(Enum):
         auto: int
+        """Automatic text direction based on text and language"""
+
         ltr: int
+        """Left-to-right"""
+
         rtl: int
+        """Right-to-left"""
+
 
 
     @staticmethod
@@ -17660,9 +19760,7 @@ class zwp_text_input_v1:
 
     @staticmethod
     def set_cursor_rectangle(x: int, y: int, width: int, height: int) -> None:
-        """
-
-        """
+        """"""
 
         ...
 
@@ -17687,16 +19785,14 @@ class zwp_text_input_v1:
         """
 
         Args:
-            serial: used to identify the known state
+            serial: Used to identify the known state
         """
 
         ...
 
     @staticmethod
     def invoke_action(button: int, index: int) -> None:
-        """
-
-        """
+        """"""
 
         ...
 
@@ -17762,7 +19858,7 @@ class zwp_text_input_v1:
             events occurring directly before preedit_string.
 
             Args:
-                serial: serial of the latest known text input state
+                serial: Serial of the latest known text input state
             """
 
             ...
@@ -17811,7 +19907,7 @@ class zwp_text_input_v1:
             Any previously set composing text should be removed.
 
             Args:
-                serial: serial of the latest known text input state
+                serial: Serial of the latest known text input state
             """
 
             ...
@@ -17859,7 +19955,7 @@ class zwp_text_input_v1:
             (where the modifier indices are set by the modifiers_map event)
 
             Args:
-                serial: serial of the latest known text input state
+                serial: Serial of the latest known text input state
             """
 
             ...
@@ -17873,7 +19969,7 @@ class zwp_text_input_v1:
             RFC-3066 format language tag.
 
             Args:
-                serial: serial of the latest known text input state
+                serial: Serial of the latest known text input state
             """
 
             ...
@@ -17890,7 +19986,7 @@ class zwp_text_input_v1:
             direction text is laid out properly.
 
             Args:
-                serial: serial of the latest known text input state
+                serial: Serial of the latest known text input state
             """
 
             ...
@@ -17953,45 +20049,122 @@ class zwp_text_input_v3:
     version = 1
 
     class change_cause(Enum):
+        """
+        Text change reason
+
+        Reason for the change of surrounding text or cursor posision.
+        """
+
         input_method: int
+        """Input method caused the change"""
+
         other: int
+        """Something else than the input method caused the change"""
+
 
 
     class content_hint(IntFlag):
+        """
+        Content hint
+
+        Content hint is a bitmask to allow to modify the behavior of the text
+        input.
+        """
+
         none: int
+        """No special behavior"""
+
         completion: int
+        """Suggest word completions"""
+
         spellcheck: int
+        """Suggest word corrections"""
+
         auto_capitalization: int
+        """Switch to uppercase letters at the start of a sentence"""
+
         lowercase: int
+        """Prefer lowercase letters"""
+
         uppercase: int
+        """Prefer uppercase letters"""
+
         titlecase: int
+        """Prefer casing for titles and headings (can be language dependent)"""
+
         hidden_text: int
+        """Characters should be hidden"""
+
         sensitive_data: int
+        """Typed text should not be stored"""
+
         latin: int
+        """Just latin characters should be entered"""
+
         multiline: int
+        """The text input is multiline"""
+
 
 
     class content_purpose(Enum):
+        """
+        Content purpose
+
+        The content purpose allows to specify the primary purpose of a text
+        input.
+
+        This allows an input method to show special purpose input panels with
+        extra characters or to disallow some characters.
+        """
+
         normal: int
+        """Default input, allowing all characters"""
+
         alpha: int
+        """Allow only alphabetic characters"""
+
         digits: int
+        """Allow only digits"""
+
         number: int
+        """Input a number (including decimal separator and sign)"""
+
         phone: int
+        """Input a phone number"""
+
         url: int
+        """Input an url"""
+
         email: int
+        """Input an email address"""
+
         name: int
+        """Input a name of a person"""
+
         password: int
+        """Input a password (combine with `sensitive_data` hint)"""
+
         pin: int
+        """Input is a numeric password (combine with `sensitive_data` hint)"""
+
         date: int
+        """Input a date"""
+
         time: int
+        """Input a time"""
+
         datetime: int
+        """Input a date and time"""
+
         terminal: int
+        """Input for a terminal"""
+
 
 
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the wp_text_input
+        Destroy the `wp_text_input`
 
         Destroy the wp_text_input object. Also disables all surfaces enabled
         through this wp_text_input object.
@@ -18294,8 +20467,8 @@ class zwp_text_input_v3:
             The initial values of both before_length and after_length are 0.
 
             Args:
-                before_length: length of text before current cursor position
-                after_length: length of text after current cursor position
+                before_length: Length of text before current cursor position
+                after_length: Length of text after current cursor position
             """
 
             ...
@@ -18349,7 +20522,7 @@ class zwp_text_input_manager_v3:
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the wp_text_input_manager
+        Destroy the `wp_text_input_manager`
 
         Destroy the wp_text_input_manager object.
         """
@@ -18446,14 +20619,32 @@ class zxdg_toplevel_decoration_v1:
 
     class error(Enum):
         unconfigured_buffer: int
+        """`xdg_toplevel` has a buffer attached before configure"""
+
         already_constructed: int
+        """`xdg_toplevel` already has a decoration object"""
+
         orphaned: int
+        """`xdg_toplevel` destroyed before the decoration object"""
+
         invalid_mode: int
+        """Invalid mode"""
+
 
 
     class mode(Enum):
+        """
+        Window decoration modes
+
+        These values describe window decoration modes.
+        """
+
         client_side: int
+        """No server-side window decoration"""
+
         server_side: int
+        """Server-side window decoration"""
+
 
 
     @staticmethod
@@ -18495,7 +20686,7 @@ class zxdg_toplevel_decoration_v1:
         error is raised by the compositor.
 
         Args:
-            mode: the decoration mode
+            mode: The decoration mode
         """
 
         ...
@@ -18528,7 +20719,7 @@ class zxdg_toplevel_decoration_v1:
             obeyed by the client.
 
             Args:
-                mode: the decoration mode
+                mode: The decoration mode
             """
 
             ...
@@ -18547,7 +20738,7 @@ class zxdg_exporter_v1:
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the xdg_exporter object
+        Destroy the `xdg_exporter` object
 
         Notify the compositor that the xdg_exporter object will no longer be
         used.
@@ -18570,7 +20761,7 @@ class zxdg_exporter_v1:
         surfaces may be exported.
 
         Args:
-            surface: the surface to export
+            surface: The surface to export
 
         Returns:
             zxdg_exported_v1: The created object
@@ -18593,7 +20784,7 @@ class zxdg_importer_v1:
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the xdg_importer object
+        Destroy the `xdg_importer` object
 
         Notify the compositor that the xdg_importer object will no longer be
         used.
@@ -18613,7 +20804,7 @@ class zxdg_importer_v1:
         manipulate its relationship using it. See xdg_imported for details.
 
         Args:
-            handle: the exported surface handle
+            handle: The exported surface handle
 
         Returns:
             zxdg_imported_v1: The created object
@@ -18658,7 +20849,7 @@ class zxdg_exported_v1:
             used to import the surface multiple times.
 
             Args:
-                handle: the exported surface handle
+                handle: The exported surface handle
             """
 
             ...
@@ -18678,7 +20869,7 @@ class zxdg_imported_v1:
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the xdg_imported object
+        Destroy the `xdg_imported` object
 
         Notify the compositor that it will no longer use the xdg_imported
         object. Any relationship that may have been set up will at this point
@@ -18698,7 +20889,7 @@ class zxdg_imported_v1:
         semantics as xdg_surface.set_parent.
 
         Args:
-            surface: the child surface
+            surface: The child surface
         """
 
         ...
@@ -18728,13 +20919,22 @@ class zxdg_exporter_v2:
     version = 1
 
     class error(Enum):
+        """
+        Error values
+
+        These errors can be emitted in response to invalid xdg_exporter
+        requests.
+        """
+
         invalid_surface: int
+        """Surface is not an `xdg_toplevel`"""
+
 
 
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the xdg_exporter object
+        Destroy the `xdg_exporter` object
 
         Notify the compositor that the xdg_exporter object will no longer be
         used.
@@ -18758,7 +20958,7 @@ class zxdg_exporter_v2:
                 protocol error is sent.
 
         Args:
-            surface: the surface to export
+            surface: The surface to export
 
         Returns:
             zxdg_exported_v2: The created object
@@ -18781,7 +20981,7 @@ class zxdg_importer_v2:
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the xdg_importer object
+        Destroy the `xdg_importer` object
 
         Notify the compositor that the xdg_importer object will no longer be
         used.
@@ -18801,7 +21001,7 @@ class zxdg_importer_v2:
         manipulate its relationship using it. See xdg_imported for details.
 
         Args:
-            handle: the exported surface handle
+            handle: The exported surface handle
 
         Returns:
             zxdg_imported_v2: The created object
@@ -18846,7 +21046,7 @@ class zxdg_exported_v2:
             may be used to import the surface multiple times.
 
             Args:
-                handle: the exported surface handle
+                handle: The exported surface handle
             """
 
             ...
@@ -18863,13 +21063,22 @@ class zxdg_imported_v2:
     version = 1
 
     class error(Enum):
+        """
+        Error values
+
+        These errors can be emitted in response to invalid xdg_imported
+        requests.
+        """
+
         invalid_surface: int
+        """Surface is not an `xdg_toplevel`"""
+
 
 
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the xdg_imported object
+        Destroy the `xdg_imported` object
 
         Notify the compositor that it will no longer use the xdg_imported
         object. Any relationship that may have been set up will at this point
@@ -18890,7 +21099,7 @@ class zxdg_imported_v2:
         semantics as xdg_toplevel.set_parent.
 
         Args:
-            surface: the child surface
+            surface: The child surface
         """
 
         ...
@@ -18911,7 +21120,7 @@ class zxdg_imported_v2:
 
 class zxdg_output_manager_v1:
     """
-    Manage xdg_output objects
+    Manage `xdg_output` objects
 
     A global factory interface for xdg_output objects.
     """
@@ -18922,7 +21131,7 @@ class zxdg_output_manager_v1:
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the xdg_output_manager object
+        Destroy the `xdg_output_manager` object
 
         Using this request a client can tell the server that it is not
         going to use the xdg_output_manager object anymore.
@@ -18935,7 +21144,7 @@ class zxdg_output_manager_v1:
     @staticmethod
     def get_xdg_output(output: wl_output) -> zxdg_output_v1:
         """
-        Create an xdg output from a wl_output
+        Create an xdg output from a `wl_output`
 
         This creates a new xdg_output object for the given wl_output.
 
@@ -18966,7 +21175,7 @@ class zxdg_output_v1:
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the xdg_output object
+        Destroy the `xdg_output` object
 
         Using this request a client can tell the server that it is not
         going to use the xdg_output object anymore.
@@ -18988,8 +21197,8 @@ class zxdg_output_v1:
             of the output changes within the global compositor space.
 
             Args:
-                x: x position within the global compositor space
-                y: y position within the global compositor space
+                x: X position within the global compositor space
+                y: Y position within the global compositor space
             """
 
             ...
@@ -19031,8 +21240,8 @@ class zxdg_output_v1:
             mode(see wl_output.mode) or transform (see wl_output.transform).
 
             Args:
-                width: width in global compositor space
-                height: height in global compositor space
+                width: Width in global compositor space
+                height: Height in global compositor space
             """
 
             ...
@@ -19083,7 +21292,7 @@ class zxdg_output_v1:
                     Compositors must still support this event.
 
             Args:
-                name: output name
+                name: Output name
             """
 
             ...
@@ -19113,7 +21322,7 @@ class zxdg_output_v1:
             wl_output.description. Compositors must still support this event.
 
             Args:
-                description: output description
+                description: Output description
             """
 
             ...
@@ -19131,20 +21340,39 @@ class xdg_shell:
     version = 1
 
     class version(Enum):
+        """
+        Latest protocol version
+
+        The 'current' member of this enum gives the version of the
+        protocol.  Implementations can compare this to the version
+        they implement using static_assert to ensure the protocol and
+        implementation versions match.
+        """
+
         current: int
+        """Always the latest version"""
+
 
 
     class error(Enum):
         role: int
+        """Given `wl_surface` has another role"""
+
         defunct_surfaces: int
+        """`xdg_shell` was destroyed before children"""
+
         not_the_topmost_popup: int
+        """The client tried to map or destroy a non-topmost popup"""
+
         invalid_popup_parent: int
+        """The client specified an invalid popup parent surface"""
+
 
 
     @staticmethod
     def destroy() -> None:
         """
-        Destroy xdg_shell
+        Destroy `xdg_shell`
 
         Destroy this xdg_shell object.
 
@@ -19207,8 +21435,8 @@ class xdg_shell:
         xdg_popup is and how it is used.
 
         Args:
-            seat: the wl_seat of the user event
-            serial: the serial of the user event
+            seat: The `wl_seat` of the user event
+            serial: The serial of the user event
 
         Returns:
             xdg_popup: The created object
@@ -19225,7 +21453,7 @@ class xdg_shell:
         the client may be deemed unresponsive.
 
         Args:
-            serial: serial of the ping event
+            serial: Serial of the ping event
         """
 
         ...
@@ -19249,7 +21477,7 @@ class xdg_shell:
             always respond to any xdg_shell object it created.
 
             Args:
-                serial: pass this to the pong request
+                serial: Pass this to the pong request
             """
 
             ...
@@ -19268,17 +21496,29 @@ class zxdg_shell_v6:
 
     class error(Enum):
         role: int
+        """Given `wl_surface` has another role"""
+
         defunct_surfaces: int
+        """`xdg_shell` was destroyed before children"""
+
         not_the_topmost_popup: int
+        """The client tried to map or destroy a non-topmost popup"""
+
         invalid_popup_parent: int
+        """The client specified an invalid popup parent surface"""
+
         invalid_surface_state: int
+        """The client provided an invalid surface state"""
+
         invalid_positioner: int
+        """The client provided an invalid positioner"""
+
 
 
     @staticmethod
     def destroy() -> None:
         """
-        Destroy xdg_shell
+        Destroy `xdg_shell`
 
         Destroy this xdg_shell object.
 
@@ -19336,7 +21576,7 @@ class zxdg_shell_v6:
         the client may be deemed unresponsive. See xdg_shell.ping.
 
         Args:
-            serial: serial of the ping event
+            serial: Serial of the ping event
         """
 
         ...
@@ -19360,7 +21600,7 @@ class zxdg_shell_v6:
             always respond to any xdg_shell object it created.
 
             Args:
-                serial: pass this to the pong request
+                serial: Pass this to the pong request
             """
 
             ...
@@ -19394,38 +21634,141 @@ class zxdg_positioner_v6:
 
     class error(Enum):
         invalid_input: int
+        """Invalid input provided"""
+
 
 
     class anchor(IntFlag):
         none: int
+        """The center of the anchor rectangle"""
+
         top: int
+        """The top edge of the anchor rectangle"""
+
         bottom: int
+        """The bottom edge of the anchor rectangle"""
+
         left: int
+        """The left edge of the anchor rectangle"""
+
         right: int
+        """The right edge of the anchor rectangle"""
+
 
 
     class gravity(IntFlag):
         none: int
+        """Center over the anchor edge"""
+
         top: int
+        """Position above the anchor edge"""
+
         bottom: int
+        """Position below the anchor edge"""
+
         left: int
+        """Position to the left of the anchor edge"""
+
         right: int
+        """Position to the right of the anchor edge"""
+
 
 
     class constraint_adjustment(IntFlag):
+        """
+        Constraint adjustments
+
+        The constraint adjustment value define ways the compositor will adjust
+        the position of the surface, if the unadjusted position would result
+        in the surface being partly constrained.
+
+        Whether a surface is considered 'constrained' is left to the compositor
+        to determine. For example, the surface may be partly outside the
+        compositor's defined 'work area', thus necessitating the child surface's
+        position be adjusted until it is entirely inside the work area.
+
+        The adjustments can be combined, according to a defined precedence: 1)
+        Flip, 2) Slide, 3) Resize.
+        """
+
         none: int
+        """
+        Don't move the child surface when constrained
+        Don't alter the surface position even if it is constrained on some
+        axis, for example partially outside the edge of a monitor.
+        """
+
         slide_x: int
+        """
+        Move along the x axis until unconstrained
+        Slide the surface along the x axis until it is no longer constrained.
+        First try to slide towards the direction of the gravity on the x axis
+        until either the edge in the opposite direction of the gravity is
+        unconstrained or the edge in the direction of the gravity is
+        constrained.
+        Then try to slide towards the opposite direction of the gravity on the
+        x axis until either the edge in the direction of the gravity is
+        unconstrained or the edge in the opposite direction of the gravity is
+        constrained.
+        """
+
         slide_y: int
+        """
+        Move along the y axis until unconstrained
+        Slide the surface along the y axis until it is no longer constrained.
+        First try to slide towards the direction of the gravity on the y axis
+        until either the edge in the opposite direction of the gravity is
+        unconstrained or the edge in the direction of the gravity is
+        constrained.
+        Then try to slide towards the opposite direction of the gravity on the
+        y axis until either the edge in the direction of the gravity is
+        unconstrained or the edge in the opposite direction of the gravity is
+        constrained.
+        """
+
         flip_x: int
+        """
+        Invert the anchor and gravity on the x axis
+        Invert the anchor and gravity on the x axis if the surface is
+        constrained on the x axis. For example, if the left edge of the
+        surface is constrained, the gravity is 'left' and the anchor is
+        'left', change the gravity to 'right' and the anchor to 'right'.
+        If the adjusted position also ends up being constrained, the resulting
+        position of the flip_x adjustment will be the one before the
+        adjustment.
+        """
+
         flip_y: int
+        """
+        Invert the anchor and gravity on the y axis
+        Invert the anchor and gravity on the y axis if the surface is
+        constrained on the y axis. For example, if the bottom edge of the
+        surface is constrained, the gravity is 'bottom' and the anchor is
+        'bottom', change the gravity to 'top' and the anchor to 'top'.
+        If the adjusted position also ends up being constrained, the resulting
+        position of the flip_y adjustment will be the one before the
+        adjustment.
+        """
+
         resize_x: int
+        """
+        Horizontally resize the surface
+        Resize the surface horizontally so that it is completely
+        unconstrained.
+        """
+
         resize_y: int
+        """
+        Vertically resize the surface
+        Resize the surface vertically so that it is completely unconstrained.
+        """
+
 
 
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the xdg_positioner object
+        Destroy the `xdg_positioner` object
 
         Notify the compositor that the xdg_positioner will no longer be used.
         """
@@ -19444,8 +21787,8 @@ class zxdg_positioner_v6:
         If a zero or negative size is set the invalid_input error is raised.
 
         Args:
-            width: width of positioned rectangle
-            height: height of positioned rectangle
+            width: Width of positioned rectangle
+            height: Height of positioned rectangle
         """
 
         ...
@@ -19467,10 +21810,10 @@ class zxdg_positioner_v6:
         If a zero or negative size is set the invalid_input error is raised.
 
         Args:
-            x: x position of anchor rectangle
-            y: y position of anchor rectangle
-            width: width of anchor rectangle
-            height: height of anchor rectangle
+            x: X position of anchor rectangle
+            y: Y position of anchor rectangle
+            width: Width of anchor rectangle
+            height: Height of anchor rectangle
         """
 
         ...
@@ -19492,7 +21835,7 @@ class zxdg_positioner_v6:
         the invalid_input error is raised.
 
         Args:
-            anchor: bit mask of anchor edges
+            anchor: Bit mask of anchor edges
         """
 
         ...
@@ -19513,7 +21856,7 @@ class zxdg_positioner_v6:
         invalid_input error is raised.
 
         Args:
-            gravity: bit mask of gravity directions
+            gravity: Bit mask of gravity directions
         """
 
         ...
@@ -19538,7 +21881,7 @@ class zxdg_positioner_v6:
         The default adjustment is none.
 
         Args:
-            constraint_adjustment: bit mask of constraint adjustments
+            constraint_adjustment: Bit mask of constraint adjustments
         """
 
         ...
@@ -19561,8 +21904,8 @@ class zxdg_positioner_v6:
         with some user interface element placed somewhere in the popup surface.
 
         Args:
-            x: surface position x offset
-            y: surface position y offset
+            x: Surface position x offset
+            y: Surface position y offset
         """
 
         ...
@@ -19614,7 +21957,7 @@ class zxdg_surface_v6:
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the xdg_surface
+        Destroy the `xdg_surface`
 
         Destroy the xdg_surface object. An xdg_surface must only be destroyed
         	after its role object has been destroyed. If the role object still
@@ -19627,7 +21970,7 @@ class zxdg_surface_v6:
     @staticmethod
     def get_toplevel() -> zxdg_toplevel_v6:
         """
-        Assign the xdg_toplevel surface role
+        Assign the `xdg_toplevel` surface role
 
         This creates an xdg_toplevel object for the given xdg_surface and gives
         	the associated wl_surface the xdg_toplevel role. If the surface already
@@ -19645,7 +21988,7 @@ class zxdg_surface_v6:
     @staticmethod
     def get_popup(parent: zxdg_surface_v6, positioner: zxdg_positioner_v6) -> zxdg_popup_v6:
         """
-        Assign the xdg_popup surface role
+        Assign the `xdg_popup` surface role
 
         This creates an xdg_popup object for the given xdg_surface and gives the
         	associated wl_surface the xdg_popup role. If the surface already
@@ -19721,7 +22064,7 @@ class zxdg_surface_v6:
                 error is raised.
 
         Args:
-            serial: the serial from the configure event
+            serial: The serial from the configure event
         """
 
         ...
@@ -19750,7 +22093,7 @@ class zxdg_surface_v6:
             to one, it is free to discard all but the last event it received.
 
             Args:
-                serial: serial of the configure event
+                serial: Serial of the configure event
             """
 
             ...
@@ -19769,6 +22112,13 @@ class zxdg_toplevel_v6:
     version = 1
 
     class resize_edge(Enum):
+        """
+        Edge values for resizing
+
+        These values are used to indicate which edge of a surface
+        is being dragged in a resize operation.
+        """
+
         none: int
         top: int
         bottom: int
@@ -19781,16 +22131,56 @@ class zxdg_toplevel_v6:
 
 
     class state(Enum):
+        """
+        Types of state on the surface
+
+        The different state values used on the surface. This is designed for
+        state values like maximized, fullscreen. It is paired with the
+        configure event to ensure that both the client and the compositor
+        setting the state can be synchronized.
+
+        States set in this way are double-buffered, see wl_surface.commit.
+        """
+
         maximized: int
+        """
+        The surface is maximized
+        The surface is maximized. The window geometry specified in the configure
+        event must be obeyed by the client. If the window geometry is not obyed,
+        the zxdg_shell_v6.invalid_surface_state error is raised.
+        """
+
         fullscreen: int
+        """
+        The surface is fullscreen
+        The surface is fullscreen. See set_fullscreen for more information.
+        """
+
         resizing: int
+        """
+        The surface is being resized
+        The surface is being resized. The window geometry specified in the
+        configure event is a maximum; the client cannot resize beyond it. If the
+        client attempts to resize above it, the zxdg_shell_v6.invalid_surface_state
+        error is raised.
+        Clients that have aspect ratio or cell sizing configuration can use
+        a smaller size, however.
+        """
+
         activated: int
+        """
+        The surface is now activated
+        Client window decorations should be painted as if the window is
+        active. Do not assume this means that the window actually has
+        keyboard or pointer focus.
+        """
+
 
 
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the xdg_toplevel
+        Destroy the `xdg_toplevel`
 
         Unmap and destroy the window. The window will be effectively
         hidden from the user's point of view, and all state like
@@ -19878,10 +22268,10 @@ class zxdg_toplevel_v6:
         like a button press, key press, or touch down event.
 
         Args:
-            seat: the wl_seat of the user event
-            serial: the serial of the user event
-            x: the x position to pop up the window menu at
-            y: the y position to pop up the window menu at
+            seat: The `wl_seat` of the user event
+            serial: The serial of the user event
+            x: The x position to pop up the window menu at
+            y: The y position to pop up the window menu at
         """
 
         ...
@@ -19909,8 +22299,8 @@ class zxdg_toplevel_v6:
         that the device focus will return when the move is completed.
 
         Args:
-            seat: the wl_seat of the user event
-            serial: the serial of the user event
+            seat: The `wl_seat` of the user event
+            serial: The serial of the user event
         """
 
         ...
@@ -19952,9 +22342,9 @@ class zxdg_toplevel_v6:
         appropriate cursor image.
 
         Args:
-            seat: the wl_seat of the user event
-            serial: the serial of the user event
-            edges: which edge or corner is being dragged
+            seat: The `wl_seat` of the user event
+            serial: The serial of the user event
+            edges: Which edge or corner is being dragged
         """
 
         ...
@@ -20124,9 +22514,7 @@ class zxdg_toplevel_v6:
 
     @staticmethod
     def unset_fullscreen() -> None:
-        """
-
-        """
+        """"""
 
         ...
 
@@ -20236,12 +22624,14 @@ class zxdg_popup_v6:
 
     class error(Enum):
         invalid_grab: int
+        """Tried to grab after being mapped"""
+
 
 
     @staticmethod
     def destroy() -> None:
         """
-        Remove xdg_popup interface
+        Remove `xdg_popup` interface
 
         This destroys the popup. Explicitly destroying the xdg_popup
         object will also dismiss the popup, and unmap the surface.
@@ -20300,8 +22690,8 @@ class zxdg_popup_v6:
         will always have keyboard focus.
 
         Args:
-            seat: the wl_seat of the user event
-            serial: the serial of the user event
+            seat: The `wl_seat` of the user event
+            serial: The serial of the user event
         """
 
         ...
@@ -20321,10 +22711,10 @@ class zxdg_popup_v6:
             window geometry of the parent surface.
 
             Args:
-                x: x position relative to parent surface window geometry
-                y: y position relative to parent surface window geometry
-                width: window geometry width
-                height: window geometry height
+                x: X position relative to parent surface window geometry
+                y: Y position relative to parent surface window geometry
+                width: Window geometry width
+                height: Window geometry height
             """
 
             ...
@@ -20387,8 +22777,8 @@ class zwp_xwayland_keyboard_grab_manager_v1:
           is nominally active.
 
         Args:
-            surface: surface to report keyboard events to
-            seat: the seat for which the keyboard should be grabbed
+            surface: Surface to report keyboard events to
+            seat: The seat for which the keyboard should be grabbed
 
         Returns:
             zwp_xwayland_keyboard_grab_v1: The created object
@@ -20431,6 +22821,8 @@ class hyprland_ctm_control_manager_v1:
 
     class error(Enum):
         invalid_matrix: int
+        """The matrix values are invalid."""
+
 
 
     @staticmethod
@@ -20627,6 +23019,8 @@ class hyprland_global_shortcuts_manager_v1:
 
     class error(Enum):
         already_taken: int
+        """The `app_id` + id combination has already been registered."""
+
 
 
     @staticmethod
@@ -20643,10 +23037,10 @@ class hyprland_global_shortcuts_manager_v1:
         In the case of a duplicate app_id + id combination, the already_taken protocol error is raised.
 
         Args:
-            id: a unique id for the shortcut
-            app_id: the app_id of the application requesting the shortcut
-            description: user-readable text describing what the shortcut does.
-            trigger_description: user-readable text describing how to trigger the shortcut for the client to render.
+            id: A unique id for the shortcut
+            app_id: The `app_id` of the application requesting the shortcut
+            description: User-readable text describing what the shortcut does.
+            trigger_description: User-readable text describing how to trigger the shortcut for the client to render.
 
         Returns:
             hyprland_global_shortcut_v1: The created object
@@ -20696,9 +23090,9 @@ class hyprland_global_shortcut_v1:
             tv_ values hold the timestamp of the occurrence.
 
             Args:
-                tv_sec_hi: high 32 bits of the seconds part of the timestamp
-                tv_sec_lo: low 32 bits of the seconds part of the timestamp
-                tv_nsec: nanoseconds part of the timestamp
+                tv_sec_hi: High 32 bits of the seconds part of the timestamp
+                tv_sec_lo: Low 32 bits of the seconds part of the timestamp
+                tv_nsec: Nanoseconds part of the timestamp
             """
 
             ...
@@ -20713,9 +23107,9 @@ class hyprland_global_shortcut_v1:
             tv_ values hold the timestamp of the occurrence.
 
             Args:
-                tv_sec_hi: high 32 bits of the seconds part of the timestamp
-                tv_sec_lo: low 32 bits of the seconds part of the timestamp
-                tv_nsec: nanoseconds part of the timestamp
+                tv_sec_hi: High 32 bits of the seconds part of the timestamp
+                tv_sec_lo: Low 32 bits of the seconds part of the timestamp
+                tv_nsec: Nanoseconds part of the timestamp
             """
 
             ...
@@ -20829,6 +23223,8 @@ class hyprland_surface_manager_v1:
 
     class error(Enum):
         already_constructed: int
+        """`wl_surface` already has a hyprland surface object"""
+
 
 
     @staticmethod
@@ -20860,7 +23256,7 @@ class hyprland_surface_manager_v1:
 
 class hyprland_surface_v1:
     """
-    Hyprland-specific wl_surface properties
+    Hyprland-specific `wl_surface` properties
 
     This interface allows access to hyprland-specific properties of a wl_surface.
 
@@ -20872,7 +23268,11 @@ class hyprland_surface_v1:
 
     class error(Enum):
         no_surface: int
+        """`wl_surface` was destroyed"""
+
         out_of_range: int
+        """Given opacity was not in the range 0.0 - 1.0 (inclusive)"""
+
 
 
     @staticmethod
@@ -20958,8 +23358,8 @@ class hyprland_toplevel_export_manager_v1:
         For example, for d161e7b0 it would be 3512854448.
 
         Args:
-            overlay_cursor: composite cursor onto the frame
-            handle: the handle of the toplevel (window) to be captured
+            overlay_cursor: Composite cursor onto the frame
+            handle: The handle of the toplevel (window) to be captured
 
         Returns:
             hyprland_toplevel_export_frame_v1: The created object
@@ -20986,8 +23386,8 @@ class hyprland_toplevel_export_manager_v1:
         Same as capture_toplevel, but with a zwlr_foreign_toplevel_handle_v1 handle.
 
         Args:
-            overlay_cursor: composite cursor onto the frame
-            handle: the zwlr_foreign_toplevel_handle_v1 handle of the toplevel to be captured
+            overlay_cursor: Composite cursor onto the frame
+            handle: The zwlr_foreign_toplevel_handle_v1 handle of the toplevel to be captured
 
         Returns:
             hyprland_toplevel_export_frame_v1: The created object
@@ -21020,11 +23420,17 @@ class hyprland_toplevel_export_frame_v1:
 
     class error(Enum):
         already_used: int
+        """The object has already been used to copy a `wl_buffer`"""
+
         invalid_buffer: int
+        """Buffer attributes are invalid"""
+
 
 
     class flags(IntFlag):
         y_invert: int
+        """Contents are y-inverted"""
+
 
 
     @staticmethod
@@ -21060,17 +23466,17 @@ class hyprland_toplevel_export_frame_v1:
         @staticmethod
         def buffer(format: wl_shm.format, width: int, height: int, stride: int) -> None:
             """
-            Wl_shm buffer information
+            `wl_shm` buffer information
 
             Provides information about wl_shm buffer parameters that need to be
             used for this frame. This event is sent once after the frame is created
             if wl_shm buffers are supported.
 
             Args:
-                format: buffer format
-                width: buffer width
-                height: buffer height
-                stride: buffer stride
+                format: Buffer format
+                width: Buffer width
+                height: Buffer height
+                stride: Buffer stride
             """
 
             ...
@@ -21092,10 +23498,10 @@ class hyprland_toplevel_export_frame_v1:
             and a ready event is the total damage since the prior ready event.
 
             Args:
-                x: damaged x coordinates
-                y: damaged y coordinates
-                width: current width
-                height: current height
+                x: Damaged x coordinates
+                y: Damaged y coordinates
+                width: Current width
+                height: Current height
             """
 
             ...
@@ -21109,7 +23515,7 @@ class hyprland_toplevel_export_frame_v1:
             "ready" event.
 
             Args:
-                flags: frame flags
+                flags: Frame flags
             """
 
             ...
@@ -21133,9 +23539,9 @@ class hyprland_toplevel_export_frame_v1:
             After receiving this event, the client should destroy the object.
 
             Args:
-                tv_sec_hi: high 32 bits of the seconds part of the timestamp
-                tv_sec_lo: low 32 bits of the seconds part of the timestamp
-                tv_nsec: nanoseconds part of the timestamp
+                tv_sec_hi: High 32 bits of the seconds part of the timestamp
+                tv_sec_lo: Low 32 bits of the seconds part of the timestamp
+                tv_nsec: Nanoseconds part of the timestamp
             """
 
             ...
@@ -21162,9 +23568,9 @@ class hyprland_toplevel_export_frame_v1:
             created if linux-dmabuf buffers are supported.
 
             Args:
-                format: fourcc pixel format
-                width: buffer width
-                height: buffer height
+                format: Fourcc pixel format
+                width: Buffer width
+                height: Buffer height
             """
 
             ...
@@ -21201,7 +23607,7 @@ class hyprland_toplevel_mapping_manager_v1:
         Get the window address for a toplevel.
 
         Args:
-            toplevel: toplevel to get the window address for
+            toplevel: Toplevel to get the window address for
 
         Returns:
             hyprland_toplevel_window_mapping_handle_v1: The created object
@@ -21217,7 +23623,7 @@ class hyprland_toplevel_mapping_manager_v1:
         Get the window address for a wlr toplevel.
 
         Args:
-            toplevel: wlr toplevel to get the window address for
+            toplevel: Wlr toplevel to get the window address for
 
         Returns:
             hyprland_toplevel_window_mapping_handle_v1: The created object
@@ -21270,8 +23676,8 @@ class hyprland_toplevel_window_mapping_handle_v1:
             `address_hi` contains the upper 32 bits
 
             Args:
-                address_hi: upper 32 bits of the window address
-                address: lower 32 bits of the window address
+                address_hi: Upper 32 bits of the window address
+                address: Lower 32 bits of the window address
             """
 
             ...
@@ -21348,6 +23754,8 @@ class zwlr_data_control_device_v1:
 
     class error(Enum):
         used_source: int
+        """Source given to `set_selection` or `set_primary_selection` was already used before"""
+
 
 
     @staticmethod
@@ -21401,7 +23809,7 @@ class zwlr_data_control_device_v1:
         @staticmethod
         def data_offer(id: zwlr_data_control_offer_v1) -> None:
             """
-            Introduce a new wlr_data_control_offer
+            Introduce a new `wlr_data_control_offer`
 
             The data_offer event introduces a new wlr_data_control_offer object,
             which will subsequently be used in either the
@@ -21483,6 +23891,8 @@ class zwlr_data_control_source_v1:
 
     class error(Enum):
         invalid_offer: int
+        """Offer sent after `wlr_data_control_device`.`set_selection`"""
+
 
 
     @staticmethod
@@ -21497,7 +23907,7 @@ class zwlr_data_control_source_v1:
         error.
 
         Args:
-            mime_type: MIME type offered by the data source
+            mime_type: Mime type offered by the data source
         """
 
         ...
@@ -21522,8 +23932,8 @@ class zwlr_data_control_source_v1:
             type over the passed file descriptor, then close it.
 
             Args:
-                mime_type: MIME type for the data
-                fd: file descriptor for the data
+                mime_type: Mime type for the data
+                fd: File descriptor for the data
             """
 
             ...
@@ -21571,8 +23981,8 @@ class zwlr_data_control_offer_v1:
         This request may happen multiple times for different MIME types.
 
         Args:
-            mime_type: MIME type desired by receiver
-            fd: file descriptor for data transfer
+            mime_type: Mime type desired by receiver
+            fd: File descriptor for data transfer
         """
 
         ...
@@ -21597,7 +24007,7 @@ class zwlr_data_control_offer_v1:
             One event per offered MIME type.
 
             Args:
-                mime_type: offered MIME type
+                mime_type: Offered mime type
             """
 
             ...
@@ -21620,7 +24030,7 @@ class zwlr_export_dmabuf_manager_v1:
         Capture the next frame of an entire output.
 
         Args:
-            overlay_cursor: include custom client hardware cursor on top of the frame
+            overlay_cursor: Include custom client hardware cursor on top of the frame
 
         Returns:
             zwlr_export_dmabuf_frame_v1: The created object
@@ -21662,13 +24072,33 @@ class zwlr_export_dmabuf_frame_v1:
     version = 1
 
     class flags(Enum):
+        """
+        Frame flags
+
+        Special flags that should be respected by the client.
+        """
+
         transient: int
+        """Clients should copy frame before processing"""
+
 
 
     class cancel_reason(Enum):
+        """
+        Cancel reason
+
+        Indicates reason for cancelling the frame.
+        """
+
         temporary: int
+        """Temporary error, source will produce more frames"""
+
         permanent: int
+        """Fatal error, source will not produce frames"""
+
         resizing: int
+        """Temporary error, source will produce more frames"""
+
 
 
     @staticmethod
@@ -21699,16 +24129,16 @@ class zwlr_export_dmabuf_frame_v1:
             "num_objects" argument.
 
             Args:
-                width: frame width in pixels
-                height: frame height in pixels
-                offset_x: crop offset for the x axis
-                offset_y: crop offset for the y axis
-                buffer_flags: flags which indicate properties (invert, interlacing),                     has the same values as zwp_linux_buffer_params_v1:flags
-                flags: indicates special frame features
-                format: format of the frame (DRM_FORMAT_*)
-                mod_high: drm format modifier, high
-                mod_low: drm format modifier, low
-                num_objects: indicates how many objects (FDs) the frame has (max 4)
+                width: Frame width in pixels
+                height: Frame height in pixels
+                offset_x: Crop offset for the x axis
+                offset_y: Crop offset for the y axis
+                buffer_flags: Flags which indicate properties (invert, interlacing),                     has the same values as zwp_linux_buffer_params_v1:flags
+                flags: Indicates special frame features
+                format: Format of the frame (drm_format_*)
+                mod_high: Drm format modifier, high
+                mod_low: Drm format modifier, low
+                num_objects: Indicates how many objects (fds) the frame has (max 4)
             """
 
             ...
@@ -21725,12 +24155,12 @@ class zwlr_export_dmabuf_frame_v1:
             descriptor as soon as they're done with it and even if the frame fails.
 
             Args:
-                index: index of the current object
-                fd: fd of the current object
-                size: size in bytes for the current object
-                offset: starting point for the data in the object's fd
-                stride: line size in bytes
-                plane_index: index of the plane the data in the object applies to
+                index: Index of the current object
+                fd: Fd of the current object
+                size: Size in bytes for the current object
+                offset: Starting point for the data in the object's fd
+                stride: Line size in bytes
+                plane_index: Index of the plane the data in the object applies to
             """
 
             ...
@@ -21754,9 +24184,9 @@ class zwlr_export_dmabuf_frame_v1:
             After receiving this event, the client should destroy this object.
 
             Args:
-                tv_sec_hi: high 32 bits of the seconds part of the timestamp
-                tv_sec_lo: low 32 bits of the seconds part of the timestamp
-                tv_nsec: nanoseconds part of the timestamp
+                tv_sec_hi: High 32 bits of the seconds part of the timestamp
+                tv_sec_lo: Low 32 bits of the seconds part of the timestamp
+                tv_nsec: Nanoseconds part of the timestamp
             """
 
             ...
@@ -21777,7 +24207,7 @@ class zwlr_export_dmabuf_frame_v1:
             After receiving this event, the client should destroy this object.
 
             Args:
-                reason: indicates a reason for cancelling this frame capture
+                reason: Indicates a reason for cancelling this frame capture
             """
 
             ...
@@ -21855,14 +24285,31 @@ class zwlr_foreign_toplevel_handle_v1:
     version = 3
 
     class state(Enum):
+        """
+        Types of states on the toplevel
+
+        The different states that a toplevel can have. These have the same meaning
+        as the states with the same names defined in xdg-toplevel
+        """
+
         maximized: int
+        """The toplevel is maximized"""
+
         minimized: int
+        """The toplevel is minimized"""
+
         activated: int
+        """The toplevel is active"""
+
         fullscreen: int
+        """The toplevel is fullscreen"""
+
 
 
     class error(Enum):
         invalid_rectangle: int
+        """The provided rectangle is invalid"""
+
 
 
     @staticmethod
@@ -22148,6 +24595,8 @@ class zwlr_gamma_control_v1:
 
     class error(Enum):
         invalid_gamma: int
+        """Invalid gamma tables"""
+
 
 
     @staticmethod
@@ -22164,7 +24613,7 @@ class zwlr_gamma_control_v1:
         gamma size.
 
         Args:
-            fd: gamma table file descriptor
+            fd: Gamma table file descriptor
         """
 
         ...
@@ -22191,7 +24640,7 @@ class zwlr_gamma_control_v1:
             This event is sent immediately when the gamma control object is created.
 
             Args:
-                size: number of elements in a ramp
+                size: Number of elements in a ramp
             """
 
             ...
@@ -22230,6 +24679,8 @@ class zwlr_input_inhibit_manager_v1:
 
     class error(Enum):
         already_inhibited: int
+        """An input inhibitor is already in use on the compositor"""
+
 
 
     @staticmethod
@@ -22291,11 +24742,28 @@ class zwlr_layer_shell_v1:
 
     class error(Enum):
         role: int
+        """`wl_surface` has another role"""
+
         invalid_layer: int
+        """Layer value is invalid"""
+
         already_constructed: int
+        """`wl_surface` has a buffer attached or committed"""
+
 
 
     class layer(Enum):
+        """
+        Available layers for surfaces
+
+        These values indicate which layers a surface can be rendered in. They
+        are ordered by z depth, bottom-most first. Traditional shell surfaces
+        will typically be rendered between the bottom and top layers.
+        Fullscreen shell surfaces are typically rendered at the top layer.
+        Multiple surfaces can share a single layer, and ordering within a
+        single layer is undefined.
+        """
+
         background: int
         bottom: int
         top: int
@@ -22305,7 +24773,7 @@ class zwlr_layer_shell_v1:
     @staticmethod
     def get_layer_surface(surface: wl_surface, output: wl_output, layer: zwlr_layer_shell_v1.layer, namespace: str) -> zwlr_layer_surface_v1:
         """
-        Create a layer_surface from a surface
+        Create a `layer_surface` from a surface
 
         Create a layer surface for an existing surface. This assigns the role of
         layer_surface, or raises a protocol error if another role is already
@@ -22330,8 +24798,8 @@ class zwlr_layer_shell_v1:
         surface.
 
         Args:
-            layer: layer to add this surface to
-            namespace: namespace for the layer surface
+            layer: Layer to add this surface to
+            namespace: Namespace for the layer surface
 
         Returns:
             zwlr_layer_surface_v1: The created object
@@ -22342,7 +24810,7 @@ class zwlr_layer_shell_v1:
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the layer_shell object
+        Destroy the `layer_shell` object
 
         This request indicates that the client will not use the layer_shell
         object any more. Objects that have been created through this instance
@@ -22375,24 +24843,97 @@ class zwlr_layer_surface_v1:
     version = 5
 
     class keyboard_interactivity(Enum):
+        """
+        Types of keyboard interaction possible for a layer shell surface
+
+        Types of keyboard interaction possible for layer shell surfaces. The
+        rationale for this is twofold: (1) some applications are not interested
+        in keyboard events and not allowing them to be focused can improve the
+        desktop experience; (2) some applications will want to take exclusive
+        keyboard focus.
+        """
+
         none: int
+        """
+        No keyboard focus is possible
+        This value indicates that this surface is not interested in keyboard
+        events and the compositor should never assign it the keyboard focus.
+        This is the default value, set for newly created layer shell surfaces.
+        This is useful for e.g. desktop widgets that display information or
+        only have interaction with non-keyboard input devices.
+        """
+
         exclusive: int
+        """
+        Request exclusive keyboard focus
+        Request exclusive keyboard focus if this surface is above the shell surface layer.
+        For the top and overlay layers, the seat will always give
+        exclusive keyboard focus to the top-most layer which has keyboard
+        interactivity set to exclusive. If this layer contains multiple
+        surfaces with keyboard interactivity set to exclusive, the compositor
+        determines the one receiving keyboard events in an implementation-
+        defined manner. In this case, no guarantee is made when this surface
+        will receive keyboard focus (if ever).
+        For the bottom and background layers, the compositor is allowed to use
+        normal focus semantics.
+        This setting is mainly intended for applications that need to ensure
+        they receive all keyboard events, such as a lock screen or a password
+        prompt.
+        """
+
         on_demand: int
+        """
+        Request regular keyboard focus semantics
+        This requests the compositor to allow this surface to be focused and
+        unfocused by the user in an implementation-defined manner. The user
+        should be able to unfocus this surface even regardless of the layer
+        it is on.
+        Typically, the compositor will want to use its normal mechanism to
+        manage keyboard focus between layer shell surfaces with this setting
+        and regular toplevels on the desktop layer (e.g. click to focus).
+        Nevertheless, it is possible for a compositor to require a special
+        interaction to focus or unfocus layer shell surfaces (e.g. requiring
+        a click even if focus follows the mouse normally, or providing a
+        keybinding to switch focus between layers).
+        This setting is mainly intended for desktop shell components (e.g.
+        panels) that allow keyboard interaction. Using this option can allow
+        implementing a desktop shell that can be fully usable without the
+        mouse.
+        """
+
 
 
     class error(Enum):
         invalid_surface_state: int
+        """Provided surface state is invalid"""
+
         invalid_size: int
+        """Size is invalid"""
+
         invalid_anchor: int
+        """Anchor bitfield is invalid"""
+
         invalid_keyboard_interactivity: int
+        """Keyboard interactivity is invalid"""
+
         invalid_exclusive_edge: int
+        """Exclusive edge is invalid given the surface anchors"""
+
 
 
     class anchor(IntFlag):
         top: int
+        """The top edge of the anchor rectangle"""
+
         bottom: int
+        """The bottom edge of the anchor rectangle"""
+
         left: int
+        """The left edge of the anchor rectangle"""
+
         right: int
+        """The right edge of the anchor rectangle"""
+
 
 
     @staticmethod
@@ -22511,7 +25052,7 @@ class zwlr_layer_surface_v1:
     @staticmethod
     def get_popup(popup: xdg_popup) -> None:
         """
-        Assign this layer_surface as an xdg_popup parent
+        Assign this `layer_surface` as an `xdg_popup` parent
 
         This assigns an xdg_popup's parent to this layer_surface.  This popup
         should have been created via xdg_surface::get_popup with the parent set
@@ -22546,7 +25087,7 @@ class zwlr_layer_surface_v1:
         event the client really is responding to.
 
         Args:
-            serial: the serial from the configure event
+            serial: The serial from the configure event
         """
 
         ...
@@ -22554,7 +25095,7 @@ class zwlr_layer_surface_v1:
     @staticmethod
     def destroy() -> None:
         """
-        Destroy the layer_surface
+        Destroy the `layer_surface`
 
         This request destroys the layer surface.
         """
@@ -22571,7 +25112,7 @@ class zwlr_layer_surface_v1:
         Layer is double-buffered, see wl_surface.commit.
 
         Args:
-            layer: layer to move this surface to
+            layer: Layer to move this surface to
         """
 
         ...
@@ -22732,7 +25273,7 @@ class zwlr_output_manager_v1:
             A serial is sent to be used in a future create_configuration request.
 
             Args:
-                serial: current configuration serial
+                serial: Current configuration serial
             """
 
             ...
@@ -22773,7 +25314,11 @@ class zwlr_output_head_v1:
 
     class adaptive_sync_state(Enum):
         disabled: int
+        """Adaptive sync is disabled"""
+
         enabled: int
+        """Adaptive sync is enabled"""
+
 
 
     @staticmethod
@@ -22852,8 +25397,8 @@ class zwlr_output_head_v1:
             the lifetime of the wlr_output_head object.
 
             Args:
-                width: width in millimeters of the output
-                height: height in millimeters of the output
+                width: Width in millimeters of the output
+                height: Height in millimeters of the output
             """
 
             ...
@@ -22881,7 +25426,7 @@ class zwlr_output_head_v1:
             transform and scale) are irrelevant.
 
             Args:
-                enabled: zero if disabled, non-zero if enabled
+                enabled: Zero if disabled, non-zero if enabled
             """
 
             ...
@@ -22906,8 +25451,8 @@ class zwlr_output_head_v1:
             space. It is only sent if the output is enabled.
 
             Args:
-                x: x position within the global compositor space
-                y: y position within the global compositor space
+                x: X position within the global compositor space
+                y: Y position within the global compositor space
             """
 
             ...
@@ -23089,8 +25634,8 @@ class zwlr_output_mode_v1:
             may be scaled or transformed.
 
             Args:
-                width: width of the mode in hardware units
-                height: height of the mode in hardware units
+                width: Width of the mode in hardware units
+                height: Height of the mode in hardware units
             """
 
             ...
@@ -23104,7 +25649,7 @@ class zwlr_output_mode_v1:
             sent if the mode has a fixed refresh rate.
 
             Args:
-                refresh: vertical refresh rate in mHz
+                refresh: Vertical refresh rate in mhz
             """
 
             ...
@@ -23151,8 +25696,14 @@ class zwlr_output_configuration_v1:
 
     class error(Enum):
         already_configured_head: int
+        """Head has been configured twice"""
+
         unconfigured_head: int
+        """Head has not been configured"""
+
         already_used: int
+        """Request sent after configuration has been applied or tested"""
+
 
 
     @staticmethod
@@ -23164,7 +25715,7 @@ class zwlr_output_configuration_v1:
         be used to change the head's properties.
 
         Args:
-            head: the head to be enabled
+            head: The head to be enabled
 
         Returns:
             zwlr_output_configuration_head_v1: The created object
@@ -23180,7 +25731,7 @@ class zwlr_output_configuration_v1:
         Disable a head.
 
         Args:
-            head: the head to be disabled
+            head: The head to be disabled
         """
 
         ...
@@ -23298,11 +25849,23 @@ class zwlr_output_configuration_head_v1:
 
     class error(Enum):
         already_set: int
+        """Property has already been set"""
+
         invalid_mode: int
+        """Mode doesn't belong to head"""
+
         invalid_custom_mode: int
+        """Mode is invalid"""
+
         invalid_transform: int
+        """Transform value outside enum"""
+
         invalid_scale: int
+        """Scale negative or zero"""
+
         invalid_adaptive_sync_state: int
+        """Invalid enum value used in the `set_adaptive_sync` request"""
+
 
 
     @staticmethod
@@ -23327,9 +25890,9 @@ class zwlr_output_configuration_head_v1:
         It is a protocol error to set both a mode and a custom mode.
 
         Args:
-            width: width of the mode in hardware units
-            height: height of the mode in hardware units
-            refresh: vertical refresh rate in mHz or zero
+            width: Width of the mode in hardware units
+            height: Height of the mode in hardware units
+            refresh: Vertical refresh rate in mhz or zero
         """
 
         ...
@@ -23342,8 +25905,8 @@ class zwlr_output_configuration_head_v1:
         This request sets the head's position in the global compositor space.
 
         Args:
-            x: x position in the global compositor space
-            y: y position in the global compositor space
+            x: X position in the global compositor space
+            y: Y position in the global compositor space
         """
 
         ...
@@ -23427,11 +25990,17 @@ class zwlr_output_power_v1:
 
     class mode(Enum):
         off: int
+        """Output is turned off."""
+
         on: int
+        """Output is turned on, no power saving"""
+
 
 
     class error(Enum):
         invalid_mode: int
+        """Nonexistent power save mode"""
+
 
 
     @staticmethod
@@ -23444,7 +26013,7 @@ class zwlr_output_power_v1:
         mode a failed event is sent.
 
         Args:
-            mode: the power save mode to set
+            mode: The power save mode to set
         """
 
         ...
@@ -23474,7 +26043,7 @@ class zwlr_output_power_v1:
             so the client is informed about the current power management mode.
 
             Args:
-                mode: the output's new power management mode
+                mode: The output's new power management mode
             """
 
             ...
@@ -23516,7 +26085,7 @@ class zwlr_screencopy_manager_v1:
         Capture the next frame of an entire output.
 
         Args:
-            overlay_cursor: composite cursor onto the frame
+            overlay_cursor: Composite cursor onto the frame
 
         Returns:
             zwlr_screencopy_frame_v1: The created object
@@ -23536,7 +26105,7 @@ class zwlr_screencopy_manager_v1:
         extents.
 
         Args:
-            overlay_cursor: composite cursor onto the frame
+            overlay_cursor: Composite cursor onto the frame
 
         Returns:
             zwlr_screencopy_frame_v1: The created object
@@ -23581,11 +26150,17 @@ class zwlr_screencopy_frame_v1:
 
     class error(Enum):
         already_used: int
+        """The object has already been used to copy a `wl_buffer`"""
+
         invalid_buffer: int
+        """Buffer attributes are invalid"""
+
 
 
     class flags(IntFlag):
         y_invert: int
+        """Contents are y-inverted"""
+
 
 
     @staticmethod
@@ -23628,17 +26203,17 @@ class zwlr_screencopy_frame_v1:
         @staticmethod
         def buffer(format: wl_shm.format, width: int, height: int, stride: int) -> None:
             """
-            Wl_shm buffer information
+            `wl_shm` buffer information
 
             Provides information about wl_shm buffer parameters that need to be
             used for this frame. This event is sent once after the frame is created
             if wl_shm buffers are supported.
 
             Args:
-                format: buffer format
-                width: buffer width
-                height: buffer height
-                stride: buffer stride
+                format: Buffer format
+                width: Buffer width
+                height: Buffer height
+                stride: Buffer stride
             """
 
             ...
@@ -23652,7 +26227,7 @@ class zwlr_screencopy_frame_v1:
             "ready" event.
 
             Args:
-                flags: frame flags
+                flags: Frame flags
             """
 
             ...
@@ -23675,9 +26250,9 @@ class zwlr_screencopy_frame_v1:
             After receiving this event, the client should destroy the object.
 
             Args:
-                tv_sec_hi: high 32 bits of the seconds part of the timestamp
-                tv_sec_lo: low 32 bits of the seconds part of the timestamp
-                tv_nsec: nanoseconds part of the timestamp
+                tv_sec_hi: High 32 bits of the seconds part of the timestamp
+                tv_sec_lo: Low 32 bits of the seconds part of the timestamp
+                tv_nsec: Nanoseconds part of the timestamp
             """
 
             ...
@@ -23711,10 +26286,10 @@ class zwlr_screencopy_frame_v1:
             and a ready event is the total damage since the prior ready event.
 
             Args:
-                x: damaged x coordinates
-                y: damaged y coordinates
-                width: current width
-                height: current height
+                x: Damaged x coordinates
+                y: Damaged y coordinates
+                width: Current width
+                height: Current height
             """
 
             ...
@@ -23729,9 +26304,9 @@ class zwlr_screencopy_frame_v1:
             created if linux-dmabuf buffers are supported.
 
             Args:
-                format: fourcc pixel format
-                width: buffer width
-                height: buffer height
+                format: Fourcc pixel format
+                width: Buffer width
+                height: Buffer height
             """
 
             ...
@@ -23761,7 +26336,11 @@ class zwlr_virtual_pointer_v1:
 
     class error(Enum):
         invalid_axis: int
+        """Client sent invalid axis enumeration value"""
+
         invalid_axis_source: int
+        """Client sent invalid axis source enumeration value"""
+
 
 
     @staticmethod
@@ -23774,9 +26353,9 @@ class zwlr_virtual_pointer_v1:
         Values are in the global compositor space.
 
         Args:
-            time: timestamp with millisecond granularity
-            dx: displacement on the x-axis
-            dy: displacement on the y-axis
+            time: Timestamp with millisecond granularity
+            dx: Displacement on the x-axis
+            dy: Displacement on the y-axis
         """
 
         ...
@@ -23792,11 +26371,11 @@ class zwlr_virtual_pointer_v1:
         to y_extent.
 
         Args:
-            time: timestamp with millisecond granularity
-            x: position on the x-axis
-            y: position on the y-axis
-            x_extent: extent of the x-axis
-            y_extent: extent of the y-axis
+            time: Timestamp with millisecond granularity
+            x: Position on the x-axis
+            y: Position on the y-axis
+            x_extent: Extent of the x-axis
+            y_extent: Extent of the y-axis
         """
 
         ...
@@ -23809,9 +26388,9 @@ class zwlr_virtual_pointer_v1:
         A button was pressed or released.
 
         Args:
-            time: timestamp with millisecond granularity
-            button: button that produced the event
-            state: physical state of the button
+            time: Timestamp with millisecond granularity
+            button: Button that produced the event
+            state: Physical state of the button
         """
 
         ...
@@ -23824,9 +26403,9 @@ class zwlr_virtual_pointer_v1:
         Scroll and other axis requests.
 
         Args:
-            time: timestamp with millisecond granularity
-            axis: axis type
-            value: length of vector in touchpad coordinates
+            time: Timestamp with millisecond granularity
+            axis: Axis type
+            value: Length of vector in touchpad coordinates
         """
 
         ...
@@ -23849,7 +26428,7 @@ class zwlr_virtual_pointer_v1:
         Source information for scroll and other axis.
 
         Args:
-            axis_source: source of the axis event
+            axis_source: Source of the axis event
         """
 
         ...
@@ -23862,8 +26441,8 @@ class zwlr_virtual_pointer_v1:
         Stop notification for scroll and other axes.
 
         Args:
-            time: timestamp with millisecond granularity
-            axis: the axis stopped with this event
+            time: Timestamp with millisecond granularity
+            axis: The axis stopped with this event
         """
 
         ...
@@ -23879,19 +26458,17 @@ class zwlr_virtual_pointer_v1:
         event with discrete value.
 
         Args:
-            time: timestamp with millisecond granularity
-            axis: axis type
-            value: length of vector in touchpad coordinates
-            discrete: number of steps
+            time: Timestamp with millisecond granularity
+            axis: Axis type
+            value: Length of vector in touchpad coordinates
+            discrete: Number of steps
         """
 
         ...
 
     @staticmethod
     def destroy() -> None:
-        """
-        Destroy the virtual pointer object
-        """
+        """Destroy the virtual pointer object"""
 
         ...
 
@@ -23921,9 +26498,7 @@ class zwlr_virtual_pointer_manager_v1:
 
     @staticmethod
     def destroy() -> None:
-        """
-        Destroy the virtual pointer manager
-        """
+        """Destroy the virtual pointer manager"""
 
         ...
 

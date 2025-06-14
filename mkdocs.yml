@@ -68,6 +68,7 @@ plugins:
 - section-index
 - mkdocstrings:
     default_handler: python
+    custom_templates: ./docs/.overrides/templates
     handlers:
       python:
         paths: ["."]
@@ -78,7 +79,10 @@ plugins:
           docstring_options:
             ignore_init_summary: true
           docstring_section_style: list
-          filters: public
+          filters:
+            - "!^_"
+            - "!object_id"
+            - "!version"
           heading_level: 1
           inherited_members: true
           line_length: 88
@@ -101,10 +105,12 @@ plugins:
             attributes: false
             functions: true
             modules: false
-            classes: true
+            classes: false
           unwrap_annotated: true
-          show_submodules: false
-          show_if_no_docstring: false
+          show_submodules: true
+          show_if_no_docstring: true
+          extensions:
+          - scripts/griffe-ext.py:EnumExtension
 
 - minify:
     minify_html: true
@@ -122,6 +128,7 @@ markdown_extensions:
     strip_period: no
 - footnotes
 - md_in_html
+- tables
 - pymdownx.blocks.admonition
 - pymdownx.blocks.details
 - pymdownx.blocks.tab:
@@ -152,4 +159,4 @@ markdown_extensions:
     custom_checkbox: true
 - toc:
     permalink: "¤"
-    toc_depth: 4
+    toc_depth: 3

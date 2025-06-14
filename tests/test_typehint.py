@@ -49,7 +49,7 @@ class TestTypeHinter(unittest.TestCase):
     def test_indent_with_comment_true(self):
         input_string = "This is a test"
         result = TypeHinter.indent(input_string, 1, comment=True)
-        expected = '    """\n    This is a test\n    """\n'
+        expected = '    """This is a test"""\n'
         assert result == expected
 
     def test_indent_with_comment_false(self):
@@ -89,7 +89,7 @@ class TestTypeHinter(unittest.TestCase):
 
         result = self.type_hinter._create_class_declaration(class_name, details)
 
-        expected = 'class TestClass:\n    """\n    Test class description\n    """\n    object_id = 0\n    version = 2\n\n'
+        expected = 'class TestClass:\n    """Test class description"""\n    object_id = 0\n    version = 2\n\n'
         assert result == expected
 
     def test_apply_simple_type_mapping(self):
